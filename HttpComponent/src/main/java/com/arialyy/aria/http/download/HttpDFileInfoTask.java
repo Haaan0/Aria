@@ -19,7 +19,6 @@ import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.Process;
 import android.text.TextUtils;
-import android.util.Log;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.RequestEnum;
@@ -208,6 +207,17 @@ final class HttpDFileInfoTask implements IInfoTask, Runnable {
     } else if (code == HttpURLConnection.HTTP_OK) {
       String contentType = conn.getHeaderField("Content-Type");
       if (TextUtils.isEmpty(contentType)) {
+        if (!checkLen(len) && !isChunked) {
+          if (len < 0) {
+            failDownload(
+                new AriaHTTPException(String.format("任务下载失败，文件长度小于0， url: %s", mEntity.getUrl())),
+                false);
+          }
+          return;
+        }
+        mEntity.setFileSize(len);
+        mTaskWrapper.setSupportBP(true);
+        doNext(code, isChunked);
         return;
       }
       if (contentType.equals("text/html")) {
@@ -254,15 +264,19 @@ final class HttpDFileInfoTask implements IInfoTask, Runnable {
           String.format("任务下载失败，errorCode：%s, errorMsg: %s, url: %s", code,
               conn.getResponseMessage(), mEntity.getUrl())), !CheckUtil.httpIsBadRequest(code));
     }
+    if (end) {
+      doNext(code, isChunked);
+    }
+  }
+
+  private void doNext(int code, boolean isChunked) {
     if (isStop || isCancel) {
       return;
     }
-    if (end) {
-      taskOption.setChunked(isChunked);
-      CompleteInfo info = new CompleteInfo(code, mTaskWrapper);
-      callback.onSucceed(mEntity.getUrl(), info);
-      mEntity.update();
-    }
+    taskOption.setChunked(isChunked);
+    CompleteInfo info = new CompleteInfo(code, mTaskWrapper);
+    callback.onSucceed(mEntity.getUrl(), info);
+    mEntity.update();
   }
 
   /**

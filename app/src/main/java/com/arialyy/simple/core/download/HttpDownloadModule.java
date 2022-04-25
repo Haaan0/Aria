@@ -51,7 +51,8 @@ public class HttpDownloadModule extends BaseViewModule {
     //String url = AppUtil.getConfigValue(context, HTTP_URL_KEY, defUrl);
     //String url = "http://fdfs.speedata.cn:9989/group1/M00/00/05/rBGFrl3fdAKAVJwfMtSa9R18wLU139.zip";
     //String url = "http://9.9.9.28:8088/files/update.zip";
-    String url = "https://y.qq.com/download/import/QQMusic-import-1.2.1.zip";
+    //String url = "https://y.qq.com/download/import/QQMusic-import-1.2.1.zip";
+    String url = "https://jojopublic.tinman.cn/cc/cc-admin/course/315865800920559616.html?fileName=1463_3337.zip&checksumV2=md5Hex%3D4e42b3aacae4756079f39bbce1295a63";
     //String url = "https://gitee.com/huang-junhua/iptv/raw/master/guonei.m3u8";
     //String url = "http://v.kjjl100.com/kz/zx/cj/2020cjswxdb/1.mp4";
     //String url = "https://static.runoob.com/images/demo/demo2.jpg";

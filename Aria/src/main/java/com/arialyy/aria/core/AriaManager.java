@@ -56,7 +56,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by lyy on 2016/12/1. https://github.com/AriaLyy/Aria
  * Aria管理器，任务操作在这里执行
  */
-@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH) public class AriaManager {
+ public class AriaManager {
   private static final String TAG = "AriaManager";
   private static final Object LOCK = new Object();
 

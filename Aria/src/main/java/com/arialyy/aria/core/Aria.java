@@ -72,7 +72,7 @@ import com.arialyy.aria.util.CommonUtil;
  *
  * </pre>
  */
-@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) public class Aria {
+public class Aria {
 
   private Aria() {
   }

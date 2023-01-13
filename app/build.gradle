@@ -4,13 +4,13 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
+  compileSdkVersion libs.versions.compilesdk.get().toInteger()
+  buildToolsVersion libs.versions.buildToolsVersion.get()
 
   defaultConfig {
     applicationId "com.arialyy.simple"
-    minSdkVersion rootProject.ext.minSdkVersion
-    targetSdkVersion rootProject.ext.targetSdkVersion
+    minSdkVersion libs.versions.minSdk.get().toInteger()
+    targetSdkVersion libs.versions.targetsdk.get().toInteger()
     versionCode 1
     versionName "1.0"
     multiDexEnabled true

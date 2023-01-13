@@ -1,13 +1,15 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+plugins {
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
+}
 
 android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
+  compileSdkVersion libs.versions.compilesdk.get().toInteger()
+  buildToolsVersion libs.versions.buildToolsVersion.get()
 
   defaultConfig {
-    minSdkVersion rootProject.ext.minSdkVersion
-    targetSdkVersion rootProject.ext.targetSdkVersion
+    minSdkVersion libs.versions.minSdk.get().toInteger()
+    targetSdkVersion libs.versions.targetsdk.get().toInteger()
     versionCode rootProject.ext.versionCode
     versionName rootProject.ext.versionName
 

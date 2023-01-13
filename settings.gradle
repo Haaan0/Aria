@@ -1,2 +1,26 @@
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    google()
+    mavenCentral()
+    mavenLocal()
+  }
+}
+enableFeaturePreview('VERSION_CATALOGS')
+dependencyResolutionManagement {
+  repositories {
+    google()
+    mavenCentral()
+    mavenLocal()
+  }
+
+  versionCatalogs {
+    libs {
+      from(files("libs.versions.toml"))
+    }
+  }
+}
+
+
 include ':app', ':Aria', ':AriaAnnotations', ':AriaCompiler', ':AppFrame', ':HttpComponent', ':M3U8Component', ':SFtpComponent',
     ':FtpComponent', ':PublicComponent'

@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
+  compileSdkVersion libs.versions.compilesdk.get().toInteger()
+  buildToolsVersion libs.versions.buildToolsVersion.get()
 
   defaultConfig {
-    minSdkVersion rootProject.ext.minSdkVersion
-    targetSdkVersion rootProject.ext.targetSdkVersion
+    minSdkVersion libs.versions.minSdk.get().toInteger()
+    targetSdkVersion libs.versions.targetsdk.get().toInteger()
     versionCode 1
     versionName "1.0"
 

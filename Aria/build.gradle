@@ -1,12 +1,15 @@
-apply plugin: 'com.android.library'
+plugins {
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
+}
 
 android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
+  compileSdkVersion libs.versions.compilesdk.get().toInteger()
+  buildToolsVersion libs.versions.buildToolsVersion.get()
 
   defaultConfig {
-    minSdkVersion rootProject.ext.minSdkVersion
-    targetSdkVersion rootProject.ext.targetSdkVersion
+    minSdkVersion libs.versions.minSdk.get().toInteger()
+    targetSdkVersion libs.versions.targetsdk.get().toInteger()
     versionCode rootProject.ext.versionCode
     versionName rootProject.ext.versionName
   }
@@ -25,8 +28,8 @@ android {
 }
 dependencies {
   implementation fileTree(include: ['*.jar'], dir: 'libs')
-  testImplementation 'junit:junit:4.12'
-//  implementation "androidx.appcompat:appcompat:${rootProject.ext.XAppcompatVersion}"
+  testImplementation(libs.bundles.android.test)
+  implementation(libs.appcompat)
   api project(path: ':AriaAnnotations')
   api project(path: ':PublicComponent')
   api project(path: ':HttpComponent')

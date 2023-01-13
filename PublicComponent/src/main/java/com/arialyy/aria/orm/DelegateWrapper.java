@@ -29,12 +29,14 @@ public class DelegateWrapper {
 
   private SQLiteDatabase mDb;
   private DelegateManager mDManager;
+  private Context context;
 
   private DelegateWrapper() {
 
   }
 
   private DelegateWrapper(Context context) {
+    this.context = context.getApplicationContext();
     SqlHelper helper = SqlHelper.init(context.getApplicationContext());
     mDb = helper.getDb();
     mDManager = DelegateManager.getInstance();
@@ -106,21 +108,21 @@ public class DelegateWrapper {
    * 删除某条数据
    */
   <T extends DbEntity> void delData(Class<T> clazz, String... expression) {
-    mDManager.getDelegate(DelegateUpdate.class).delData(mDb, clazz, expression);
+    mDManager.getDelegate(DelegateDel.class).delData(context, clazz, expression);
   }
 
   /**
    * 修改某行数据
    */
   void updateData(DbEntity dbEntity) {
-    mDManager.getDelegate(DelegateUpdate.class).updateData(mDb, dbEntity);
+    mDManager.getDelegate(DelegateUpdate.class).updateData(context, dbEntity);
   }
 
   /**
    * 更新多条数据
    */
   <T extends DbEntity> void updateManyData(List<T> dbEntitys) {
-    mDManager.getDelegate(DelegateUpdate.class).updateManyData(mDb, dbEntitys);
+    mDManager.getDelegate(DelegateUpdate.class).updateManyData(context, dbEntitys);
   }
 
   /**
@@ -178,14 +180,14 @@ public class DelegateWrapper {
    * 插入数据
    */
   void insertData(DbEntity dbEntity) {
-    mDManager.getDelegate(DelegateUpdate.class).insertData(mDb, dbEntity);
+    mDManager.getDelegate(DelegateInsert.class).insertData(context, dbEntity);
   }
 
   /**
    * 插入多条数据
    */
   <T extends DbEntity> void insertManyData(List<T> dbEntitys) {
-    mDManager.getDelegate(DelegateUpdate.class).insertManyData(mDb, dbEntitys);
+    mDManager.getDelegate(DelegateInsert.class).insertManyData(context, dbEntitys);
   }
 
   /**

@@ -21,7 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 /**
  * Created by laoyuyu on 2018/3/22.
  */
-abstract class AbsDelegate {
+public abstract class AbsDelegate {
   static final String TAG = "AbsDelegate";
 
   void closeCursor(Cursor cursor) {

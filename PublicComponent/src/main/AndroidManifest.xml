@@ -2,4 +2,11 @@
     package="com.arialyy.aria.publiccomponent" >
 
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+  <application>
+    <provider
+        android:authorities="${applicationId}.com.arialyy.aria.provider"
+        android:name="com.arialyy.aria.orm.DbContentProvider"
+        android:exported="false" />
+  </application>
 </manifest>

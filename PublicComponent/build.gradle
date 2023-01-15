@@ -1,6 +1,7 @@
 plugins {
   id 'com.android.library'
   id 'org.jetbrains.kotlin.android'
+  id 'kotlin-kapt'
 }
 
 android {
@@ -10,17 +11,12 @@ android {
   defaultConfig {
     minSdkVersion libs.versions.minSdk.get().toInteger()
     targetSdkVersion libs.versions.targetsdk.get().toInteger()
-    versionCode rootProject.ext.versionCode
-    versionName rootProject.ext.versionName
 
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles 'consumer-rules.pro'
   }
 
   buildTypes {
-    debug{
-      debuggable true
-    }
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -35,9 +31,11 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  testImplementation 'junit:junit:4.12'
-  implementation "androidx.core:core-ktx:+"
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  testImplementation(libs.bundles.android.test)
+  implementation(libs.appcompat)
+  implementation(libs.bundles.room)
+  implementation(libs.startup)
+  kapt libs.room.compiler
 }
 
 //apply from: 'bintray-release.gradle'
@@ -45,6 +43,3 @@ ext{
   PUBLISH_ARTIFACT_ID = 'public'
 }
 apply from: '../gradle/mavenCentral-release.gradle'
-repositories {
-  mavenCentral()
-}

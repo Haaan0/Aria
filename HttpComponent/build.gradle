@@ -10,16 +10,11 @@ android {
   defaultConfig {
     minSdkVersion libs.versions.minSdk.get().toInteger()
     targetSdkVersion libs.versions.targetsdk.get().toInteger()
-    versionCode rootProject.ext.versionCode
-    versionName rootProject.ext.versionName
 
     consumerProguardFiles 'consumer-rules.pro'
   }
 
   buildTypes {
-    debug{
-      debuggable true
-    }
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

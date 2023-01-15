@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -90,7 +89,4 @@ dependencies {
 //    implementation 'com.arialyy.aria:m3u8Component:3.8.12' // 如果需要使用m3u8下载功能，请增加该组件
 
   debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
-}
-repositories {
-  mavenCentral()
 }

@@ -9,15 +9,10 @@ android {
   defaultConfig {
     minSdkVersion libs.versions.minSdk.get().toInteger()
     targetSdkVersion libs.versions.targetsdk.get().toInteger()
-    versionCode 1
-    versionName "1.0"
 
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
-    debug{
-      debuggable true
-    }
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -37,8 +32,8 @@ dependencies {
   androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
     exclude group: 'com.android.support', module: 'support-annotations'
   })
-  testImplementation 'junit:junit:4.12'
-  api "androidx.appcompat:appcompat:${rootProject.ext.XAppcompatVersion}"
+  testImplementation libs.bundles.android.test
+  implementation(libs.appcompat)
   api 'com.google.code.gson:gson:2.8.2'
   api 'io.reactivex:rxandroid:1.2.0'
   api 'io.reactivex:rxjava:1.1.5'

@@ -3,24 +3,37 @@ pluginManagement {
     gradlePluginPortal()
     google()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
     mavenLocal()
+    maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
   }
 }
+
 enableFeaturePreview('VERSION_CATALOGS')
 dependencyResolutionManagement {
+  //  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
   repositories {
     google()
     mavenCentral()
     mavenLocal()
+    maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+    maven { url 'https://jitpack.io' }
+    maven {
+      url 'https://pkgs.dev.azure.com/MicrosoftDeviceSDK/DuoSDK-Public/_packaging/Duo-SDK-Feed/maven/v1'
+    }
   }
 
   versionCatalogs {
     libs {
-      from(files("libs.versions.toml"))
+      //      from("com.lyy.kpa.version:catalog:0.0.1")
+      from(files('libs.versions.toml'))
+      // 我们也可以重写覆盖catalog中的groovy版本
+      //      version("groovy", "3.0.6")
     }
   }
-}
 
+}
 
 include ':app', ':Aria', ':AriaAnnotations', ':AriaCompiler', ':AppFrame', ':HttpComponent', ':M3U8Component', ':SFtpComponent',
     ':FtpComponent', ':PublicComponent'
+rootProject.name='Aria'

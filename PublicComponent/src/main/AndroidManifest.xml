@@ -1,12 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.arialyy.aria.publiccomponent" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.arialyy.aria.publiccomponent">
 
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
   <application>
+
     <provider
-        android:authorities="${applicationId}.com.arialyy.aria.provider"
-        android:name="com.arialyy.aria.orm.DbContentProvider"
-        android:exported="false" />
+        android:name="androidx.startup.InitializationProvider"
+        android:authorities="${applicationId}.androidx-startup"
+        android:exported="false"
+        tools:node="merge">
+      <!-- This entry makes ExampleLoggerInitializer discoverable. -->
+      <meta-data  android:name="com.arialyy.aria.core.DuaStartupProvider"
+          android:value="androidx.startup" />
+    </provider>
   </application>
 </manifest>

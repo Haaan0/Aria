@@ -16,12 +16,28 @@
 package com.arialyy.aria.core.provider
 
 import android.content.Context
-import androidx.room.RoomDatabase
-import com.arialyy.aria.orm.DuaDb
+import androidx.startup.Initializer
+import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.service.DbService
+import timber.log.Timber
+import timber.log.Timber.DebugTree
 
-interface IDbProvider {
+class DuaStartupProvider : Initializer<Unit> {
 
-  fun getDbName() = "duaDb"
+  override fun create(context: Context) {
+    DuaContext.getServiceManager().let {
+      it.registerService(DuaContext.DB_SERVICE, context, DbService::class.java)
+    }
+    initLog()
+  }
 
-  fun <T : DuaDb> generateDb(context: Context): RoomDatabase.Builder<T>
+  private fun initLog() {
+    if (Timber.treeCount == 0) {
+      Timber.plant(DebugTree())
+    }
+  }
+
+  override fun dependencies(): MutableList<Class<out Initializer<*>>> {
+    return mutableListOf()
+  }
 }

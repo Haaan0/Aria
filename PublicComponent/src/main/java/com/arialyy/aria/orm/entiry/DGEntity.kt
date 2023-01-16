@@ -16,24 +16,41 @@
 package com.arialyy.aria.orm.entiry
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.arialyy.aria.orm.DGUrlConverter
 
 /**
- * Download Entity
- */
-@Entity(indices = [Index(value = ["sourceUrl", "savePath"])])
-data class DEntity(
-  @PrimaryKey(autoGenerate = true) val dId: Int = 0,
+ * @Author laoyuyu
+ * @Description
+ * @Date 4:32 PM 2023/1/16
+ **/
+@Entity
+@TypeConverters(DGUrlConverter::class)
+data class DGEntity(
+  @PrimaryKey(autoGenerate = true) val dgId: Int = 0,
 
   /**
-   * file source url
+   * 组合任务等hash为： 为子任务地址相加的url的Md5
+   * ftpdir为：ftpdir下载地址
    */
-  val sourceUrl: String,
+  val groupHash: String,
+
   /**
-   * file save path
+   * 任务组别名
+   */
+  val alias: String? = null,
+
+  /**
+   * 保存路径
    */
   val savePath: String,
+
+  /**
+   * 子任务url地址
+   */
+  val urls: List<String>,
+
   /**
    * extended Information
    */

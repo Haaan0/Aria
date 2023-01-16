@@ -15,18 +15,30 @@
  */
 package com.arialyy.aria.orm
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.arialyy.aria.orm.dao.DEntityDao
-import com.arialyy.aria.orm.dao.UEntityDao
-import com.arialyy.aria.orm.entiry.UEntity
+import androidx.room.ProvidedTypeConverter
+import androidx.room.TypeConverter
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
-@Database(
-  entities = [DbEntity::class, UEntity::class],
-  version = 1
-)
-abstract class DuaDb : RoomDatabase() {
-  abstract fun getDEntityDao(): DEntityDao
+/**
+ * @Author laoyuyu
+ * @Description
+ * @Date 7:24 PM 2023/1/16
+ **/
+@ProvidedTypeConverter
+class DGUrlConverter {
+  private val gson by lazy {
+    Gson()
+  }
 
-  abstract fun getUEntityDao(): UEntityDao
+  @TypeConverter
+  fun stringToList(string: String?): List<String> {
+    if (string.isNullOrEmpty()) return emptyList()
+    return gson.fromJson(string, object : TypeToken<List<String>>() {}.type)
+  }
+
+  @TypeConverter
+  fun listToString(strList: List<String>): String {
+    return gson.toJson(strList)
+  }
 }

@@ -13,20 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.orm
+package com.arialyy.aria.orm.dao
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.arialyy.aria.orm.dao.DEntityDao
-import com.arialyy.aria.orm.dao.UEntityDao
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 import com.arialyy.aria.orm.entiry.UEntity
 
-@Database(
-  entities = [DbEntity::class, UEntity::class],
-  version = 1
-)
-abstract class DuaDb : RoomDatabase() {
-  abstract fun getDEntityDao(): DEntityDao
+/**
+ * @Author laoyuyu
+ * @Description
+ * @Date 19:23 AM 2023/1/16
+ **/
+@Dao
+interface UEntityDao {
+  @Query("SELECT * FROM DEntity WHERE :uId=uId")
+  suspend fun queryUEntityById(uId: String): UEntity
 
-  abstract fun getUEntityDao(): UEntityDao
+  @Query("SELECT * FROM UEntity WHERE :filePath=filePath")
+  suspend fun queryUEntityBySource(filePath: String): UEntity
+
+  @Insert
+  suspend fun insert(uEntity: UEntity)
+
+  @Update
+  suspend fun update(uEntity: UEntity)
+
+  @Delete
+  suspend fun delete(uEntity: UEntity)
 }

@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core
+package com.arialyy.aria.core.service
 
 import android.content.Context
-import androidx.room.Room
-import androidx.room.RoomDatabase
 import androidx.room.RoomDatabase.Builder
-import androidx.startup.Initializer
 import com.arialyy.aria.core.config.AutoGenerateConstance
 import com.arialyy.aria.orm.DefaultDbProvider
+import com.arialyy.aria.orm.DuaDb
 import com.arialyy.aria.util.ReflectionUtil
 
-class DuaStartupProvider : Initializer<Unit> {
+/**
+ * @Author laoyuyu
+ * @Description
+ * @Date 19:36 AM 2023/1/16
+ **/
+open class DbService : IService {
+  private var duaDb: DuaDb? = null
+
   /**
    * Find a user-defined database
    */
-  private fun findCustomDatabase(context: Context): Builder<RoomDatabase>? {
+  private fun findCustomDatabase(context: Context): Builder<DuaDb>? {
     try {
       val clazz = javaClass.classLoader.loadClass(AutoGenerateConstance.GenerateClassName)
         ?: return null
@@ -37,22 +42,24 @@ class DuaStartupProvider : Initializer<Unit> {
 
       val method = ReflectionUtil.getMethod(clazz, "generateDb", Context::class.java) ?: return null
 
-      return method.invoke(obj, context) as Builder<RoomDatabase>?
+      return method.invoke(obj, context) as Builder<DuaDb>?
     } catch (e: java.lang.Exception) {
       return null
     }
   }
 
-  override fun create(context: Context) {
+  // fun findDEntity(dId: Int): DEntity? {
+  //   if (duaDb == null) {
+  //     return null
+  //   }
+  // }
+
+  override fun init(context: Context) {
     var customDb = findCustomDatabase(context)
     if (customDb == null) {
       customDb = DefaultDbProvider().generateDb(context)
     }
-    customDb.build()
-    // .addMigrations(MIGRATION_2_3(), MIGRATION_3_4())
-  }
-
-  override fun dependencies(): MutableList<Class<out Initializer<*>>> {
-    return mutableListOf()
+    duaDb = customDb
+      .build()
   }
 }

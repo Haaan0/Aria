@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.provider
+package com.arialyy.aria.core.service
 
 import android.content.Context
-import androidx.room.RoomDatabase
-import com.arialyy.aria.orm.DuaDb
 
-interface IDbProvider {
+/**
+ * @Author laoyuyu
+ * @Description
+ * @Date 19:34 AM 2023/1/16
+ **/
+internal interface IService {
 
-  fun getDbName() = "duaDb"
-
-  fun <T : DuaDb> generateDb(context: Context): RoomDatabase.Builder<T>
+  fun init(context: Context)
 }

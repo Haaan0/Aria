@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.provider
+package com.arialyy.aria.core
 
-import android.content.Context
-import androidx.room.RoomDatabase
-import com.arialyy.aria.orm.DuaDb
+import android.annotation.SuppressLint
+import com.arialyy.aria.core.service.ServiceManager
 
-interface IDbProvider {
+/**
+ * @Author laoyuyu
+ * @Description
+ * @Date 10:40 AM 2023/1/16
+ **/
+@SuppressLint("StaticFieldLeak")
+internal object DuaContext {
+  const val DB_SERVICE = "DB_SERVICE"
 
-  fun getDbName() = "duaDb"
+  private val serviceArray = arrayOf(DB_SERVICE)
 
-  fun <T : DuaDb> generateDb(context: Context): RoomDatabase.Builder<T>
+  fun isService(serviceName: String) = serviceName in serviceArray
+
+  fun getServiceManager() = ServiceManager
 }

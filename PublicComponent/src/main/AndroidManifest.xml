@@ -12,7 +12,7 @@
         android:exported="false"
         tools:node="merge">
       <!-- This entry makes ExampleLoggerInitializer discoverable. -->
-      <meta-data  android:name="com.arialyy.aria.core.DuaStartupProvider"
+      <meta-data  android:name="com.arialyy.aria.core.provider.DuaStartupProvider"
           android:value="androidx.startup" />
     </provider>
   </application>

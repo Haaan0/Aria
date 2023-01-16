@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.provider
+package com.arialyy.aria.orm.entiry
 
-import android.content.Context
-import androidx.room.RoomDatabase
-import com.arialyy.aria.orm.DuaDb
+import androidx.room.Embedded
+import androidx.room.Relation
 
-interface IDbProvider {
-
-  fun getDbName() = "duaDb"
-
-  fun <T : DuaDb> generateDb(context: Context): RoomDatabase.Builder<T>
-}
+data class DGSubList(
+  @Embedded val dgEntity: DGEntity,
+  @Relation(
+    parentColumn = "dgId",
+    entityColumn = "dId"
+  )
+  val subEntity: List<DEntity>
+)

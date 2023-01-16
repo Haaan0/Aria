@@ -19,7 +19,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "u_entity", indices = [Index(value = ["serverUrl", "filePath"])])
+@Entity(indices = [Index(value = ["serverUrl", "filePath"])])
 data class UEntity(
   @PrimaryKey(autoGenerate = true) val uId: Int = 0,
   /**
@@ -35,5 +35,9 @@ data class UEntity(
   /**
    * extended Information
    */
-  var ext: String? = null
+  var ext: String? = null,
+
+  val createTime: Long,
+
+  val updateTime: Long
 )

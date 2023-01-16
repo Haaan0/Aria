@@ -23,7 +23,7 @@ import com.arialyy.aria.core.provider.IDbProvider
 
 class DefaultDbProvider : IDbProvider {
 
-  override fun <T : RoomDatabase> generateDb(context: Context): Builder<T> {
+  override fun <T : DuaDb> generateDb(context: Context): Builder<T> {
     return Room.databaseBuilder(
       context,
       DuaDb::class.java, getDbName()

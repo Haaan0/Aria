@@ -12,6 +12,8 @@ android-espresso = "3.5.0"
 android-ktx = "1.7.0"
 lifecycle = "2.5.1"
 startup = "1.1.1"
+timber = "5.0.1"
+gson = "2.10.1"
 
 
 [libraries]
@@ -28,6 +30,8 @@ lifecycle-viewmodel-ktx = {module = "androidx.lifecycle:lifecycle-viewmodel-ktx"
 lifecycle-viewmodel-compose = {module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle"}
 lifecycle-runtime-ktx =  {module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle"}
 startup = {module = "androidx.startup:startup-runtime", version.ref = "startup"}
+timber = {module = "com.jakewharton.timber:timber", version.ref = "timber"}
+gson = {module = "com.google.code.gson:gson", version.ref = "gson"}
 
 [bundles]
 room = ["room-runtime", "room-common"]

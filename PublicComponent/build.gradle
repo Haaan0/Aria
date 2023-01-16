@@ -35,6 +35,8 @@ dependencies {
   implementation(libs.appcompat)
   implementation(libs.bundles.room)
   implementation(libs.startup)
+  implementation(libs.timber)
+  implementation(libs.gson)
   kapt libs.room.compiler
 }
 

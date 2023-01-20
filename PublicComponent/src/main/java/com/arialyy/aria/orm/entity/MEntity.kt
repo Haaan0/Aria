@@ -18,6 +18,10 @@ package com.arialyy.aria.orm.entity
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.orm.DuaDb
+import timber.log.Timber
+import java.util.TimeZone
 
 @Entity(indices = [Index(value = ["sourceUrl", "savePath"])])
 data class MEntity(
@@ -58,4 +62,15 @@ data class MEntity(
    */
   val cacheDir: String? = null
 
-)
+) {
+  fun hasKey() = keyId != -1
+
+  suspend fun getKeyInfo(): MKeyInfo? {
+    if (!hasKey()) {
+      Timber.w("no key info")
+      return null
+    }
+    return DuaContext.getServiceManager().getDbService().getDuaDb()?.getMEntityDao()
+      ?.getKeyInfoByKId(keyId)
+  }
+}

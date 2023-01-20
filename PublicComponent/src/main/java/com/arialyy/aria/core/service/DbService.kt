@@ -27,7 +27,7 @@ import com.arialyy.aria.util.ReflectionUtil
  * @Description
  * @Date 19:36 AM 2023/1/16
  **/
-internal class DbService : IService {
+class DbService : IService {
   private var duaDb: DuaDb? = null
 
   /**
@@ -48,11 +48,7 @@ internal class DbService : IService {
     }
   }
 
-  // fun findDEntity(dId: Int): DEntity? {
-  //   if (duaDb == null) {
-  //     return null
-  //   }
-  // }
+  fun getDuaDb() = duaDb
 
   override fun init(context: Context) {
     var customDb = findCustomDatabase(context)

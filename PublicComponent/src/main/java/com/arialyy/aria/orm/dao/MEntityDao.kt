@@ -13,25 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core
+package com.arialyy.aria.orm.dao
 
-import android.annotation.SuppressLint
-import com.arialyy.aria.core.service.ServiceManager
-import kotlinx.coroutines.MainScope
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
+import com.arialyy.aria.orm.entity.MEntity
+import com.arialyy.aria.orm.entity.MKeyInfo
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 10:40 AM 2023/1/16
+ * @Date 10:23 AM 2023/1/120
  **/
-@SuppressLint("StaticFieldLeak")
-internal object DuaContext {
-  const val DB_SERVICE = "DB_SERVICE"
+@Dao
+interface MEntityDao {
 
-  private val serviceArray = arrayOf(DB_SERVICE)
-  val duaScope = MainScope()
+  @Query("SELECT * FROM MEntity WHERE :savePath=savePath")
+  suspend fun getMEntityByPath(savePath: String): MEntity
 
-  fun isService(serviceName: String) = serviceName in serviceArray
+  @Update
+  suspend fun update(entity: MEntity)
 
-  fun getServiceManager() = ServiceManager
+  @Insert
+  suspend fun insert(entity: MEntity)
+
+  @Delete
+  suspend fun delete(entity: MEntity)
+
+  @Query("SELECT * FROM MKeyInfo WHERE :kId=kId")
+  suspend fun getKeyInfoByKId(kId: Int): MKeyInfo
 }

@@ -26,7 +26,7 @@ import com.arialyy.aria.orm.entity.DEntity
 /**
  * @Author laoyuyu
  * @Description
- * @Date 19:23 AM 2023/1/16
+ * @Date 7:23 AM 2023/1/16
  **/
 @Dao
 interface DEntityDao {

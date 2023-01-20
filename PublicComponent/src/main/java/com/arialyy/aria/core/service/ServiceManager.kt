@@ -46,11 +46,11 @@ object ServiceManager {
   /**
    * get datebase service, if already [registerService] custom service, return custom service
    */
-  fun getDbService(serviceName: String): DbService {
-    if (!DuaContext.isService(serviceName)) {
-      throw AriaException("$serviceName Not a service.")
+  fun getDbService(): DbService {
+    if (!DuaContext.isService(DuaContext.DB_SERVICE)) {
+      throw AriaException("${DuaContext.DB_SERVICE} Not a service.")
     }
-    return (serviceCache[serviceName]
-      ?: throw AriaException("service not found: $serviceName")) as DbService
+    return (serviceCache[DuaContext.DB_SERVICE]
+      ?: throw AriaException("service not found: ${DuaContext.DB_SERVICE}")) as DbService
   }
 }

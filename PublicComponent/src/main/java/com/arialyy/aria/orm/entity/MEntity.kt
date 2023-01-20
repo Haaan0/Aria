@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.orm.entiry
+package com.arialyy.aria.orm.entity
 
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/**
- * Download Entity
- */
 @Entity(indices = [Index(value = ["sourceUrl", "savePath"])])
-data class DEntity(
-  @PrimaryKey(autoGenerate = true) val dId: Int = 0,
+data class MEntity(
+  @PrimaryKey(autoGenerate = true) val mId: Int = 0,
+
+  val keyId: Int = -1,
 
   /**
    * file source url
@@ -39,7 +38,24 @@ data class DEntity(
    */
   var ext: String? = null,
 
-  val createTime: Long,
+  /**
+   * 当前peer的位置
+   */
+  val peerIndex: Int = 0,
 
-  val updateTime: Long
+  /**
+   * peer总数
+   */
+  private var peerNum: Int = 0,
+
+  /**
+   * 是否是直播，true 直播
+   */
+  val isLive: Boolean = false,
+
+  /**
+   * 缓存目录
+   */
+  val cacheDir: String? = null
+
 )

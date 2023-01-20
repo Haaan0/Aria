@@ -13,16 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.orm.entiry
+package com.arialyy.aria.orm.entity
 
-import androidx.room.Embedded
-import androidx.room.Relation
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
-data class DGSubList(
-  @Embedded val dgEntity: DGEntity,
-  @Relation(
-    parentColumn = "dgId",
-    entityColumn = "dId"
-  )
-  val subEntity: List<DEntity>
+/**
+ * Download Entity
+ */
+@Entity(indices = [Index(value = ["sourceUrl", "savePath"])])
+data class DEntity(
+  @PrimaryKey(autoGenerate = true) val did: Int = 0,
+
+  val parentId: Int = -1,
+
+  /**
+   * file source url
+   */
+  val sourceUrl: String,
+  /**
+   * file save path
+   */
+  val savePath: String,
+  /**
+   * extended Information
+   */
+  var ext: String? = null,
+
+  val isSub: Boolean = false,
+
+  val createTime: Long,
+
+  val updateTime: Long
 )

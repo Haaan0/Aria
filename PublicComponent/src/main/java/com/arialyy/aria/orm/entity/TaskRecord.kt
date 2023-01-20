@@ -13,31 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.orm.entiry
+package com.arialyy.aria.orm.entity
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(indices = [Index(value = ["serverUrl", "filePath"])])
-data class UEntity(
-  @PrimaryKey(autoGenerate = true) val uId: Int = 0,
-  /**
-   * uploader server url
-   */
-  val serverUrl: String,
-
-  /**
-   * file path
-   */
+@Entity(indices = [Index(value = ["taskKey"])])
+data class TaskRecord(
+  @PrimaryKey(autoGenerate = true) val tId: Int = 0,
+  val taskKey: String,
   val filePath: String,
-
-  /**
-   * extended Information
-   */
-  var ext: String? = null,
-
-  val createTime: Long,
-
-  val updateTime: Long
-)
+  val taskType: Int,
+  val fileLen: Long,
+  val blockNum: Int,
+  val blockSize: Long
+) {
+  @Ignore
+  internal var blockList: MutableList<BlockRecord> = mutableListOf()
+}

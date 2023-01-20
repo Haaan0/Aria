@@ -27,7 +27,7 @@ import com.arialyy.aria.util.ReflectionUtil
  * @Description
  * @Date 19:36 AM 2023/1/16
  **/
-open class DbService : IService {
+internal class DbService : IService {
   private var duaDb: DuaDb? = null
 
   /**

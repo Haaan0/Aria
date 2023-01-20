@@ -19,8 +19,9 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
-import com.arialyy.aria.orm.entiry.DEntity
+import com.arialyy.aria.orm.entity.DEntity
 
 /**
  * @Author laoyuyu
@@ -29,11 +30,16 @@ import com.arialyy.aria.orm.entiry.DEntity
  **/
 @Dao
 interface DEntityDao {
+
+  @Transaction
+  @Query("SELECT * FROM DEntity")
+  suspend fun getDEntityList():List<DEntity>
+
   @Query("SELECT * FROM DEntity WHERE :dId=dId")
-  suspend fun queryDEntityById(dId: String): DEntity
+  suspend fun getDEntityById(did: String): DEntity
 
   @Query("SELECT * FROM DEntity WHERE :sourceUrl=sourceUrl")
-  suspend fun queryDEntityBySource(sourceUrl: String): DEntity
+  suspend fun getDEntityBySource(sourceUrl: String): DEntity
 
   @Insert
   suspend fun insert(dEntity: DEntity)

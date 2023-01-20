@@ -13,50 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.orm.entiry
+package com.arialyy.aria.orm.entity
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.arialyy.aria.orm.DGUrlConverter
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 4:32 PM 2023/1/16
+ * @Date 10:16 AM 2023/1/19
  **/
-@Entity
-@TypeConverters(DGUrlConverter::class)
-data class DGEntity(
-  @PrimaryKey(autoGenerate = true) val dgId: Int = 0,
+@Entity(
+  foreignKeys = [ForeignKey(
+    entity = TaskRecord::class,
+    parentColumns = ["tId"],
+    childColumns = ["tId"],
+    onDelete = CASCADE
+  )]
+)
+data class BlockRecord(
+  @PrimaryKey(autoGenerate = true) val bId: Int = 0,
+
+  val tId: Int,
 
   /**
-   * 组合任务等hash为： 为子任务地址相加的url的Md5
-   * ftpdir为：ftpdir下载地址
+   * 开始位置
    */
-  val groupHash: String,
+  val startLocation: Long = 0,
 
   /**
-   * 任务组别名
+   * 结束位置
    */
-  val alias: String? = null,
+  val endLocation: Long = 0,
 
-  /**
-   * 保存路径
-   */
-  val savePath: String,
+  val blockSize: Long = 0,
 
-  /**
-   * 子任务url地址
-   */
-  val urls: List<String>,
-
-  /**
-   * extended Information
-   */
-  var ext: String? = null,
-
-  val createTime: Long,
-
-  val updateTime: Long
+  val isComplete: Boolean = false
 )

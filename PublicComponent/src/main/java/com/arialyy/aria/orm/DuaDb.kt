@@ -19,10 +19,14 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.arialyy.aria.orm.dao.DEntityDao
 import com.arialyy.aria.orm.dao.UEntityDao
-import com.arialyy.aria.orm.entiry.UEntity
+import com.arialyy.aria.orm.entity.BlockRecord
+import com.arialyy.aria.orm.entity.DGEntity
+import com.arialyy.aria.orm.entity.MEntity
+import com.arialyy.aria.orm.entity.TaskRecord
+import com.arialyy.aria.orm.entity.UEntity
 
 @Database(
-  entities = [DbEntity::class, UEntity::class],
+  entities = [DbEntity::class, UEntity::class, DGEntity::class, MEntity::class, TaskRecord::class, BlockRecord::class],
   version = 1
 )
 abstract class DuaDb : RoomDatabase() {

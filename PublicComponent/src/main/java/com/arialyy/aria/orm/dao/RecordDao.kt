@@ -21,32 +21,47 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.arialyy.aria.orm.entity.UEntity
+import com.arialyy.aria.orm.entity.BlockRecord
+import com.arialyy.aria.orm.entity.RecordRelation
+import com.arialyy.aria.orm.entity.TaskRecord
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 19:23 AM 2023/1/16
+ * @Date 10:34 AM 2023/1/19
  **/
 @Dao
-interface UEntityDao {
+interface RecordDao {
 
   @Transaction
-  @Query("SELECT * FROM DEntity")
-  suspend fun getUEntityList(): List<UEntity>
-
-  @Query("SELECT * FROM DEntity WHERE :uId=uId")
-  suspend fun getUEntityById(uId: String): UEntity
-
-  @Query("SELECT * FROM UEntity WHERE :filePath=filePath")
-  suspend fun getUEntityBySource(filePath: String): UEntity
+  @Query("SELECT * FROM TaskRecord WHERE :key=taskKey")
+  suspend fun getTaskRecordByKey(key: String): RecordRelation
 
   @Insert
-  suspend fun insert(uEntity: UEntity)
+  @Deprecated(
+    "please use ",
+    ReplaceWith(
+      "deleteTaskRecord(taskRecord)",
+      "com.arialyy.aria.orm.dao.RecordDao.insert"
+    )
+  )
+  suspend fun insertTaskRecord(taskRecord: TaskRecord)
+
+  @Insert
+  suspend fun insertSubList(blockList: List<BlockRecord>)
 
   @Update
-  suspend fun update(uEntity: UEntity)
+  suspend fun update(record: TaskRecord)
 
   @Delete
-  suspend fun delete(uEntity: UEntity)
+  suspend fun deleteTaskRecord(record: TaskRecord)
+
+  @Delete
+  suspend fun deleteBlockRecord(blockRecord: List<BlockRecord>)
+
+  @Transaction
+  suspend fun insert(taskRecord: TaskRecord) {
+    insertTaskRecord(taskRecord)
+    insertSubList(taskRecord.blockList)
+  }
 }

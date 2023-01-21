@@ -13,26 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core
-
-import android.annotation.SuppressLint
-import com.arialyy.aria.core.service.ServiceManager
-import kotlinx.coroutines.MainScope
+package com.arialyy.aria.core.inf
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 10:40 AM 2023/1/16
+ * @Date 11:34 AM 2023/1/20
  **/
-@SuppressLint("StaticFieldLeak")
-internal object DuaContext {
-  const val DB_SERVICE = "DB_SERVICE"
-
-  private val serviceArray = arrayOf(DB_SERVICE)
-  val duaScope = MainScope()
-
-  fun isService(serviceName: String) = serviceName in serviceArray
-
-  fun getServiceManager() = ServiceManager
-
+interface IDuaReceiver {
 }

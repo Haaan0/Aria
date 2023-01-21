@@ -26,22 +26,22 @@ android {
   lintOptions {
     abortOnError false
   }
-
 }
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
+  api project(path: ':AriaAnnotations')
   testImplementation(libs.bundles.android.test)
   implementation(libs.appcompat)
   implementation(libs.bundles.room)
   implementation(libs.startup)
-  implementation(libs.timber)
+  api(libs.timber)
   implementation(libs.gson)
   kapt libs.room.compiler
 }
 
 //apply from: 'bintray-release.gradle'
-ext{
+ext {
   PUBLISH_ARTIFACT_ID = 'public'
 }
 apply from: '../gradle/mavenCentral-release.gradle'

@@ -25,6 +25,7 @@ dependencies {
   implementation fileTree(include: ['*.jar'], dir: 'libs')
   testImplementation(libs.bundles.android.test)
   implementation(libs.appcompat)
+  implementation(libs.timber)
   api project(path: ':AriaAnnotations')
   api project(path: ':PublicComponent')
   api project(path: ':HttpComponent')

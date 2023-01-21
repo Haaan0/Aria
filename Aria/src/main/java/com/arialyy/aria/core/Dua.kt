@@ -15,24 +15,20 @@
  */
 package com.arialyy.aria.core
 
-import android.annotation.SuppressLint
-import com.arialyy.aria.core.service.ServiceManager
-import kotlinx.coroutines.MainScope
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle.Event
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import com.arialyy.aria.core.common.receiver.LifLifecycleReceiver
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 10:40 AM 2023/1/16
+ * @Date 10:48 AM 2023/1/20
  **/
-@SuppressLint("StaticFieldLeak")
-internal object DuaContext {
-  const val DB_SERVICE = "DB_SERVICE"
+object Dua {
 
-  private val serviceArray = arrayOf(DB_SERVICE)
-  val duaScope = MainScope()
-
-  fun isService(serviceName: String) = serviceName in serviceArray
-
-  fun getServiceManager() = ServiceManager
-
+  fun with(lifecycle: LifecycleOwner): LifLifecycleReceiver {
+    return LifLifecycleReceiver(lifecycle)
+  }
 }

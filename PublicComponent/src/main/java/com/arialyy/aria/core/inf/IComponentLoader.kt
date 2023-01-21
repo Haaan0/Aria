@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core
+package com.arialyy.aria.core.inf
 
-import android.annotation.SuppressLint
-import com.arialyy.aria.core.service.ServiceManager
-import kotlinx.coroutines.MainScope
+import com.arialyy.annotations.TaskEnum
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 10:40 AM 2023/1/16
+ * @Date 10:44 AM 2023/1/20
  **/
-@SuppressLint("StaticFieldLeak")
-internal object DuaContext {
-  const val DB_SERVICE = "DB_SERVICE"
+interface IComponentLoader {
 
-  private val serviceArray = arrayOf(DB_SERVICE)
-  val duaScope = MainScope()
+  companion object {
+    val proxyMethods = arrayOf("download", "upload")
+  }
 
-  fun isService(serviceName: String) = serviceName in serviceArray
+  // fun upload()
 
-  fun getServiceManager() = ServiceManager
+  fun <T : IDownloader> download(): T
 
+  fun getTaskEnum(): TaskEnum
 }

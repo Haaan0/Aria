@@ -28,7 +28,7 @@ dependencies {
   implementation(libs.timber)
   api project(path: ':AriaAnnotations')
   api project(path: ':PublicComponent')
-  api project(path: ':HttpComponent')
+  api project(path: ':Http')
 }
 
 //apply from: 'bintray-release.gradle'

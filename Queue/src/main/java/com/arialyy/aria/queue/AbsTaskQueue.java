@@ -17,6 +17,7 @@
 package com.arialyy.aria.queue;
 
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.IPool;
 import com.arialyy.aria.core.inf.ITaskQueue;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.manager.ThreadTaskManager;

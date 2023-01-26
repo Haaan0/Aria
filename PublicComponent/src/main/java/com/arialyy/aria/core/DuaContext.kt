@@ -18,7 +18,6 @@ package com.arialyy.aria.core
 import android.annotation.SuppressLint
 import android.content.Context
 import com.arialyy.aria.core.service.LifecycleManager
-import com.arialyy.aria.core.service.QueueManager
 import com.arialyy.aria.core.service.ServiceManager
 import kotlinx.coroutines.MainScope
 
@@ -40,10 +39,7 @@ object DuaContext {
 
   fun isService(serviceName: String) = serviceName in serviceArray
 
-
   fun getServiceManager() = ServiceManager
 
   fun getLifeManager() = LifecycleManager
-
-  fun getQueueManger() = QueueManager
 }

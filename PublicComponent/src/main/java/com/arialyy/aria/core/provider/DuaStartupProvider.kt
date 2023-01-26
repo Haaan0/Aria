@@ -18,9 +18,11 @@ package com.arialyy.aria.core.provider
 import android.content.Context
 import androidx.startup.Initializer
 import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.inf.IComponentInit
 import com.arialyy.aria.core.service.DbService
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+import java.util.ServiceLoader
 
 class DuaStartupProvider : Initializer<Unit> {
 
@@ -30,6 +32,17 @@ class DuaStartupProvider : Initializer<Unit> {
       it.registerService(DuaContext.DB_SERVICE, DbService::class.java)
     }
     initLog()
+    initComponent(context)
+  }
+
+  /**
+   * init all component, [IComponentInit]
+   */
+  private fun initComponent(context: Context) {
+    val sa = ServiceLoader.load(IComponentInit::class.java, javaClass.classLoader)
+    sa.forEach {
+      it.init(context)
+    }
   }
 
   private fun initLog() {

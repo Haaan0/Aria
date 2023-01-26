@@ -30,7 +30,7 @@ android {
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-  implementation project(path: ':HttpComponent')
+  implementation project(path: ':Http')
   implementation project(path: ':PublicComponent')
 }
 

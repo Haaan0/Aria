@@ -16,6 +16,7 @@
 
 package com.arialyy.aria.queue;
 
+import com.arialyy.aria.core.inf.IPool;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.task.ITask;
 import java.util.ArrayList;

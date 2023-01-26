@@ -17,6 +17,7 @@
 package com.arialyy.aria.queue;
 
 import android.content.Context;
+import androidx.annotation.NonNull;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.task.DownloadTask;
 

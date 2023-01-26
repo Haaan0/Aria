@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arialyy.aria.queue;
+package com.arialyy.aria.core.inf;
 
 import com.arialyy.aria.core.task.ITask;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Created by lyy on 2016/8/14. 任务池
  */
-interface IPool<T extends ITask> {
+public interface IPool<T extends ITask> {
 
   List<T> getAllTask();
 

@@ -19,13 +19,14 @@ package com.arialyy.aria.core.listener;
 import android.os.Handler;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.service.IService;
 import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.upload.UploadEntity;
 
 /**
  * Created by lyy on 2016/11/2. 调度器功能接口
  */
-public interface ISchedulers extends Handler.Callback {
+public interface ISchedulers extends Handler.Callback, IService {
 
   String ARIA_TASK_INFO_ACTION = "ARIA_TASK_INFO_ACTION";
   /**

@@ -15,13 +15,13 @@
  */
 package com.arialyy.aria.core.task;
 
+import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
 /**
  * Created by lyy on 2017/2/13.
  */
-public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
+public interface ITask {
 
   /**
    * 普通下载任务
@@ -59,15 +59,12 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    */
   int getTaskType();
 
+  void setState(int state);
+
   /**
    * 获取下载状态
    */
-  int getState();
-
-  /**
-   * 唯一标识符，DownloadTask 为下载地址，UploadTask 为文件路径
-   */
-  String getKey();
+  TaskState getTaskState();
 
   /**
    * 任务是否正在执行
@@ -75,16 +72,6 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    * @return true，正在执行；
    */
   boolean isRunning();
-
-  /**
-   * 获取信息实体
-   */
-  TASK_WRAPPER getTaskWrapper();
-
-  /**
-   * 启动任务
-   */
-  void start();
 
   /**
    * 启动任务
@@ -95,20 +82,10 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
 
   /**
    * 停止任务
-   */
-  void stop();
-
-  /**
-   * 停止任务
    *
    * @param type {@link TaskSchedulerType}
    */
   void stop(int type);
-
-  /**
-   * 删除任务
-   */
-  void cancel();
 
   /**
    * 停止任务
@@ -116,11 +93,6 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    * @param type {@link TaskSchedulerType}
    */
   void cancel(int type);
-
-  /**
-   * 读取扩展数据
-   */
-  Object getExpand(String key);
 
   /**
    * 任务是否停止了
@@ -144,13 +116,12 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
   boolean isNeedRetry();
 
   /**
-   * 获取任务名，也就是文件名
-   */
-  String getTaskName();
-
-  /**
    * 任务的调度类型
    * {@link TaskSchedulerType}
    */
   int getSchedulerType();
+
+  int getTaskId();
+
+  <T extends ITaskOption> T getTaskOption(Class<T> clazz);
 }

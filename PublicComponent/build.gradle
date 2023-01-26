@@ -36,6 +36,7 @@ dependencies {
   implementation(libs.bundles.room)
   implementation(libs.startup)
   api(libs.timber)
+  api(libs.annotation)
   implementation(libs.gson)
   kapt libs.room.compiler
 }

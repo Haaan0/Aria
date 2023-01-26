@@ -15,20 +15,21 @@
  */
 package com.arialyy.aria.core
 
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.Lifecycle.Event
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.arialyy.aria.core.common.receiver.LifLifecycleReceiver
+import com.arialyy.aria.core.config.Configuration
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 10:48 AM 2023/1/20
  **/
+@Deprecated("有问题，微软有dua的工程在github上")// 使用cof? exco?
 object Dua {
 
   fun with(lifecycle: LifecycleOwner): LifLifecycleReceiver {
     return LifLifecycleReceiver(lifecycle)
   }
+
+  fun getCommonConfig() = Configuration.getInstance().cCommonCfg
 }

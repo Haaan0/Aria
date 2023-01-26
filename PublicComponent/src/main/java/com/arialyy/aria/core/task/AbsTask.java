@@ -15,53 +15,48 @@
  */
 package com.arialyy.aria.core.task;
 
-import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ComponentUtil;
 import java.util.HashMap;
 import java.util.Map;
+import timber.log.Timber;
 
 /**
  * Created by AriaL on 2017/6/29.
  */
-public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
-    implements ITask<TASK_WRAPPER> {
+public abstract class AbsTask implements ITask {
   public static final String ERROR_INFO_KEY = "ERROR_INFO_KEY";
-  protected String TAG = CommonUtil.getClassName(getClass());
   /**
    * 是否需要重试，默认为false
    */
   private boolean needRetry = true;
-  protected TASK_WRAPPER mTaskWrapper;
-  protected Handler mOutHandler;
-  protected Context mContext;
-  protected boolean isHeighestTask = false;
+  protected ITaskOption mTaskOption;
   private boolean isCancel = false, isStop = false;
   private IUtil mUtil;
-  /**
-   * 扩展信息
-   */
-  private Map<String, Object> mExpand = new HashMap<>();
   /**
    * 该任务的调度类型
    */
   private int mSchedulerType = TaskSchedulerType.TYPE_DEFAULT;
-  protected IEventListener mListener;
+  protected TaskState mTaskState = new TaskState();
+  private int taskId = -1;
+  private final Map<String, Object> mExpand = new HashMap<>();
 
-  protected AbsTask() {
+  protected AbsTask(ITaskOption taskOption) {
+    mTaskOption = taskOption;
+    taskId = TaskStatePool.INSTANCE.buildTaskId$PublicComponent_debug();
+    TaskStatePool.INSTANCE.putTaskState(getTaskId(), mTaskState);
   }
 
-  public Handler getOutHandler() {
-    return mOutHandler;
+  @Override public void setState(int state) {
+    mTaskState.setState(state);
   }
 
   synchronized IUtil getUtil() {
@@ -71,12 +66,20 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
     return mUtil;
   }
 
+  @Override public <T extends ITaskOption> T getTaskOption(Class<T> clazz) {
+    return (T) mTaskOption;
+  }
+
+  @Override public int getTaskId() {
+    return taskId;
+  }
+
   /**
    * 获取剩余时间，单位：s
    * 如果是m3u8任务，无法获取剩余时间；m2u8任务如果需要获取剩余时间，请设置文件长度{@link AbsEntity#setFileSize(long)}
    */
   public int getTimeLeft() {
-    return getTaskWrapper().getEntity().getTimeLeft();
+    return mTaskState.getTimeLeft();
   }
 
   /**
@@ -87,7 +90,7 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
    * 时间 ≥7 天，显示样式 ∞
    */
   public String getConvertTimeLeft() {
-    return CommonUtil.formatTime(getTaskWrapper().getEntity().getTimeLeft());
+    return CommonUtil.formatTime(getTimeLeft());
   }
 
   /**
@@ -95,13 +98,22 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
    */
   public void putExpand(String key, Object obj) {
     if (TextUtils.isEmpty(key)) {
-      ALog.e(TAG, "key 为空");
+      Timber.e("key 为空");
       return;
-    } else if (obj == null) {
-      ALog.i(TAG, "扩展数据为空");
+    }
+    if (obj == null) {
+      Timber.w("扩展数据为空");
       return;
     }
     mExpand.put(key, obj);
+  }
+
+  public Object getExpand(String key) {
+    return mExpand.get(key);
+  }
+
+  public TaskState getTaskState() {
+    return mTaskState;
   }
 
   @Override public boolean isNeedRetry() {
@@ -113,40 +125,19 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   }
 
   /**
-   * 最高优先级命令，最高优先级命令有以下属性
-   * 1、在下载队列中，有且只有一个最高优先级任务
-   * 2、最高优先级任务会一直存在，直到用户手动暂停或任务完成
-   * 3、任务调度器不会暂停最高优先级任务
-   * 4、用户手动暂停或任务完成后，第二次重新执行该任务，该命令将失效
-   * 5、如果下载队列中已经满了，则会停止队尾的任务
-   * 6、把任务设置为最高优先级任务后，将自动执行任务，不需要重新调用start()启动任务
-   */
-  public void setHighestPriority(boolean isHighestPriority) {
-    isHeighestTask = isHighestPriority;
-  }
-
-  /**
-   * 读取扩展数据
-   */
-  @Override
-  public Object getExpand(String key) {
-    return mExpand.get(key);
-  }
-
-  /**
    * 任务是否完成
    *
    * @return {@code true} 已经完成，{@code false} 未完成
    */
   public boolean isComplete() {
-    return mTaskWrapper.getEntity().isComplete();
+    return mTaskState.isComplete();
   }
 
   /**
    * 获取当前下载进度
    */
   public long getCurrentProgress() {
-    return mTaskWrapper.getEntity().getCurrentProgress();
+    return mTaskState.getCurProgress();
   }
 
   /**
@@ -155,29 +146,17 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
    * @return 如：已经下载3mb的大小，则返回{@code 3mb}
    */
   public String getConvertCurrentProgress() {
-    if (mTaskWrapper.getEntity().getCurrentProgress() == 0) {
+    if (getCurrentProgress() == 0) {
       return "0b";
     }
-    return CommonUtil.formatFileSize(mTaskWrapper.getEntity().getCurrentProgress());
-  }
-
-  /**
-   * 转换单位后的文件长度
-   *
-   * @return 如果文件长度为0，则返回0m，否则返回转换后的长度1b、1kb、1mb、1gb、1tb
-   */
-  public String getConvertFileSize() {
-    if (mTaskWrapper.getEntity().getFileSize() == 0) {
-      return "0mb";
-    }
-    return CommonUtil.formatFileSize(mTaskWrapper.getEntity().getFileSize());
+    return CommonUtil.formatFileSize(getCurrentProgress());
   }
 
   /**
    * 获取文件大小
    */
   public long getFileSize() {
-    return mTaskWrapper.getEntity().getFileSize();
+    return mTaskState.getFileSize();
   }
 
   /**
@@ -186,62 +165,36 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
    * @return 返回百分比进度，如果文件长度为0，返回0
    */
   public int getPercent() {
-    return mTaskWrapper.getEntity().getPercent();
-  }
-
-  /**
-   * 任务当前状态
-   *
-   * @return {@link IEntity}
-   */
-  public int getState() {
-    return mTaskWrapper.getState();
-  }
-
-  /**
-   * 获取保存的扩展字段
-   *
-   * @return 如果实体不存在，则返回null，否则返回扩展字段
-   */
-  public String getExtendField() {
-    return mTaskWrapper.getEntity() == null ? null : mTaskWrapper.getEntity().getStr();
-  }
-
-  @Override public void start() {
-    start(TaskSchedulerType.TYPE_DEFAULT);
+    return mTaskState.getPercent();
   }
 
   @Override public void start(int type) {
     mSchedulerType = type;
     mUtil = getUtil();
     if (mUtil == null) {
-      ALog.e(TAG, "任务工具创建失败");
+      Timber.e("util is  null");
       return;
     }
     if (type == TaskSchedulerType.TYPE_START_AND_RESET_STATE) {
       if (getUtil().isRunning()) {
-        ALog.e(TAG, String.format("任务【%s】重启失败", getTaskName()));
+        Timber.e("task restart fail");
         return;
       }
       mUtil.start();
-      ALog.d(TAG, String.format("任务【%s】重启成功", getTaskName()));
+      Timber.e("task restart success");
       return;
     }
     if (getUtil().isRunning()) {
-      ALog.d(TAG, "任务正在下载");
-    } else {
-      getUtil().start();
+      Timber.d("task is running");
+      return;
     }
-  }
-
-  @Override public void stop() {
-    stop(TaskSchedulerType.TYPE_DEFAULT);
+    getUtil().start();
   }
 
   @Override public void stop(int type) {
     mUtil = getUtil();
     if (mUtil == null) {
-      ALog.e(TAG, "任务工具创建失败");
+      Timber.e("util is  null");
       return;
     }
     isStop = true;
@@ -249,14 +202,10 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
     getUtil().stop();
   }
 
-  @Override public void cancel() {
-    cancel(TaskSchedulerType.TYPE_DEFAULT);
-  }
-
   @Override public void cancel(int type) {
     mUtil = getUtil();
     if (mUtil == null) {
-      ALog.e(TAG, "任务工具创建失败");
+      Timber.e("util is  null");
       return;
     }
     isCancel = true;
@@ -302,52 +251,32 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   }
 
   /**
-   * @return 返回原始byte速度，需要你在配置文件中配置
-   * <pre>
-   *   {@code
-   *    <xml>
-   *      <download>
-   *        ...
-   *        <convertSpeed value="false"/>
-   *      </download>
-   *
-   *      或在代码中设置
-   *      Aria.get(this).getDownloadConfig().setConvertSpeed(false);
-   *    </xml>
-   *   }
-   * </pre>
-   * 才能生效
+   * Bytes transferred in 1 second, if file size 0, return 0
+   * curSpeed, unit: byte/s
    */
   public long getSpeed() {
-    return mTaskWrapper.getEntity().getSpeed();
+    return mTaskState.getSpeed();
   }
 
   /**
-   * @return 返回转换单位后的速度，需要你在配置文件中配置，转换完成后为：1b/s、1kb/s、1mb/s、1gb/s、1tb/s
-   * <pre>
-   *   {@code
-   *    <xml>
-   *      <download>
-   *        ...
-   *        <convertSpeed value="true"/>
-   *      </download>
+   * you need set params in config
    *
-   *      或在代码中设置
-   *      Aria.get(this).getDownloadConfig().setConvertSpeed(true);
-   *    </xml>
-   *   }
+   * @return Returns the converted speed:1b/s、1kb/s、1mb/s、1gb/s、1tb/s
+   * xml:
+   * <pre>
+   * `<xml>
+   * <download>
+   * ...
+   * <convertSpeed value="true"/>
+   * </download>
+   *
+   * code:
+   * Dua.getCommonConfig().setConvertSpeed(true);
+   * </xml>
+   *
    * </pre>
-   * 才能生效
    */
   public String getConvertSpeed() {
-    return mTaskWrapper.getEntity().getConvertSpeed();
-  }
-
-  @Override public TASK_WRAPPER getTaskWrapper() {
-    return mTaskWrapper;
-  }
-
-  public boolean isHighestPriorityTask() {
-    return isHeighestTask;
+    return mTaskState.getConvertSpeed();
   }
 }

@@ -30,10 +30,12 @@ public final class Configuration {
   static final String UPLOAD_CONFIG_FILE = "/Aria/AriaUpload.cfg";
   static final String APP_CONFIG_FILE = "/Aria/AriaApp.cfg";
   static final String DGROUP_CONFIG_FILE = "/Aria/AriaDGroup.cfg";
+  static final String COMMON_CONFIG_FILE = "/Aria/AriaCommon.cfg";
   public DownloadConfig downloadCfg;
   public UploadConfig uploadCfg;
   public AppConfig appCfg;
   public DGroupConfig dGroupCfg;
+  public CommonConfig cCommonCfg;
 
   private Configuration() {
     //删除老版本的配置文件
@@ -43,6 +45,7 @@ public final class Configuration {
     File newUCfg = new File(String.format("%s%s", basePath, UPLOAD_CONFIG_FILE));
     File newACfg = new File(String.format("%s%s", basePath, APP_CONFIG_FILE));
     File dgCfg = new File(String.format("%s%s", basePath, DGROUP_CONFIG_FILE));
+    File cCfg = new File(String.format("%s%s", basePath, COMMON_CONFIG_FILE));
     // 加载下载配置
     if (newDCfg.exists()) {
       downloadCfg = (DownloadConfig) FileUtil.readObjFromFile(newDCfg.getPath());
@@ -70,6 +73,13 @@ public final class Configuration {
     }
     if (dGroupCfg == null) {
       dGroupCfg = new DGroupConfig();
+    }
+    // 通用配置
+    if (cCfg.exists()) {
+      cCommonCfg = (CommonConfig) FileUtil.readObjFromFile(dgCfg.getPath());
+    }
+    if (cCommonCfg == null) {
+      cCommonCfg = new CommonConfig();
     }
   }
 

@@ -16,9 +16,9 @@
 package com.arialyy.aria.orm.entity
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.arialyy.aria.core.inf.IEntity
 
 /**
  * Download Entity
@@ -47,4 +47,4 @@ data class DEntity(
   val createTime: Long,
 
   val updateTime: Long
-)
+) : IEntity

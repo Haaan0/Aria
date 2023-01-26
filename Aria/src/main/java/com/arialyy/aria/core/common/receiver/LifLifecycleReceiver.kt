@@ -17,9 +17,11 @@ package com.arialyy.aria.core.common.receiver
 
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IComponentLoader
 import com.arialyy.aria.core.inf.IDuaReceiver
-import com.arialyy.aria.core.scheduler.TaskSchedulers
+import com.arialyy.aria.schedulers.TaskSchedulers
+import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
 
 /**
@@ -34,21 +36,30 @@ class LifLifecycleReceiver(val lifecycle: LifecycleOwner) : IDuaReceiver {
    * @param clazz eg: HttpLoader, FtpLoader
    */
   fun <T : IComponentLoader> setLoader(clazz: Class<T>): T {
+    val clazzProxy = Proxy.getProxyClass(
+      javaClass.classLoader,
+      *clazz.interfaces
+    )
+
+    val constructor = clazzProxy.getConstructor(InvocationHandler::class.java)
+    val loader = constructor.newInstance()
+    DuaContext.getLifeManager().loaderAssociationTarget(lifecycle, loader as IComponentLoader)
     return Proxy.newProxyInstance(
       javaClass.classLoader, arrayOf(IComponentLoader::class.java)
-    ) { proxy, method, args ->
-      val result = method.invoke(proxy, args)
+    ) { _, method, args ->
+      val result = method.invoke(loader, args)
       if (method.name in IComponentLoader.proxyMethods) {
         lifecycle.lifecycle.addObserver(object : DefaultLifecycleObserver {
           override fun onCreate(owner: LifecycleOwner) {
             super.onCreate(owner)
-            TaskSchedulers.getInstance()
-              .register(lifecycle, (proxy as IComponentLoader).getTaskEnum())
+            com.arialyy.aria.schedulers.TaskSchedulers.getInstance().register(lifecycle, loader.getTaskEnum())
           }
 
           override fun onDestroy(owner: LifecycleOwner) {
             super.onDestroy(owner)
-            TaskSchedulers.getInstance().unRegister(lifecycle)
+            com.arialyy.aria.schedulers.TaskSchedulers.getInstance().unRegister(lifecycle)
+            DuaContext.getLifeManager().removeLoader(lifecycle)
+            DuaContext.getLifeManager().removeCustomListener(lifecycle)
           }
         })
       }

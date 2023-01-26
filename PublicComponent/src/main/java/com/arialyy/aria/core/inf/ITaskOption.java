@@ -15,10 +15,13 @@
  */
 package com.arialyy.aria.core.inf;
 
+import com.arialyy.aria.core.listener.IEventListener;
+
 /**
  * Created by AriaL on 2017/6/29.
  * 任务信息设置接口
  */
-public interface ITaskOption {
+public abstract class ITaskOption {
 
+  public IEventListener taskListener;
 }

@@ -78,7 +78,7 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
 
   @Download.onPre void onPre(DownloadTask task) {
     mAdapter.updateState(task.getEntity());
-    Log.d(TAG, task.getTaskName() + ", " + task.getState());
+    Log.d(TAG, task.getTaskName() + ", " + task.getTaskState());
   }
 
   @Download.onWait void onWait(DownloadTask task) {
@@ -86,12 +86,12 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
   }
 
   @Download.onTaskStart void taskStart(DownloadTask task) {
-    Log.d(TAG, task.getTaskName() + ", " + task.getState());
+    Log.d(TAG, task.getTaskName() + ", " + task.getTaskState());
     mAdapter.updateState(task.getEntity());
   }
 
   @Download.onTaskResume void taskResume(DownloadTask task) {
-    Log.d(TAG, task.getTaskName() + ", " + task.getState());
+    Log.d(TAG, task.getTaskName() + ", " + task.getTaskState());
     mAdapter.updateState(task.getEntity());
   }
 

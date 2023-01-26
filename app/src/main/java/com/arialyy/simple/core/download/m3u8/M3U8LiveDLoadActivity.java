@@ -166,7 +166,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
   @Download.onTaskStart
   void taskStart(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
+      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getTaskState());
       getBinding().pl.setInfo(task.getEntity());
     }
   }

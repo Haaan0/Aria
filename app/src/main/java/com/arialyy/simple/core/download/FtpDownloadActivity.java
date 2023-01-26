@@ -118,7 +118,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   void taskStart(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().pl.setInfo(task.getEntity());
-      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
+      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getTaskState());
     }
   }
 

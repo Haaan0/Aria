@@ -13,6 +13,8 @@ abstract class BaseConfig implements Serializable {
   static final int TYPE_APP = 3;
   static final int TYPE_DGROUP = 4;
 
+  static final int TYPE_COMMON = 100;
+
   /**
    * 类型
    *
@@ -38,6 +40,9 @@ abstract class BaseConfig implements Serializable {
         break;
       case TYPE_DGROUP:
         path = Configuration.DGROUP_CONFIG_FILE;
+        break;
+      case TYPE_COMMON:
+        path = Configuration.COMMON_CONFIG_FILE;
         break;
     }
     if (!TextUtils.isEmpty(path)) {

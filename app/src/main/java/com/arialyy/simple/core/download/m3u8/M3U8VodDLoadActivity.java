@@ -31,7 +31,6 @@ import com.arialyy.annotations.Download;
 import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
@@ -51,7 +50,6 @@ import com.arialyy.simple.databinding.ActivityM3u8VodBinding;
 import com.arialyy.simple.to.PeerIndex;
 import com.arialyy.simple.widget.ProgressLayout;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -229,7 +227,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   @Download.onTaskStart
   void taskStart(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
+      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getTaskState());
       getBinding().seekBar.setMax(task.getEntity().getM3U8Entity().getPeerNum());
       getBinding().pl.setInfo(task.getEntity());
     }

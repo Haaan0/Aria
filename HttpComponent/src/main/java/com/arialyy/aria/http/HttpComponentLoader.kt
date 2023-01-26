@@ -16,6 +16,7 @@
 package com.arialyy.aria.http
 
 import com.arialyy.annotations.TaskEnum
+import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBaseLoader
 import com.arialyy.aria.core.inf.IComponentLoader
 import com.arialyy.aria.core.inf.IDownloader
@@ -30,7 +31,7 @@ import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 class HttpComponentLoader : IComponentLoader {
 
   private val downloader by lazy(SYNCHRONIZED) {
-    HttpDownloader()
+    HttpDownloader(DuaContext.getLifeManager().getTargetByLoader(this)!!)
   }
   private lateinit var loader: IBaseLoader
 

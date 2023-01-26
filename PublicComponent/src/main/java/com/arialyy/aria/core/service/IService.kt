@@ -22,7 +22,7 @@ import android.content.Context
  * @Description
  * @Date 19:34 AM 2023/1/16
  **/
-internal interface IService {
+interface IService {
 
   fun init(context: Context)
 }

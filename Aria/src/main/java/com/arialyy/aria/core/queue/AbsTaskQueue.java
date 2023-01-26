@@ -17,22 +17,19 @@
 package com.arialyy.aria.core.queue;
 
 import android.text.TextUtils;
-import android.util.Log;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.ITaskQueue;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
-import com.arialyy.aria.core.queue.pool.BaseCachePool;
-import com.arialyy.aria.core.queue.pool.BaseExecutePool;
 import com.arialyy.aria.core.queue.pool.DGLoadSharePool;
 import com.arialyy.aria.core.queue.pool.DLoadSharePool;
 import com.arialyy.aria.core.queue.pool.UploadSharePool;
-import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.task.UploadTask;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.ArrayList;
@@ -41,8 +38,8 @@ import java.util.List;
 /**
  * Created by lyy on 2017/2/23. 任务队列
  */
-public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends AbsTaskWrapper>
-    implements ITaskQueue<TASK, TASK_WRAPPER> {
+public abstract class AbsTaskQueue<TASK extends ITask>
+    implements ITaskQueue<TASK> {
   final int TYPE_D_QUEUE = 1;
   final int TYPE_DG_QUEUE = 2;
   final int TYPE_U_QUEUE = 3;
@@ -114,7 +111,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
       ALog.w(TAG, "resume task fail, task is null");
       return;
     }
-    if (mExecutePool.taskExits(task.getKey())) {
+    if (mExecutePool.taskExist(task.getKey())) {
       ALog.w(TAG, String.format("task【%s】running", task.getKey()));
       return;
     }
@@ -133,7 +130,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   @Override public void stopAllTask() {
     for (TASK task : mExecutePool.getAllTask()) {
       if (task != null) {
-        int state = task.getState();
+        int state = task.getTaskState();
         if (task.isRunning() || (state != IEntity.STATE_COMPLETE
             && state != IEntity.STATE_CANCEL)) {
           task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
@@ -194,7 +191,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   }
 
   @Override public void setMaxTaskNum(int maxNum) {
-    int oldMaxSize = getOldMaxNum();
+    int oldMaxSize = getOldMaxSize();
     int diff = maxNum - oldMaxSize;
     if (oldMaxSize == maxNum) {
       ALog.w(TAG, "设置的下载任务数和配置文件的下载任务数一直，跳过");
@@ -209,11 +206,11 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
         }
       }
     }
-    mExecutePool.setMaxNum(maxNum);
+    mExecutePool.setPoolSize(maxNum);
     if (diff >= 1) {
       for (int i = 0; i < diff; i++) {
         TASK nextTask = getNextTask();
-        if (nextTask != null && nextTask.getState() == IEntity.STATE_WAIT) {
+        if (nextTask != null && nextTask.getTaskState() == IEntity.STATE_WAIT) {
           startTask(nextTask);
         }
       }
@@ -261,7 +258,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
     if (task == null) {
       ALog.w(TAG, "create fail, task is null");
     }
-    if (mExecutePool.taskExits(task.getKey())) {
+    if (mExecutePool.taskExist(task.getKey())) {
       ALog.w(TAG, String.format("任务【%s】执行中", task.getKey()));
       return;
     }
@@ -277,7 +274,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
       ALog.w(TAG, "stop fail, task is null");
       return;
     }
-    int state = task.getState();
+    int state = task.getTaskState();
     boolean canStop = false;
     switch (state) {
       case IEntity.STATE_WAIT:
@@ -333,7 +330,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
       return;
     }
 
-    int state = task.getState();
+    int state = task.getTaskState();
     switch (state) {
       case IEntity.STATE_POST_PRE:
       case IEntity.STATE_PRE:

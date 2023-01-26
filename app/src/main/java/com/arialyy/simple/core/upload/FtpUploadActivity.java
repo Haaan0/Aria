@@ -152,7 +152,7 @@ public class FtpUploadActivity extends BaseActivity<ActivitySingleBinding> {
   void taskStart(UploadTask task) {
     if (task.getEntity().getUrl().equals(mUrl)) {
       getBinding().pl.setInfo(task.getEntity());
-      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
+      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getTaskState());
     }
   }
 

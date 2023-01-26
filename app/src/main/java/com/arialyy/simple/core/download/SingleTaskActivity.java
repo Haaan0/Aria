@@ -34,15 +34,11 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskListener;
-import com.arialyy.aria.core.download.target.HttpNormalTarget;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
-import com.arialyy.aria.core.scheduler.NormalTaskListenerInterface;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import com.arialyy.aria.util.FileUtil;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
@@ -210,7 +206,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   public void onTaskStart(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().pl.setInfo(task.getEntity());
-      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
+      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getTaskState());
     }
   }
 

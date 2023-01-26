@@ -64,7 +64,7 @@ public class DGroupTaskQueue
   @Override public DownloadGroupTask createTask(DGTaskWrapper wrapper) {
     super.createTask(wrapper);
     DownloadGroupTask task = null;
-    if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
+    if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExist(wrapper.getKey())) {
       task = (DownloadGroupTask) TaskFactory.getInstance()
           .createTask(wrapper, TaskSchedulers.getInstance());
       addTask(task);
@@ -74,7 +74,7 @@ public class DGroupTaskQueue
     return task;
   }
 
-  @Override public int getOldMaxNum() {
+  public int getOldMaxSize() {
     return AriaConfig.getInstance().getDGConfig().oldMaxTaskNum;
   }
 }

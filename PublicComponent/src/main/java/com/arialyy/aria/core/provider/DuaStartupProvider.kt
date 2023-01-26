@@ -25,8 +25,9 @@ import timber.log.Timber.DebugTree
 class DuaStartupProvider : Initializer<Unit> {
 
   override fun create(context: Context) {
+    DuaContext.context = context
     DuaContext.getServiceManager().let {
-      it.registerService(DuaContext.DB_SERVICE, context, DbService::class.java)
+      it.registerService(DuaContext.DB_SERVICE, DbService::class.java)
     }
     initLog()
   }

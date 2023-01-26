@@ -15,32 +15,42 @@
  */
 package com.arialyy.aria.core.service
 
-import android.content.Context
 import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.queue.ITaskQueue
+import com.arialyy.aria.core.service.QueueManager.registerQueue
+import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.UploadTask
 import com.arialyy.aria.exception.AriaException
 import timber.log.Timber
 
 object ServiceManager {
   private val serviceCache = hashMapOf<String, IService>()
 
-  private fun getServiceName(clazz: Class<*>) = clazz.name
+  /**
+   * register a service
+   * @param serviceName [DuaContext.DB_SERVICE]
+   */
+  fun <T : IService> registerService(serviceName: String, clazz: Class<T>) {
+    if (!DuaContext.isService(serviceName)) {
+      throw AriaException("$serviceName Not a service.")
+    }
+    Timber.d("start register service: $serviceName")
+    val s = clazz.newInstance()
+    s.init(DuaContext.context)
+    serviceCache[serviceName] = s
+  }
 
   /**
    * register a service
    * @param serviceName [DuaContext.DB_SERVICE]
    */
-  fun <T : IService> registerService(serviceName: String, context: Context, clazz: Class<T>) {
+  fun registerService(serviceName: String, service: IService) {
     if (!DuaContext.isService(serviceName)) {
       throw AriaException("$serviceName Not a service.")
     }
-    val sn = getServiceName(clazz)
-    val service = serviceCache[sn]
-    if (service == null) {
-      Timber.d("start register service: $sn")
-      val s = clazz.newInstance()
-      s.init(context)
-      serviceCache[serviceName] = s
-    }
+    Timber.d("start register service: $serviceName")
+    service.init(DuaContext.context)
+    serviceCache[serviceName] = service
   }
 
   /**
@@ -52,5 +62,24 @@ object ServiceManager {
     }
     return (serviceCache[DuaContext.DB_SERVICE]
       ?: throw AriaException("service not found: ${DuaContext.DB_SERVICE}")) as DbService
+  }
+
+  /**
+   * get queue service, if already [registerQueue] custom queue, return custom queue
+   */
+  fun getDownloadQueue(): com.arialyy.aria.queue.ITaskQueue<DownloadTask> {
+    if (!DuaContext.isService(DuaContext.D_QUEUE)) {
+      throw AriaException("${DuaContext.D_QUEUE} not a queue.")
+    }
+    return (serviceCache[DuaContext.D_QUEUE]
+      ?: throw AriaException("queue not found: ${DuaContext.D_QUEUE}")) as com.arialyy.aria.queue.ITaskQueue<DownloadTask>
+  }
+
+  fun getUploadQueue(): com.arialyy.aria.queue.ITaskQueue<UploadTask> {
+    if (!DuaContext.isService(DuaContext.U_QUEUE)) {
+      throw AriaException("${DuaContext.U_QUEUE} not a queue.")
+    }
+    return (serviceCache[DuaContext.U_QUEUE]
+      ?: throw AriaException("queue not found: ${DuaContext.U_QUEUE}")) as com.arialyy.aria.queue.ITaskQueue<UploadTask>
   }
 }

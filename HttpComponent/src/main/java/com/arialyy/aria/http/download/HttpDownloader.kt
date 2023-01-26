@@ -18,36 +18,19 @@ package com.arialyy.aria.http.download
 import com.arialyy.annotations.TaskEnum
 import com.arialyy.annotations.TaskEnum.DOWNLOAD
 import com.arialyy.aria.core.inf.IDownloader
-import com.arialyy.aria.http.HttpOption
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 14:11 AM 2023/1/20
  **/
-internal class HttpDownloader : IDownloader {
-  private lateinit var uri: String
-  private lateinit var savePath: String
-  private var httpOption = HttpOption()
+class HttpDownloader(val target: Any) : IDownloader {
 
   override fun getTaskEnum(): TaskEnum {
     return DOWNLOAD
   }
 
-  fun setSourceUri(uri: String): HttpDownloader {
-    this.uri = uri
-    return this
+  fun load(url: String): HttpDStartController {
+    return HttpDStartController(target, url)
   }
-
-  fun setSavePath(savePath: String): HttpDownloader {
-    this.savePath = savePath
-    return this
-  }
-
-  fun setHttpOption(httpOption: HttpOption): HttpDownloader {
-    this.httpOption = httpOption
-    return this
-  }
-
-
 }

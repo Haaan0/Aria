@@ -16,6 +16,9 @@
 package com.arialyy.aria.core
 
 import android.annotation.SuppressLint
+import android.content.Context
+import com.arialyy.aria.core.service.LifecycleManager
+import com.arialyy.aria.core.service.QueueManager
 import com.arialyy.aria.core.service.ServiceManager
 import kotlinx.coroutines.MainScope
 
@@ -25,14 +28,22 @@ import kotlinx.coroutines.MainScope
  * @Date 10:40 AM 2023/1/16
  **/
 @SuppressLint("StaticFieldLeak")
-internal object DuaContext {
+object DuaContext {
   const val DB_SERVICE = "DB_SERVICE"
+  const val D_QUEUE = "D_QUEUE"
+  const val U_QUEUE = "U_QUEUE"
 
-  private val serviceArray = arrayOf(DB_SERVICE)
+  private val serviceArray = arrayOf(DB_SERVICE, D_QUEUE, U_QUEUE)
   val duaScope = MainScope()
+
+  lateinit var context: Context
 
   fun isService(serviceName: String) = serviceName in serviceArray
 
+
   fun getServiceManager() = ServiceManager
 
+  fun getLifeManager() = LifecycleManager
+
+  fun getQueueManger() = QueueManager
 }

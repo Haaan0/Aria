@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.inf
 
 import com.arialyy.annotations.TaskEnum
+import com.arialyy.aria.core.listener.ITaskStatusListener
 
 /**
  * @Author laoyuyu

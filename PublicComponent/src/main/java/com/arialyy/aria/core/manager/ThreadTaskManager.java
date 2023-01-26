@@ -17,8 +17,8 @@
 package com.arialyy.aria.core.manager;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.task.IThreadTask;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.HashSet;
@@ -39,8 +39,8 @@ public class ThreadTaskManager {
   private static volatile ThreadTaskManager INSTANCE = null;
   private static final int CORE_POOL_NUM = 20;
   private static final ReentrantLock LOCK = new ReentrantLock();
-  private ThreadPoolExecutor mExePool;
-  private Map<String, Set<FutureContainer>> mThreadTasks = new ConcurrentHashMap<>();
+  private final ThreadPoolExecutor mExePool;
+  private final Map<Integer, Set<FutureContainer>> mThreadTasks = new ConcurrentHashMap<>();
 
   public static synchronized ThreadTaskManager getInstance() {
     if (INSTANCE == null) {
@@ -85,21 +85,20 @@ public class ThreadTaskManager {
   /**
    * 启动线程任务
    *
-   * @param key 任务对应的key{@link AbsTaskWrapper#getKey()}
+   * @param taskId {@link ITask#getTaskId()}
    * @param threadTask 线程任务{@link IThreadTask}
    */
-  public void startThread(String key, IThreadTask threadTask) {
+  public void startThread(Integer taskId, IThreadTask threadTask) {
     try {
       LOCK.tryLock(2, TimeUnit.SECONDS);
       if (mExePool.isShutdown()) {
         ALog.e(TAG, "线程池已经关闭");
         return;
       }
-      key = getKey(key);
-      Set<FutureContainer> temp = mThreadTasks.get(key);
+      Set<FutureContainer> temp = mThreadTasks.get(taskId);
       if (temp == null) {
         temp = new HashSet<>();
-        mThreadTasks.put(key, temp);
+        mThreadTasks.put(taskId, temp);
       }
       FutureContainer container = new FutureContainer();
       container.threadTask = threadTask;
@@ -115,27 +114,23 @@ public class ThreadTaskManager {
   /**
    * 任务是否在执行
    *
-   * @param key 任务的key
    * @return {@code true} 任务正在运行
    */
-  public boolean taskIsRunning(String key) {
-    return mThreadTasks.get(getKey(key)) != null;
+  public boolean taskIsRunning(Integer taskId) {
+    return mThreadTasks.get(taskId) != null;
   }
 
   /**
    * 停止任务的所有线程
-   *
-   * @param key 任务对应的key{@link AbsTaskWrapper#getKey()}
    */
-  public void removeTaskThread(String key) {
+  public void removeTaskThread(Integer taskId) {
     try {
       LOCK.tryLock(2, TimeUnit.SECONDS);
       if (mExePool.isShutdown()) {
         ALog.e(TAG, "线程池已经关闭");
         return;
       }
-      key = getKey(key);
-      Set<FutureContainer> temp = mThreadTasks.get(key);
+      Set<FutureContainer> temp = mThreadTasks.get(taskId);
       if (temp != null && temp.size() > 0) {
         for (FutureContainer container : temp) {
           if (container.future.isDone() || container.future.isCancelled()) {
@@ -144,7 +139,7 @@ public class ThreadTaskManager {
           container.threadTask.destroy();
         }
         temp.clear();
-        mThreadTasks.remove(key);
+        mThreadTasks.remove(taskId);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -156,11 +151,10 @@ public class ThreadTaskManager {
   /**
    * 根据线程名删除任务的中的线程
    *
-   * @param key 任务的key，如果是组合任务，则为组合任务的key
    * @param threadName 线程名
    * @return true 删除线程成功；false 删除线程失败
    */
-  public boolean removeSingleTaskThread(String key, String threadName) {
+  public boolean removeSingleTaskThread(Integer taskId, String threadName) {
     try {
       LOCK.tryLock(2, TimeUnit.SECONDS);
       if (mExePool.isShutdown()) {
@@ -172,8 +166,7 @@ public class ThreadTaskManager {
         return false;
       }
 
-      key = getKey(key);
-      Set<FutureContainer> temp = mThreadTasks.get(key);
+      Set<FutureContainer> temp = mThreadTasks.get(taskId);
       if (temp != null && temp.size() > 0) {
         FutureContainer tempC = null;
         for (FutureContainer container : temp) {
@@ -199,10 +192,9 @@ public class ThreadTaskManager {
   /**
    * 删除单个线程任务
    *
-   * @param key 任务的key
    * @param task 线程任务
    */
-  public boolean removeSingleTaskThread(String key, IThreadTask task) {
+  public boolean removeSingleTaskThread(Integer taskId, IThreadTask task) {
     try {
       LOCK.tryLock(2, TimeUnit.SECONDS);
       if (mExePool.isShutdown()) {
@@ -213,8 +205,7 @@ public class ThreadTaskManager {
         ALog.e(TAG, "线程任务为空");
         return false;
       }
-      key = getKey(key);
-      Set<FutureContainer> temp = mThreadTasks.get(key);
+      Set<FutureContainer> temp = mThreadTasks.get(taskId);
       if (temp != null && temp.size() > 0) {
         FutureContainer tempC = null;
         for (FutureContainer container : temp) {
@@ -266,17 +257,7 @@ public class ThreadTaskManager {
     }
   }
 
-  /**
-   * map中的key
-   *
-   * @param key 任务的key{@link AbsTaskWrapper#getKey()}
-   * @return 转换后的map中的key
-   */
-  private String getKey(String key) {
-    return CommonUtil.getStrMd5(key);
-  }
-
-  private class FutureContainer {
+  private static class FutureContainer {
     Future future;
     IThreadTask threadTask;
   }

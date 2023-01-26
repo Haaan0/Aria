@@ -27,7 +27,7 @@ import com.arialyy.aria.util.CommonUtil;
 class DGLoadExecutePool<TASK extends AbsTask> extends DLoadExecutePool<TASK> {
   private final String TAG = CommonUtil.getClassName(this);
 
-  @Override protected int getMaxSize() {
+  @Override protected int getPoolSize() {
     return AriaConfig.getInstance().getDGConfig().getMaxTaskNum();
   }
 }

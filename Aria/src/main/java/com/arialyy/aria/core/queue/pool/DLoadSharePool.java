@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.queue.pool;
 
+import com.arialyy.aria.core.queue.BaseCachePool;
+
 /**
  * Created by Aria.Lao on 2017/7/17.
  * 下载任务池，该池子为简单任务和任务组共用

@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.inf;
 
-import com.arialyy.aria.orm.annotation.Ignore;
+import androidx.room.Ignore;
 
 /**
  * Created by lyy on 2017/2/23.

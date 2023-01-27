@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.arialyy.aria.core.command;
-
-import com.arialyy.aria.core.task.ITask;
-import timber.log.Timber;
+package com.arialyy.aria.core.command
 
 /**
- * Created by lyy on 2016/8/22.
- * 添加任务的命令
- */
-public final class AddCmd extends AbsCmd {
-
-  public AddCmd(ITask task) {
-    super(task);
+ * @Author laoyuyu
+ * @Description
+ * @Date 10:39 AM 2023/1/27
+ **/
+class CmdResp(val code: Int = CODE_DEF) {
+  companion object {
+    const val CODE_COMPLETE = 1
+    const val CODE_INTERRUPT = 999
+    const val CODE_DEF = 0
   }
 
-  @Override public CmdResp executeCmd() {
-    CmdResp resp = interceptor();
-    if (resp.isInterrupt()) {
-      Timber.w("interruption occurred, cancel cmd");
-      return resp;
-    }
-    getTaskQueue().addTask(mTask);
-    return resp;
-  }
+  /**
+   * Whether to interrupt or not
+   */
+  fun isInterrupt() = code == CODE_INTERRUPT
+
+  fun isComplete() = code == CODE_COMPLETE
 }

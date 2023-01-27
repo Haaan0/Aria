@@ -57,4 +57,6 @@ public interface IEntity {
    * 删除任务
    */
   @Ignore int STATE_CANCEL = 7;
+
+  void update();
 }

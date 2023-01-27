@@ -13,31 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.inf
+package com.arialyy.aria.core.command
+
+import com.arialyy.aria.core.inf.ITaskQueue
+import com.arialyy.aria.core.task.ITask
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 12:32 PM 2023/1/22
+ * @Date 11:06 AM 2023/1/27
  **/
-interface IStartController {
-  /**
-   * 添加任务
-   *
-   * @return 正常添加，返回任务id，否则返回-1
-   */
-  fun add(): Int
+internal class CmdChain(
+  private val interceptors: List<ICmdInterceptor>,
+  private val index: Int = 0,
+  private val task: ITask,
+  private val queue: ITaskQueue<ITask>
+) : ICmdInterceptor.IChain {
+  override fun getQueue(): ITaskQueue<ITask> {
+    return queue
+  }
 
-  /**
-   * 创建并开始任务
-   *
-   * @return 正常启动，返回任务id，否则返回-1
-   */
-  fun start(): Int
+  override fun getTask(): ITask {
+    return task
+  }
 
-  /**
-   * 恢复任务
-   * @return 正常启动，返回任务id，否则返回-1
-   */
-  fun resume(): Int
+  override fun proceed(task: ITask): CmdResp {
+    val next = CmdChain(interceptors, index, task, queue)
+    val interceptor = interceptors[index]
+    return interceptor.interceptor(next)
+  }
 }

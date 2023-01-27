@@ -15,14 +15,11 @@
  */
 package com.arialyy.aria.core.task;
 
-import android.os.Handler;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ComponentUtil;
 import java.util.HashMap;
@@ -33,11 +30,6 @@ import timber.log.Timber;
  * Created by AriaL on 2017/6/29.
  */
 public abstract class AbsTask implements ITask {
-  public static final String ERROR_INFO_KEY = "ERROR_INFO_KEY";
-  /**
-   * 是否需要重试，默认为false
-   */
-  private boolean needRetry = true;
   protected ITaskOption mTaskOption;
   private boolean isCancel = false, isStop = false;
   private IUtil mUtil;
@@ -116,21 +108,13 @@ public abstract class AbsTask implements ITask {
     return mTaskState;
   }
 
-  @Override public boolean isNeedRetry() {
-    return needRetry;
-  }
-
-  public void setNeedRetry(boolean needRetry) {
-    this.needRetry = needRetry;
-  }
-
   /**
    * 任务是否完成
    *
    * @return {@code true} 已经完成，{@code false} 未完成
    */
   public boolean isComplete() {
-    return mTaskState.isComplete();
+    return mTaskState.isCompleted();
   }
 
   /**

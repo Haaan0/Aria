@@ -18,7 +18,10 @@ package com.arialyy.aria.orm.entity
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.arialyy.aria.core.inf.IEntity
+import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.inf.BaseEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Download Entity
@@ -34,7 +37,7 @@ data class DEntity(
    */
   val sourceUrl: String,
   /**
-   * file save path
+   * file save path, it's uri
    */
   val savePath: String,
   /**
@@ -44,7 +47,16 @@ data class DEntity(
 
   val isSub: Boolean = false,
 
-  val createTime: Long,
+  val fileSize: Long = 0
 
-  val updateTime: Long
-) : IEntity
+) : BaseEntity() {
+  override fun update() {
+    fun update() {
+      updateTime = System.currentTimeMillis()
+      DuaContext.duaScope.launch(Dispatchers.IO) {
+        DuaContext.getServiceManager().getDbService().getDuaDb()?.getDEntityDao()
+          ?.update(this@DEntity)
+      }
+    }
+  }
+}

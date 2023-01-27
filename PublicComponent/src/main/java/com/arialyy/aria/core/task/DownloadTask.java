@@ -17,7 +17,6 @@
 package com.arialyy.aria.core.task;
 
 import android.net.Uri;
-import android.os.Handler;
 import com.arialyy.aria.core.download.DTaskOption;
 
 /**
@@ -26,9 +25,9 @@ import com.arialyy.aria.core.download.DTaskOption;
  */
 public class DownloadTask extends AbsTask {
 
-  private DownloadTask(DTaskOption taskOption) {
+  public DownloadTask(DTaskOption taskOption) {
     super(taskOption);
-    taskOption.taskListener.setParams(this, outHandler);
+    taskOption.taskListener.setParams(this);
   }
 
   public Uri getSavePath() {

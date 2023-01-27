@@ -15,9 +15,11 @@
  */
 package com.arialyy.aria.core.service
 
+import android.os.Handler
+import android.os.Looper
 import com.arialyy.aria.core.DuaContext
-import com.arialyy.aria.queue.ITaskQueue
-import com.arialyy.aria.core.service.QueueManager.registerQueue
+import com.arialyy.aria.core.inf.ITaskQueue
+import com.arialyy.aria.core.listener.ISchedulers
 import com.arialyy.aria.core.task.DownloadTask
 import com.arialyy.aria.core.task.UploadTask
 import com.arialyy.aria.exception.AriaException
@@ -25,6 +27,8 @@ import timber.log.Timber
 
 object ServiceManager {
   private val serviceCache = hashMapOf<String, IService>()
+
+  private var schedulerHandler: Handler? = null
 
   /**
    * register a service
@@ -65,21 +69,31 @@ object ServiceManager {
   }
 
   /**
-   * get queue service, if already [registerQueue] custom queue, return custom queue
+   * get downloadQueue service, if already [registerService] custom queue, return custom queue
    */
-  fun getDownloadQueue(): com.arialyy.aria.queue.ITaskQueue<DownloadTask> {
-    if (!DuaContext.isService(DuaContext.D_QUEUE)) {
-      throw AriaException("${DuaContext.D_QUEUE} not a queue.")
-    }
+  fun getDownloadQueue(): ITaskQueue<DownloadTask> {
     return (serviceCache[DuaContext.D_QUEUE]
-      ?: throw AriaException("queue not found: ${DuaContext.D_QUEUE}")) as com.arialyy.aria.queue.ITaskQueue<DownloadTask>
+      ?: throw AriaException("queue not found: ${DuaContext.D_QUEUE}")) as ITaskQueue<DownloadTask>
   }
 
-  fun getUploadQueue(): com.arialyy.aria.queue.ITaskQueue<UploadTask> {
-    if (!DuaContext.isService(DuaContext.U_QUEUE)) {
-      throw AriaException("${DuaContext.U_QUEUE} not a queue.")
-    }
+  /**
+   * get uploadQueue service, if already [registerService] custom queue, return custom queue
+   */
+  fun getUploadQueue(): ITaskQueue<UploadTask> {
     return (serviceCache[DuaContext.U_QUEUE]
-      ?: throw AriaException("queue not found: ${DuaContext.U_QUEUE}")) as com.arialyy.aria.queue.ITaskQueue<UploadTask>
+      ?: throw AriaException("queue not found: ${DuaContext.U_QUEUE}")) as ITaskQueue<UploadTask>
+  }
+
+  /**
+   * get uploadQueue service, if already [registerService] custom queue, return custom queue
+   */
+  fun getSchedulerHandler(): Handler {
+    if (schedulerHandler != null) {
+      return schedulerHandler!!
+    }
+    val scheduler = serviceCache[DuaContext.SCHEDULER] as ISchedulers?
+      ?: throw AriaException("queue not found: ${DuaContext.SCHEDULER}")
+    schedulerHandler = Handler(Looper.getMainLooper(), scheduler)
+    return schedulerHandler!!
   }
 }

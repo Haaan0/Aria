@@ -16,42 +16,36 @@
 package com.arialyy.aria.core.listener;
 
 import android.os.Handler;
-import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.AriaConfig;
+import com.arialyy.aria.core.DuaContext;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.task.AbsTask;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.task.ITask;
+import com.arialyy.aria.core.task.TaskState;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.AriaException;
+import com.arialyy.aria.orm.EntityCachePool;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
-import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import timber.log.Timber;
 
 public abstract class BaseListener implements IEventListener {
-  protected String TAG = getClass().getSimpleName();
   static final int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
-  protected SoftReference<Handler> outHandler;
+  protected Handler outHandler;
   private long mLastLen;   //上一次发送长度
   private boolean isFirst = true;
-  private AbsTask mTask;
+  private ITask mTask;
   long mLastSaveTime;
-  protected AbsEntity mEntity;
-  protected AbsTaskWrapper mTaskWrapper;
-  private boolean isConvertSpeed;
   private long mUpdateInterval;
 
-  @Override public IEventListener setParams(AbsTask task, Handler outHandler) {
-    this.outHandler = new SoftReference<>(outHandler);
+  @Override public IEventListener setParams(ITask task) {
+    this.outHandler = DuaContext.INSTANCE.getServiceManager().getSchedulerHandler();
     mTask = new WeakReference<>(task).get();
-    mEntity = mTask.getTaskWrapper().getEntity();
-    mTaskWrapper = mTask.getTaskWrapper();
-    isConvertSpeed = mTaskWrapper.getConfig().isConvertSpeed();
-    mUpdateInterval = mTaskWrapper.getConfig().getUpdateInterval();
-    mLastLen = mEntity.getCurrentProgress();
+    mUpdateInterval = AriaConfig.getInstance().getCConfig().getUpdateInterval();
+    mLastLen = task.getTaskState().getCurProgress();
     mLastSaveTime = System.currentTimeMillis();
-    TAG = CommonUtil.getClassName(getClass());
     return this;
   }
 
@@ -75,7 +69,7 @@ public abstract class BaseListener implements IEventListener {
   }
 
   @Override public void onProgress(long currentLocation) {
-    mEntity.setCurrentProgress(currentLocation);
+    mTask.getTaskState().setCurProgress(currentLocation);
     long speed = currentLocation - mLastLen;
     if (isFirst) {
       speed = 0;
@@ -108,21 +102,23 @@ public abstract class BaseListener implements IEventListener {
     saveData(IEntity.STATE_CANCEL, -1);
     handleSpeed(0);
     if (mTask.getSchedulerType() != TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
-      ALog.d(TAG, "删除任务完成");
+      Timber.d("remove task success");
       sendInState2Target(ISchedulers.CANCEL);
     }
   }
 
   @Override public void onFail(boolean needRetry, AriaException e) {
-    mEntity.setFailNum(mEntity.getFailNum() + 1);
-    saveData(IEntity.STATE_FAIL, mEntity.getCurrentProgress());
+    TaskState ts = mTask.getTaskState();
+    int taskFailNum = ts.getFailNum();
+    ts.setFailNum(taskFailNum + 1);
+    ts.setNeedRetry(needRetry);
+
+    saveData(IEntity.STATE_FAIL, ts.getCurProgress());
     handleSpeed(0);
-    mTask.setNeedRetry(needRetry);
-    mTask.putExpand(AbsTask.ERROR_INFO_KEY, e);
     sendInState2Target(ISchedulers.FAIL);
     if (e != null) {
       String error = ALog.getExceptionString(e);
-      ALog.e(TAG, error);
+      Timber.e(error);
       ErrorHelp.saveError(e.getMessage(), error);
     }
   }
@@ -131,21 +127,12 @@ public abstract class BaseListener implements IEventListener {
     if (mUpdateInterval != 1000) {
       speed = speed * 1000 / mUpdateInterval;
     }
-    if (isConvertSpeed) {
-      mEntity.setConvertSpeed(CommonUtil.formatFileSize(speed < 0 ? 0 : speed) + "/s");
-    }
-    mEntity.setSpeed(speed < 0 ? 0 : speed);
+    mTask.getTaskState().setSpeed(speed);
+
     int taskType = mTaskWrapper.getRequestType();
     if (taskType != ITaskWrapper.M3U8_VOD && taskType != ITaskWrapper.M3U8_LIVE) {
       mEntity.setPercent((int) (mEntity.getFileSize() <= 0 ? 0
           : mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
-    }
-    if (mEntity.getFileSize() != 0) {
-      if (speed == 0) {
-        mEntity.setTimeLeft(Integer.MAX_VALUE);
-      } else {
-        mEntity.setTimeLeft((int) ((mEntity.getFileSize() - mEntity.getCurrentProgress()) / speed));
-      }
     }
   }
 
@@ -171,25 +158,22 @@ public abstract class BaseListener implements IEventListener {
    * @param state {@link ISchedulers#START}
    */
   protected void sendInState2Target(int state) {
-    if (outHandler.get() != null) {
-      outHandler.get().obtainMessage(state, mTask).sendToTarget();
-    }
+    outHandler.obtainMessage(state, mTask).sendToTarget();
   }
 
   protected void saveData(int state, long location) {
-    mEntity.setState(state);
+    TaskState ts = mTask.getTaskState();
+    ts.setState(state);
+    ts.setCurProgress(location);
 
     if (state == IEntity.STATE_CANCEL) {
       handleCancel();
       return;
-    } else if (state == IEntity.STATE_STOP) {
-      mEntity.setStopTime(System.currentTimeMillis());
-    } else if (state == IEntity.STATE_COMPLETE) {
+    }
+
+    if (state == IEntity.STATE_COMPLETE) {
       handleComplete();
     }
-    if (location > 0) {
-      mEntity.setCurrentProgress(location);
-    }
-    mEntity.update();
+    EntityCachePool.INSTANCE.updateState(mTask.getTaskId(), state, location);
   }
 }

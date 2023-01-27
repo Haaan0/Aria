@@ -16,20 +16,65 @@
 
 package com.arialyy.aria.core.command;
 
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.core.queue.AbsTaskQueue;
+import com.arialyy.aria.core.DuaContext;
+import com.arialyy.aria.core.inf.ITaskQueue;
+import com.arialyy.aria.core.task.ITask;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by AriaL on 2017/6/29.
  */
-public abstract class AbsCmd<T extends AbsTaskWrapper> implements ICmd {
-  protected AbsTaskQueue mQueue;
-  protected T mTaskWrapper;
-  protected String TAG;
+public abstract class AbsCmd implements ICmd {
+
+  protected ITask mTask;
+
+  protected List<ICmdInterceptor> userInterceptors;
+
+  protected List<ICmdInterceptor> coreInterceptors = new ArrayList<>();
+
+  protected AbsCmd(ITask task) {
+    mTask = task;
+    addCoreInterceptor(new TaskCheckInterceptor());
+  }
 
   /**
-   * 是否是下载任务的命令
-   * {@code true} 下载任务的命令，{@code false} 上传任务的命令
+   * add user interceptor
    */
-  protected boolean isDownloadCmd = true;
+  public void setInterceptors(List<ICmdInterceptor> userInterceptors) {
+    this.userInterceptors.addAll(userInterceptors);
+  }
+
+  protected void addCoreInterceptor(ICmdInterceptor interceptor) {
+    coreInterceptors.add(interceptor);
+  }
+
+  /**
+   * if interruption occurred, stop cmd
+   */
+  protected CmdResp interceptor() {
+    if (userInterceptors == null || userInterceptors.isEmpty()) {
+      return null;
+    }
+    List<ICmdInterceptor> interceptors = new ArrayList<>();
+    interceptors.addAll(userInterceptors);
+    interceptors.addAll(coreInterceptors);
+    ICmdInterceptor.IChain chain = new CmdChain(interceptors, 0, mTask, getTaskQueue());
+    return chain.proceed(mTask);
+  }
+
+  public ITaskQueue<ITask> getTaskQueue() {
+    ITaskQueue<?> itq = null;
+    switch (mTask.getTaskType()) {
+      case ITask.DOWNLOAD: {
+        itq = DuaContext.INSTANCE.getServiceManager().getDownloadQueue();
+        break;
+      }
+      case ITask.UPLOAD: {
+        itq = DuaContext.INSTANCE.getServiceManager().getUploadQueue();
+        break;
+      }
+    }
+    return (ITaskQueue<ITask>) itq;
+  }
 }

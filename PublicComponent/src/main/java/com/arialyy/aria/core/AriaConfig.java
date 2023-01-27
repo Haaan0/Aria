@@ -27,6 +27,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import com.arialyy.aria.core.config.AppConfig;
+import com.arialyy.aria.core.config.CommonConfig;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.config.DGroupConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
@@ -56,6 +57,9 @@ public class AriaConfig {
   private UploadConfig mUConfig;
   private AppConfig mAConfig;
   private DGroupConfig mDGConfig;
+
+  private CommonConfig mCConfig;
+
   /**
    * 是否已经联网，true 已经联网
    */
@@ -92,6 +96,10 @@ public class AriaConfig {
   private void initData() {
     initConfig();
     regNetCallBack(APP);
+  }
+
+  public CommonConfig getCConfig() {
+    return mCConfig;
   }
 
   public DownloadConfig getDConfig() {
@@ -181,7 +189,6 @@ public class AriaConfig {
     return false;
   }
 
-
   public boolean isConnectedNet() {
     return isConnectedNet;
   }
@@ -194,6 +201,7 @@ public class AriaConfig {
     mUConfig = Configuration.getInstance().uploadCfg;
     mAConfig = Configuration.getInstance().appCfg;
     mDGConfig = Configuration.getInstance().dGroupCfg;
+    mCConfig = Configuration.getInstance().cCommonCfg;
 
     File xmlFile = new File(APP.getFilesDir().getPath() + Configuration.XML_FILE);
     File tempDir = new File(APP.getFilesDir().getPath() + "/temp");

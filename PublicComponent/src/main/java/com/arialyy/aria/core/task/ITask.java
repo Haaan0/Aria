@@ -109,13 +109,6 @@ public interface ITask {
   boolean isCancel();
 
   /**
-   * 任务是否需要重试
-   *
-   * @return {@code true}任务已经取消
-   */
-  boolean isNeedRetry();
-
-  /**
    * 任务的调度类型
    * {@link TaskSchedulerType}
    */

@@ -1,6 +1,7 @@
 package com.arialyy.aria.schedulers
 
 import android.content.Context
+import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IComponentInit
 
 /**
@@ -10,6 +11,7 @@ import com.arialyy.aria.core.inf.IComponentInit
  **/
 class SchedulerComponent : IComponentInit {
   override fun init(context: Context) {
-
+    DuaContext.getServiceManager()
+      .registerService(DuaContext.SCHEDULER, TaskSchedulers.getInstance())
   }
 }

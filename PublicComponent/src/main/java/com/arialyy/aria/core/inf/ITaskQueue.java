@@ -25,6 +25,11 @@ import com.arialyy.aria.core.task.ITask;
 public interface ITaskQueue<TASK extends ITask> extends IService {
 
   /**
+   * add task to cache queue
+   */
+  boolean addTask(TASK task);
+
+  /**
    * @return {@code true} task exists
    */
   boolean taskExists(int taskId);

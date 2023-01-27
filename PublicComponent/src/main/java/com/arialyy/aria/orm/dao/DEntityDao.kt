@@ -33,7 +33,10 @@ interface DEntityDao {
 
   @Transaction
   @Query("SELECT * FROM DEntity")
-  suspend fun getDEntityList():List<DEntity>
+  suspend fun getDEntityList(): List<DEntity>
+
+  @Query("SELECT * FROM DEntity WHERE :savePath=savePath")
+  suspend fun getDEntityBySavePath(savePath: String): DEntity
 
   @Query("SELECT * FROM DEntity WHERE :dId=dId")
   suspend fun getDEntityById(did: String): DEntity

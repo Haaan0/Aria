@@ -25,6 +25,17 @@ import com.arialyy.aria.util.CommonUtil
  * @Date 10:04 PM 2023/1/24
  **/
 class TaskState {
+
+  /**
+   * need to try again?，default: false
+   */
+  var needRetry = false
+
+  /**
+   * already fail num
+   */
+  var failNum = 0
+
   var state: Int = IEntity.STATE_WAIT
 
   /**
@@ -62,7 +73,11 @@ class TaskState {
 
   fun getPercent() = ((curProgress * 100) / fileSize).toInt()
 
-  fun isComplete() = state == IEntity.STATE_COMPLETE
+  fun isCompleted() = state == IEntity.STATE_COMPLETE
+
+  fun isStopped() = state == IEntity.STATE_STOP
+
+  fun isRunning() = state == IEntity.STATE_RUNNING
 
   /**
    * you need set params in config

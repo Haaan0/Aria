@@ -17,12 +17,16 @@ package com.arialyy.aria.http.download
 
 import android.net.Uri
 import com.arialyy.aria.core.DuaContext
-import com.arialyy.aria.core.event.EventMsgUtil
+import com.arialyy.aria.core.command.AddCmd
+import com.arialyy.aria.core.command.StartCmd
 import com.arialyy.aria.core.inf.IStartController
 import com.arialyy.aria.core.task.DownloadTask
 import com.arialyy.aria.http.HttpBaseController
 import com.arialyy.aria.http.HttpOption
 import com.arialyy.aria.http.HttpUtil
+import com.arialyy.aria.orm.EntityCachePool
+import com.arialyy.aria.orm.entity.DEntity
+import kotlinx.coroutines.launch
 
 /**
  * @Author laoyuyu
@@ -60,36 +64,54 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
     if (HttpUtil.checkHttpDParams(httpDTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
-    val task = DownloadTask()
+    val task = DownloadTask(httpDTaskOption)
+    DuaContext.duaScope.launch {
+      val dEntity = findDEntityBySavePath(httpDTaskOption)
+      EntityCachePool.putEntity(task.taskId, dEntity)
+    }
+    return task
   }
 
-  override fun add(): Long {
+  /**
+   * find DEntity, if that not exist, create and save it
+   */
+  private suspend fun findDEntityBySavePath(option: HttpDTaskOption): DEntity {
+    val savePath = option.savePathUri?.toString()
+    if (savePath.isNullOrEmpty()) {
+      throw IllegalArgumentException("savePath is null")
+    }
+    val dao = DuaContext.getServiceManager().getDbService().getDuaDb()?.getDEntityDao()
+    val de = dao?.getDEntityBySavePath(savePath)
+    if (de != null) {
+      return de
+    }
+    val newDe = DEntity(
+      sourceUrl = option.sourUrl!!,
+      savePath = savePath,
+    )
+    dao?.insert(newDe)
+    return newDe
+  }
+
+  override fun add(): Int {
     if (!HttpUtil.checkHttpDParams(httpDTaskOption)) {
       return -1
     }
-    EventMsgUtil.getDefault().post()
-    TODO("Not yet implemented")
+    val task = createTask()
+    val resp = AddCmd(task).executeCmd()
+    return if (resp.isInterrupt()) -1 else task.taskId
   }
 
-  override fun create(): Long {
+  override fun start(): Int {
     if (!HttpUtil.checkHttpDParams(httpDTaskOption)) {
       return -1
     }
-
-    TODO("Not yet implemented")
+    val task = createTask()
+    val resp = StartCmd(task).executeCmd()
+    return if (resp.isInterrupt()) -1 else task.taskId
   }
 
-  override fun resume(): Long {
-    if (!HttpUtil.checkHttpDParams(httpDTaskOption)) {
-      return -1
-    }
-    TODO("Not yet implemented")
-  }
-
-  override fun resume(newStart: Boolean): Long {
-    if (!HttpUtil.checkHttpDParams(httpDTaskOption)) {
-      return -1
-    }
-    TODO("Not yet implemented")
+  override fun resume(): Int {
+    return start()
   }
 }

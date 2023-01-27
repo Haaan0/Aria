@@ -47,6 +47,15 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
 
   protected abstract int getMaxTaskSize();
 
+  @Override public boolean addTask(TASK task) {
+    if (task == null) {
+      Timber.e("task is null");
+      return false;
+    }
+    getCachePool().putTask(task);
+    return false;
+  }
+
   @Override public boolean taskExists(int taskId) {
     return getCachePool().taskExist(taskId) || getExePool().taskExist(taskId);
   }
@@ -260,6 +269,4 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
     Timber.w("start next fail");
     return false;
   }
-
-
 }

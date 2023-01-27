@@ -13,6 +13,7 @@ import java.lang.reflect.Type
  * @Date 2:58 下午 2022/4/25
  **/
 internal object DbUtil {
+
   /**
    * 创建存储数据\更新数据时使用的ContentValues
    *

@@ -20,6 +20,7 @@ import android.content.Context
 import com.arialyy.aria.core.service.LifecycleManager
 import com.arialyy.aria.core.service.ServiceManager
 import kotlinx.coroutines.MainScope
+import java.util.logging.Handler
 
 /**
  * @Author laoyuyu
@@ -31,8 +32,9 @@ object DuaContext {
   const val DB_SERVICE = "DB_SERVICE"
   const val D_QUEUE = "D_QUEUE"
   const val U_QUEUE = "U_QUEUE"
+  const val SCHEDULER = "SCHEDULER"
 
-  private val serviceArray = arrayOf(DB_SERVICE, D_QUEUE, U_QUEUE)
+  private val serviceArray = arrayOf(DB_SERVICE, D_QUEUE, U_QUEUE, SCHEDULER)
   val duaScope = MainScope()
 
   lateinit var context: Context

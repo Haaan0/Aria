@@ -33,11 +33,11 @@ dependencies {
   api project(path: ':AriaAnnotations')
   testImplementation(libs.bundles.android.test)
   implementation(libs.appcompat)
-  implementation(libs.bundles.room)
   implementation(libs.startup)
   api(libs.timber)
   api(libs.annotation)
   implementation(libs.gson)
+  implementation(libs.bundles.room)
   kapt libs.room.compiler
 }
 

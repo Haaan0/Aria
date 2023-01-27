@@ -1,6 +1,7 @@
 plugins {
   id 'com.android.library'
   id 'org.jetbrains.kotlin.android'
+  id 'kotlin-kapt'
 }
 
 android {
@@ -30,6 +31,9 @@ dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
 
   implementation project(path: ':PublicComponent')
+  implementation(libs.bundles.room)
+  implementation(libs.kt.coroutines)
+  kapt libs.room.compiler
 }
 
 //apply from: 'bintray-release.gradle'

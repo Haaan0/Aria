@@ -24,5 +24,5 @@ public interface ICmd {
   /**
    * 执行命令
    */
-  void executeCmd();
+  CmdResp executeCmd();
 }

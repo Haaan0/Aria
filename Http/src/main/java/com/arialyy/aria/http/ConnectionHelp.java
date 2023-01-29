@@ -19,7 +19,6 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.ProtocolType;
 import com.arialyy.aria.core.common.RequestEnum;
-import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.SSLContextUtil;
 import java.io.IOException;
@@ -28,7 +27,6 @@ import java.net.CookieManager;
 import java.net.CookieStore;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -49,25 +47,33 @@ public final class ConnectionHelp {
   /**
    * 处理url参数
    */
-  public static URL handleUrl(String url, HttpTaskOption taskDelegate)
+  public static URL handleUrl(String url, HttpOption option)
       throws MalformedURLException {
-    Map<String, String> params = taskDelegate.getParams();
-    if (params != null && taskDelegate.getRequestEnum() == RequestEnum.GET) {
-      if (url.contains("?")) {
-        ALog.e(TAG, String.format("设置参数失败，url中已经有?，url: %s", url));
-        return new URL(CommonUtil.convertUrl(url));
+    Map<String, String> params = option.getParams();
+    if (params.isEmpty()) {
+      return new URL(CommonUtil.convertUrl(url));
+    }
+
+    if (option.getRequestMethod() == RequestEnum.GET) {
+      if (!url.contains("?")) {
+        url = url.concat("?");
       }
       StringBuilder sb = new StringBuilder();
       sb.append(url).append("?");
       Set<String> keys = params.keySet();
       for (String key : keys) {
-        sb.append(key).append("=").append(URLEncoder.encode(params.get(key))).append("&");
+        sb.append(URLEncoder.encode(key))
+            .append("=")
+            .append(URLEncoder.encode(params.get(key)))
+            .append("&");
       }
       String temp = sb.toString();
       temp = temp.substring(0, temp.length() - 1);
       return new URL(CommonUtil.convertUrl(temp));
-    } else {
-      return new URL(CommonUtil.convertUrl(url));
+    }
+
+    if (option.getRequestMethod() == RequestEnum.POST) {
+
     }
   }
 

@@ -26,4 +26,5 @@ import com.arialyy.aria.core.inf.ITaskOption
 open class DTaskOption : ITaskOption() {
   var sourUrl: String? = null
   var savePathUri: Uri? = null
+  var redirectUrl: String? = null
 }

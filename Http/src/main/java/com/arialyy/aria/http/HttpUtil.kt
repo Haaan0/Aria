@@ -15,9 +15,17 @@
  */
 package com.arialyy.aria.http
 
+import android.text.TextUtils
 import com.arialyy.aria.http.download.HttpDTaskOption
 import com.arialyy.aria.util.CheckUtil
+import com.arialyy.aria.util.Regular
 import timber.log.Timber
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.util.regex.Pattern
+import java.util.zip.GZIPInputStream
+import java.util.zip.InflaterInputStream
 
 /**
  * @Author laoyuyu
@@ -25,6 +33,46 @@ import timber.log.Timber
  * @Date 12:40 PM 2023/1/22
  **/
 internal object HttpUtil {
+  /**
+   * 拦截window.location.replace数据
+   *
+   * @return 重定向url
+   */
+  fun getWindowReplaceUrl(text: String?): String? {
+    if (text.isNullOrEmpty()) {
+      Timber.e("text is null")
+      return null
+    }
+    val reg = Regular.REG_WINLOD_REPLACE
+    val p = Pattern.compile(reg)
+    val m = p.matcher(text)
+    if (m.find()) {
+      var s = m.group()
+      s = s.substring(9, s.length - 2)
+      return s
+    }
+    return null
+  }
+
+  /**
+   * 转换HttpUrlConnect的inputStream流
+   *
+   * @return [GZIPInputStream]、[InflaterInputStream]
+   * @throws IOException
+   */
+  @Throws(IOException::class) fun convertInputStream(connection: HttpURLConnection): InputStream? {
+    val encoding = connection.getHeaderField("Content-Encoding")
+    if (TextUtils.isEmpty(encoding)) {
+      return connection.inputStream
+    }
+    if (encoding.contains("gzip")) {
+      return GZIPInputStream(connection.inputStream)
+    }
+    if (encoding.contains("deflate")) {
+      return InflaterInputStream(connection.inputStream)
+    }
+    return connection.inputStream
+  }
 
   fun checkHttpDParams(option: HttpDTaskOption?): Boolean {
     if (option == null) {

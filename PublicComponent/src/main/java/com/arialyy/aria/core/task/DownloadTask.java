@@ -18,6 +18,7 @@ package com.arialyy.aria.core.task;
 
 import android.net.Uri;
 import com.arialyy.aria.core.download.DTaskOption;
+import com.arialyy.aria.core.inf.ITaskUtil;
 
 /**
  * Created by lyy on 2016/8/11.
@@ -25,8 +26,8 @@ import com.arialyy.aria.core.download.DTaskOption;
  */
 public class DownloadTask extends AbsTask {
 
-  public DownloadTask(DTaskOption taskOption) {
-    super(taskOption);
+  public DownloadTask(DTaskOption taskOption, ITaskUtil util) {
+    super(taskOption, util);
     taskOption.taskListener.setParams(this);
   }
 

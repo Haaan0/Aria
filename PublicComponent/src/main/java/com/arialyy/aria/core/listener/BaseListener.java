@@ -25,7 +25,7 @@ import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.task.TaskState;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.AriaException;
-import com.arialyy.aria.orm.EntityCachePool;
+import com.arialyy.aria.core.task.TaskCachePool;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.ErrorHelp;
 import java.lang.ref.WeakReference;
@@ -174,6 +174,6 @@ public abstract class BaseListener implements IEventListener {
     if (state == IEntity.STATE_COMPLETE) {
       handleComplete();
     }
-    EntityCachePool.INSTANCE.updateState(mTask.getTaskId(), state, location);
+    TaskCachePool.INSTANCE.updateState(mTask.getTaskId(), state, location);
   }
 }

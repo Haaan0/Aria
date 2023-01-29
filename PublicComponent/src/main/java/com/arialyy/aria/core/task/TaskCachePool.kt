@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.orm
+package com.arialyy.aria.core.task
 
 import com.arialyy.aria.core.inf.BaseEntity
 import com.arialyy.aria.core.inf.IEntity
+import com.arialyy.aria.core.inf.ITaskUtil
 import timber.log.Timber
 
 /**
@@ -24,15 +25,34 @@ import timber.log.Timber
  * @Description
  * @Date 21:43 AM 2023/1/22
  **/
-object EntityCachePool {
+object TaskCachePool {
   /**
    * key: taskId
    */
   private val entityMap = hashMapOf<Int, BaseEntity>()
+  private val taskUtilMap = hashMapOf<String, ITaskUtil>()
+
+  /**
+   * @param taskKey task unique identifier, like: savePath, sourceUrl
+   */
+  fun putTaskUtil(taskKey: String, taskUtil: ITaskUtil) {
+    if (taskKey.isEmpty()) {
+      Timber.e("invalid taskKey: $taskKey")
+      return
+    }
+    taskUtilMap[taskKey] = taskUtil
+  }
+
+  /**
+   * @param taskKey task unique identifier, like: savePath, sourceUrl
+   */
+  fun getTaskUtil(taskKey: String): ITaskUtil? {
+    return taskUtilMap[taskKey]
+  }
 
   fun putEntity(taskId: Int, entity: BaseEntity) {
     if (taskId <= 0) {
-      Timber.e("invalid taskId: ${taskId}")
+      Timber.e("invalid taskId: $taskId")
       return
     }
     entityMap[taskId] = entity

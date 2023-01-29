@@ -20,13 +20,15 @@ import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.command.AddCmd
 import com.arialyy.aria.core.command.StartCmd
 import com.arialyy.aria.core.inf.IStartController
+import com.arialyy.aria.core.processor.IHttpFileLenAdapter
 import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseController
 import com.arialyy.aria.http.HttpOption
 import com.arialyy.aria.http.HttpUtil
-import com.arialyy.aria.orm.EntityCachePool
 import com.arialyy.aria.orm.entity.DEntity
 import kotlinx.coroutines.launch
+import java.net.HttpURLConnection
 
 /**
  * @Author laoyuyu
@@ -45,16 +47,28 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
   /**
    * set http params, link Header
    */
-  fun setHttpOption(httpOption: HttpOption): HttpBaseController {
+  fun setHttpOption(httpOption: HttpOption): HttpDStartController {
     httpDTaskOption.httpOption = httpOption
     return this
   }
 
-  fun setListener(listener: HttpDownloadListener): HttpBaseController {
+  /**
+   * Maybe the server has special rules, you need set [IHttpFileLenAdapter] to get the file length from [HttpURLConnection.getHeaderFields]
+   */
+  fun setHttpFileLenAdapter(adapter: IHttpFileLenAdapter): HttpDStartController {
+
+    httpDTaskOption.fileSizeAdapter = adapter
+    return this
+  }
+
+  fun setListener(listener: HttpDownloadListener): HttpDStartController {
     DuaContext.getLifeManager().addCustomListener(target, listener)
     return this
   }
 
+  /**
+   * set file save path, eg: /mnt/sdcard/Downloads/test.zip
+   */
   fun setSavePath(savePath: Uri): HttpDStartController {
     httpDTaskOption.savePathUri = savePath
     return this
@@ -64,10 +78,16 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
     if (HttpUtil.checkHttpDParams(httpDTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
-    val task = DownloadTask(httpDTaskOption)
+    val savePath = httpDTaskOption.savePathUri!!.toString()
+    var util = TaskCachePool.getTaskUtil(savePath)
+    if (util == null) {
+      util = HttpDTaskUtil()
+      TaskCachePool.putTaskUtil(savePath, util)
+    }
+    val task = DownloadTask(httpDTaskOption, util)
     DuaContext.duaScope.launch {
       val dEntity = findDEntityBySavePath(httpDTaskOption)
-      EntityCachePool.putEntity(task.taskId, dEntity)
+      TaskCachePool.putEntity(task.taskId, dEntity)
     }
     return task
   }

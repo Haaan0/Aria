@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.http.download
-
-import com.arialyy.aria.core.download.DTaskOption
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter
-import com.arialyy.aria.http.HttpOption
+package com.arialyy.aria.core.task
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 12:47 PM 2023/1/22
+ * @Date 11:06 AM 2023/1/27
  **/
-class HttpDTaskOption : DTaskOption() {
+class TaskChain(
+  private val interceptors: List<ITaskInterceptor>,
+  private val index: Int = 0,
+  private val task: ITask,
+) : ITaskInterceptor.IChain {
 
-  var httpOption: HttpOption? = null
-  var fileSizeAdapter: IHttpFileLenAdapter? = null
+  override fun getTask(): ITask {
+    return task
+  }
+
+  override fun proceed(task: ITask): TaskResp {
+    val next = TaskChain(interceptors, index, task)
+    val interceptor = interceptors[index]
+    return interceptor.interceptor(next)
+  }
 }

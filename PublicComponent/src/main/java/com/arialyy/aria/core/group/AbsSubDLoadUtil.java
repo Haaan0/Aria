@@ -19,7 +19,7 @@ import android.os.Handler;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.inf.IUtil;
+import com.arialyy.aria.core.inf.ITaskUtil;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.loader.LoaderStructure;
@@ -31,7 +31,7 @@ import com.arialyy.aria.util.CommonUtil;
 /**
  * 子任务下载器工具，需要在线程池中执行
  */
-public abstract class AbsSubDLoadUtil implements IUtil, Runnable {
+public abstract class AbsSubDLoadUtil implements ITaskUtil, Runnable {
   protected final String TAG = CommonUtil.getClassName(getClass());
 
   protected SubLoader mDLoader;
@@ -51,7 +51,7 @@ public abstract class AbsSubDLoadUtil implements IUtil, Runnable {
     this.needGetInfo = needGetInfo;
   }
 
-  @Override public IUtil setParams(AbsTaskWrapper taskWrapper, IEventListener listener) {
+  @Override public ITaskUtil setParams(AbsTaskWrapper taskWrapper, IEventListener listener) {
     mWrapper = (DTaskWrapper) taskWrapper;
     mDLoader = getLoader();
     return this;

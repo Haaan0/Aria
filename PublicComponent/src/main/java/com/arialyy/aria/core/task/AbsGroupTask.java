@@ -35,8 +35,8 @@ public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskWrapper>
    * @param url 子任务下载地址
    */
   public void startSubTask(String url) {
-    if (getUtil() != null) {
-      ((AbsGroupLoaderUtil) getUtil()).startSubTask(url);
+    if (getTaskUtil() != null) {
+      ((AbsGroupLoaderUtil) getTaskUtil()).startSubTask(url);
     }
   }
 
@@ -46,8 +46,8 @@ public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskWrapper>
    * @param url 子任务下载地址
    */
   public void stopSubTask(String url) {
-    if (getUtil() != null) {
-      ((AbsGroupLoaderUtil) getUtil()).stopSubTask(url);
+    if (getTaskUtil() != null) {
+      ((AbsGroupLoaderUtil) getTaskUtil()).stopSubTask(url);
     }
   }
 }

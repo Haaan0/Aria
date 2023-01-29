@@ -16,10 +16,9 @@
 
 package com.arialyy.aria.core.loader;
 
-import com.arialyy.aria.core.inf.IUtil;
+import com.arialyy.aria.core.inf.ITaskUtil;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -28,7 +27,7 @@ import com.arialyy.aria.util.CommonUtil;
  * Created by lyy on 2015/8/25.
  * HTTP\FTP单任务下载工具
  */
-public abstract class AbsNormalLoaderUtil implements IUtil {
+public abstract class AbsNormalLoaderUtil implements ITaskUtil {
   protected String TAG = CommonUtil.getClassName(getClass());
   private IEventListener mListener;
   protected AbsNormalLoader mLoader;
@@ -38,7 +37,7 @@ public abstract class AbsNormalLoaderUtil implements IUtil {
   protected AbsNormalLoaderUtil() {
   }
 
-  @Override public IUtil setParams(AbsTaskWrapper taskWrapper, IEventListener listener) {
+  @Override public ITaskUtil setParams(AbsTaskWrapper taskWrapper, IEventListener listener) {
     mTaskWrapper = taskWrapper;
     mListener = listener;
     mLoader = getLoader();

@@ -18,10 +18,9 @@ package com.arialyy.aria.core.task;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.inf.ITaskOption;
-import com.arialyy.aria.core.inf.IUtil;
+import com.arialyy.aria.core.inf.ITaskUtil;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.util.CommonUtil;
-import com.arialyy.aria.util.ComponentUtil;
 import java.util.HashMap;
 import java.util.Map;
 import timber.log.Timber;
@@ -32,7 +31,7 @@ import timber.log.Timber;
 public abstract class AbsTask implements ITask {
   protected ITaskOption mTaskOption;
   private boolean isCancel = false, isStop = false;
-  private IUtil mUtil;
+  private ITaskUtil mUtil;
   /**
    * 该任务的调度类型
    */
@@ -41,20 +40,19 @@ public abstract class AbsTask implements ITask {
   private int taskId = -1;
   private final Map<String, Object> mExpand = new HashMap<>();
 
-  protected AbsTask(ITaskOption taskOption) {
+  protected AbsTask(ITaskOption taskOption, ITaskUtil util) {
     mTaskOption = taskOption;
+    mUtil = util;
     taskId = TaskStatePool.INSTANCE.buildTaskId$PublicComponent_debug();
     TaskStatePool.INSTANCE.putTaskState(getTaskId(), mTaskState);
+    util.init(this, taskOption.taskListener);
   }
 
   @Override public void setState(int state) {
     mTaskState.setState(state);
   }
 
-  synchronized IUtil getUtil() {
-    if (mUtil == null) {
-      mUtil = ComponentUtil.getInstance().buildUtil(mTaskWrapper, mListener);
-    }
+  ITaskUtil getTaskUtil() {
     return mUtil;
   }
 
@@ -154,13 +152,13 @@ public abstract class AbsTask implements ITask {
 
   @Override public void start(int type) {
     mSchedulerType = type;
-    mUtil = getUtil();
+    mUtil = getTaskUtil();
     if (mUtil == null) {
       Timber.e("util is  null");
       return;
     }
     if (type == TaskSchedulerType.TYPE_START_AND_RESET_STATE) {
-      if (getUtil().isRunning()) {
+      if (getTaskUtil().isRunning()) {
         Timber.e("task restart fail");
         return;
       }
@@ -168,33 +166,33 @@ public abstract class AbsTask implements ITask {
       Timber.e("task restart success");
       return;
     }
-    if (getUtil().isRunning()) {
+    if (getTaskUtil().isRunning()) {
       Timber.d("task is running");
       return;
     }
-    getUtil().start();
+    getTaskUtil().start();
   }
 
   @Override public void stop(int type) {
-    mUtil = getUtil();
+    mUtil = getTaskUtil();
     if (mUtil == null) {
       Timber.e("util is  null");
       return;
     }
     isStop = true;
     mSchedulerType = type;
-    getUtil().stop();
+    getTaskUtil().stop();
   }
 
   @Override public void cancel(int type) {
-    mUtil = getUtil();
+    mUtil = getTaskUtil();
     if (mUtil == null) {
       Timber.e("util is  null");
       return;
     }
     isCancel = true;
     mSchedulerType = type;
-    getUtil().cancel();
+    getTaskUtil().cancel();
   }
 
   /**
@@ -203,7 +201,7 @@ public abstract class AbsTask implements ITask {
    * @return {@code true} 正在下载
    */
   @Override public boolean isRunning() {
-    return getUtil().isRunning();
+    return getTaskUtil().isRunning();
   }
 
   /**

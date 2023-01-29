@@ -25,8 +25,8 @@ import com.arialyy.aria.core.task.ITaskInterceptor.IChain
  * @Date 1:12 PM 2023/1/28
  **/
 abstract class AbsTaskUtil : ITaskUtil {
-  protected lateinit var mTask: ITask
-  protected lateinit var mEventListener: IEventListener
+  private lateinit var mTask: ITask
+  private lateinit var mEventListener: IEventListener
 
   private val mUserInterceptor = mutableListOf<ITaskInterceptor>()
   private val mCoreInterceptor = mutableListOf<ITaskInterceptor>()
@@ -36,14 +36,16 @@ abstract class AbsTaskUtil : ITaskUtil {
     mEventListener = listener
   }
 
+  protected fun getTask() = mTask
+
   /**
    * add user interceptor
    */
-  open fun setInterceptors(userInterceptors: List<ITaskInterceptor>) {
+  protected fun addInterceptors(userInterceptors: List<ITaskInterceptor>) {
     mUserInterceptor.addAll(userInterceptors)
   }
 
-  protected open fun addCoreInterceptor(interceptor: ITaskInterceptor) {
+  protected fun addCoreInterceptor(interceptor: ITaskInterceptor) {
     mCoreInterceptor.add(interceptor)
   }
 

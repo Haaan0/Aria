@@ -22,12 +22,14 @@ import com.arialyy.aria.core.command.StartCmd
 import com.arialyy.aria.core.inf.IStartController
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter
 import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseController
 import com.arialyy.aria.http.HttpOption
 import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.orm.entity.DEntity
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.net.HttpURLConnection
 
 /**
@@ -45,6 +47,19 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
   }
 
   /**
+   * use multi-threaded download file, if file size <= 5m, this setting is not valid
+   * @param threadNum  range [1 - 32]
+   */
+  fun setThreadNum(threadNum: Long): HttpDStartController {
+    if (threadNum !in 1..32) {
+      Timber.e("set thread num fail, only 0 < threadNum < 33, threadNum: $threadNum")
+      return this
+    }
+    httpDTaskOption.threadNum = threadNum
+    return this
+  }
+
+  /**
    * set http params, link Header
    */
   fun setHttpOption(httpOption: HttpOption): HttpDStartController {
@@ -56,11 +71,22 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
    * Maybe the server has special rules, you need set [IHttpFileLenAdapter] to get the file length from [HttpURLConnection.getHeaderFields]
    */
   fun setHttpFileLenAdapter(adapter: IHttpFileLenAdapter): HttpDStartController {
-
     httpDTaskOption.fileSizeAdapter = adapter
     return this
   }
 
+  /**
+   * if you want to do something before the task is executed, you can set up a task interceptor
+   * eg: determine the network status before task execution
+   */
+  fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpDStartController {
+    httpDTaskOption.taskInterceptor.add(taskInterceptor)
+    return this
+  }
+
+  /**
+   * set download listener
+   */
   fun setListener(listener: HttpDownloadListener): HttpDStartController {
     DuaContext.getLifeManager().addCustomListener(target, listener)
     return this

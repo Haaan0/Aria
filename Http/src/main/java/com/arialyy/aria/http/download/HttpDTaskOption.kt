@@ -17,6 +17,7 @@ package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.download.DTaskOption
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter
+import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.http.HttpOption
 
 /**
@@ -26,6 +27,13 @@ import com.arialyy.aria.http.HttpOption
  **/
 class HttpDTaskOption : DTaskOption() {
 
+  companion object {
+    const val BLOCK_SIZE = 1024 * 1024 * 5
+  }
+
   var httpOption: HttpOption? = null
   var fileSizeAdapter: IHttpFileLenAdapter? = null
+  var taskInterceptor = mutableListOf<ITaskInterceptor>()
+  var isChunkTask = false
+  var threadNum: Long = 1L
 }

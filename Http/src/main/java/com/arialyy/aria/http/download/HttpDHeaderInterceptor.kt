@@ -40,7 +40,7 @@ import java.util.UUID
  * @Description
  * @Date 2:27 PM 2023/1/28
  **/
-internal class HttpHeaderInterceptor : ITaskInterceptor {
+internal class HttpDHeaderInterceptor : ITaskInterceptor {
   private lateinit var task: ITask
   private lateinit var taskOption: HttpDTaskOption
 
@@ -53,22 +53,27 @@ internal class HttpHeaderInterceptor : ITaskInterceptor {
 
   override fun interceptor(chain: TaskChain): TaskResp {
     if (Looper.myLooper() == Looper.getMainLooper()) {
-      throw IllegalThreadStateException("Io operations cannot be in the main thread")
+      throw IllegalThreadStateException("io operations cannot be in the main thread")
     }
+    Timber.i("step 1. get file info")
     task = chain.getTask()
     taskOption = task.getTaskOption(HttpDTaskOption::class.java)
-    return try {
+    try {
       val fileSize = getFileSize()
-
-      chain.proceed(task)
+      if (fileSize >= 0) {
+        task.taskState.fileSize = fileSize
+        return chain.proceed(task)
+      }
     } catch (e: IOException) {
       Timber.e(
         "download fail, url: ${
           chain.getTask().getTaskOption(HttpDTaskOption::class.java).sourUrl
         }"
       )
-      TaskResp(TaskResp.CODE_GET_FILE_INFO_FAIL)
+      return TaskResp(TaskResp.CODE_GET_FILE_INFO_FAIL)
     }
+    Timber.e("can't get fileSize")
+    return TaskResp(TaskResp.CODE_INTERRUPT)
   }
 
   @Throws(IOException::class)
@@ -78,8 +83,8 @@ internal class HttpHeaderInterceptor : ITaskInterceptor {
     val conn: HttpURLConnection = IRequest.getRequest(taskOption.httpOption!!)
       .getDConnection(taskOption.sourUrl!!, taskOption.httpOption!!)
     // https://httpwg.org/specs/rfc9110.html#byte.ranges
-    // conn.setRequestProperty("Range", "bytes=" + 0 + "-")
-    conn.setRequestProperty("Range", "bytes=0-1") // 尝试获取1个字节
+    conn.setRequestProperty("Range", "bytes=0-")
+    // conn.setRequestProperty("Range", "bytes=0-1") // 尝试获取1个字节
     conn.connect()
     return handleConnect(conn)
   }
@@ -109,8 +114,16 @@ internal class HttpHeaderInterceptor : ITaskInterceptor {
           reader.close()
           return handleUrlReTurn(conn, HttpUtil.getWindowReplaceUrl(sb.toString()))
         }
+        val chunkSize = checkChunkFileSize(conn)
+        if (chunkSize > -1) {
+          Timber.d("the url is chunk task, ${conn.url}")
+          return chunkSize
+        }
         // code is 200, but file size cannot be obtained.
         return -1
+      }
+      code == 416 -> {
+        return getFileSizeFromHeader(conn.headerFields, taskOption)
       }
       code in CODE_30X -> {
         Timber.d("handle 30x turn, code: $code")
@@ -124,6 +137,19 @@ internal class HttpHeaderInterceptor : ITaskInterceptor {
         return -1
       }
     }
+  }
+
+  /**
+   * if headers has [rfc9112 Transfer-Encoding](https://httpwg.org/specs/rfc9112.html#chunked.trailer.section)
+   * the url is chunk task
+   */
+  private fun checkChunkFileSize(conn: HttpURLConnection): Long {
+    val chunkHead = conn.headerFields["Transfer-Encoding"]
+    if (chunkHead.isNullOrEmpty()) {
+      return -1
+    }
+    taskOption.isChunkTask = true
+    return 0
   }
 
   @Throws(IOException::class) private fun handleUrlReTurn(

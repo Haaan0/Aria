@@ -22,8 +22,6 @@ import android.os.Message;
 
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.inf.IThreadStateManager;
-import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
@@ -95,7 +93,7 @@ public class GroupSubThreadStateManager implements IThreadStateManager {
           break;
         case STATE_FAIL:
           mFailNum.getAndIncrement();
-          if (isFail()) {
+          if (hasFailedBlock()) {
             sendMessageFromMsg(msg);
 
            /* Bundle b = msg.getData();
@@ -107,7 +105,7 @@ public class GroupSubThreadStateManager implements IThreadStateManager {
           break;
         case STATE_COMPLETE:
           mCompleteNum.getAndIncrement();
-          if (isComplete()) {
+          if (isCompleted()) {
             ALog.d(TAG, "isComplete, completeNum = " + mCompleteNum);
             //if (mTaskRecord.taskType == ITaskWrapper.D_SFTP) {
             //  mergerSFtp();
@@ -133,7 +131,7 @@ public class GroupSubThreadStateManager implements IThreadStateManager {
               //mListener.onComplete();
             }
             quitLooper();
-          }else if (isFail()) {
+          }else if (hasFailedBlock()) {
             sendMessageFromMsg(msg);
             quitLooper();
           }
@@ -210,7 +208,7 @@ public class GroupSubThreadStateManager implements IThreadStateManager {
    * 所有子线程是否都已经失败
    */
   @Override
-  public boolean isFail() {
+  public boolean hasFailedBlock() {
     //ALog.d(TAG,
     //    String.format("isFail; stopNum: %s, cancelNum: %s, failNum: %s, completeNum: %s", mStopNum,
     //        mCancelNum, mFailNum, mCompleteNum));
@@ -222,7 +220,7 @@ public class GroupSubThreadStateManager implements IThreadStateManager {
    * 所有子线程是否都已经完成
    */
   @Override
-  public boolean isComplete() {
+  public boolean isCompleted() {
     //ALog.d(TAG,
     //    String.format("isComplete; stopNum: %s, cancelNum: %s, failNum: %s, completeNum: %s",
     //        mStopNum,

@@ -16,14 +16,11 @@
 package com.arialyy.aria.core.inf;
 
 import android.os.Handler;
-import android.os.Looper;
-import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.loader.ILoaderComponent;
 
 /**
  * 线程任务状态
  */
-public interface IThreadStateManager extends ILoaderComponent {
+public interface IThreadStateManager {
   int STATE_STOP = 0x01;
   int STATE_FAIL = 0x02;
   int STATE_CANCEL = 0x03;
@@ -39,18 +36,18 @@ public interface IThreadStateManager extends ILoaderComponent {
   String DATA_ADD_LEN = "DATA_ADD_LEN"; // 增加的长度
 
   /**
-   * 任务是否已经失败
+   * 是否有失败的快
    *
-   * @return true 任务已失败
+   * @return true 有失败的快
    */
-  boolean isFail();
+  boolean hasFailedBlock();
 
   /**
    * 任务是否已经完成
    *
    * @return true 任务已完成
    */
-  boolean isComplete();
+  boolean isCompleted();
 
   /**
    * 获取当前任务进度
@@ -66,10 +63,9 @@ public interface IThreadStateManager extends ILoaderComponent {
    */
   void updateCurrentProgress(long currentProgress);
 
-  /**
-   * 设置消息循环体
-   */
-  void setLooper(TaskRecord taskRecord, Looper looper);
+  boolean isStopped();
+
+  boolean isCanceled();
 
   /**
    * 创建handler 回调

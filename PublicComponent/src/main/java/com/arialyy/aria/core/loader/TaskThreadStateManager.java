@@ -19,60 +19,56 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import timber.log.Timber;
 
 /**
  * 线程任务管理器，用于处理多线程下载时任务的状态回调
  */
-public class NormalThreadStateManager implements IThreadStateManager {
-  private final String TAG = CommonUtil.getClassName(this);
-
+public class TaskThreadStateManager implements IThreadStateManager {
+  /**
+   * 分块文件路径: 文件路径.blockId.part
+   */
+  public static String SUB_PATH = "%s.%s.part";
   /**
    * 任务状态回调
    */
-  private IEventListener mListener;
-  private int mThreadNum;    // 启动的线程总数
-  private AtomicInteger mCancelNum = new AtomicInteger(0); // 已经取消的线程的数
-  private AtomicInteger mStopNum = new AtomicInteger(0);  // 已经停止的线程数
-  private AtomicInteger mFailNum = new AtomicInteger(0);  // 失败的线程数
-  private AtomicInteger mCompleteNum = new AtomicInteger(0);  // 完成的线程数
+  private final IEventListener mListener;
+  private final int mThreadNum;    // 启动的线程总数
+  private final AtomicInteger mCancelNum = new AtomicInteger(0); // 已经取消的线程的数
+  private final AtomicInteger mStopNum = new AtomicInteger(0);  // 已经停止的线程数
+  private final AtomicInteger mFailNum = new AtomicInteger(0);  // 失败的线程数
+  private final AtomicInteger mCompleteNum = new AtomicInteger(0);  // 完成的线程数
   private long mProgress; //当前总进度
-  private TaskRecord mTaskRecord; // 任务记录
   private Looper mLooper;
 
   /**
    * @param listener 任务事件
    */
-  public NormalThreadStateManager(IEventListener listener) {
+  public TaskThreadStateManager(IEventListener listener, int threadNum) {
     mListener = listener;
+    mThreadNum = threadNum;
   }
 
-  @Override public void setLooper(TaskRecord taskRecord, Looper looper) {
-    mTaskRecord = taskRecord;
-    mThreadNum = mTaskRecord.threadNum;
+  @Override public void setLooper(Looper looper) {
     mLooper = looper;
   }
 
   private void checkLooper() {
-    if (mTaskRecord == null) {
-      throw new NullPointerException("任务记录为空");
-    }
     if (mLooper == null) {
       throw new NullPointerException("Looper为空");
     }
   }
 
-  private Handler.Callback callback = new Handler.Callback() {
+  private final Handler.Callback callback = new Handler.Callback() {
     @Override public boolean handleMessage(Message msg) {
       checkLooper();
       switch (msg.what) {
@@ -90,7 +86,7 @@ public class NormalThreadStateManager implements IThreadStateManager {
           break;
         case STATE_FAIL:
           mFailNum.getAndIncrement();
-          if (isFail()) {
+          if (hasFailedBlock()) {
             Bundle b = msg.getData();
             mListener.onFail(b.getBoolean(DATA_RETRY, false),
                 (AriaException) b.getSerializable(DATA_ERROR_INFO));
@@ -99,12 +95,8 @@ public class NormalThreadStateManager implements IThreadStateManager {
           break;
         case STATE_COMPLETE:
           mCompleteNum.getAndIncrement();
-          if (isComplete()) {
-            ALog.d(TAG, "isComplete, completeNum = " + mCompleteNum);
-            //if (mTaskRecord.taskType == ITaskWrapper.D_SFTP) {
-            //  mergerSFtp();
-            //  mListener.onComplete();
-            //} else
+          if (isCompleted()) {
+            Timber.d("isComplete, completeNum = %s", mCompleteNum);
             if (mTaskRecord.isBlock || mTaskRecord.threadNum == 1) {
               if (mergeFile()) {
                 mListener.onComplete();
@@ -177,7 +169,7 @@ public class NormalThreadStateManager implements IThreadStateManager {
    * 所有子线程是否都已经失败
    */
   @Override
-  public boolean isFail() {
+  public boolean hasFailedBlock() {
     //ALog.d(TAG,
     //    String.format("isFail; stopNum: %s, cancelNum: %s, failNum: %s, completeNum: %s", mStopNum,
     //        mCancelNum, mFailNum, mCompleteNum));
@@ -189,7 +181,7 @@ public class NormalThreadStateManager implements IThreadStateManager {
    * 所有子线程是否都已经完成
    */
   @Override
-  public boolean isComplete() {
+  public boolean isCompleted() {
     //ALog.d(TAG,
     //    String.format("isComplete; stopNum: %s, cancelNum: %s, failNum: %s, completeNum: %s",
     //        mStopNum,
@@ -222,26 +214,6 @@ public class NormalThreadStateManager implements IThreadStateManager {
   }
 
   /**
-   * 合并sftp的分块
-   */
-  private boolean mergerSFtp() {
-    if (mTaskRecord.threadNum == 1) {
-      File partFile = new File(String.format(IRecordHandler.SUB_PATH, mTaskRecord.filePath, 0));
-      return partFile.renameTo(new File(mTaskRecord.filePath));
-    }
-
-    List<String> partPath = new ArrayList<>();
-    for (int i = 0, len = mTaskRecord.threadNum; i < len; i++) {
-      partPath.add(String.format(IRecordHandler.SUB_PATH, mTaskRecord.filePath, i));
-    }
-    FileUtil.mergeSFtpFile(mTaskRecord.filePath, partPath, mTaskRecord.fileLength);
-    for (String pp : partPath) {
-      FileUtil.deleteFile(pp);
-    }
-    return true;
-  }
-
-  /**
    * 合并文件
    *
    * @return {@code true} 合并成功，{@code false}合并失败
@@ -249,7 +221,7 @@ public class NormalThreadStateManager implements IThreadStateManager {
   private boolean mergeFile() {
     if (mTaskRecord.threadNum == 1) {
       File targetFile = new File(mTaskRecord.filePath);
-      if (targetFile.exists()){
+      if (targetFile.exists()) {
         //没有获得文件长度：不支持断点续传
         if (mTaskRecord.fileLength == 0 && targetFile.length() != 0) {
           return true;
@@ -283,9 +255,5 @@ public class NormalThreadStateManager implements IThreadStateManager {
       ALog.e(TAG, "合并失败");
       return false;
     }
-  }
-
-  @Override public void accept(ILoaderVisitor visitor) {
-    visitor.addComponent(this);
   }
 }

@@ -92,7 +92,7 @@ public class UploadThreadStateManager implements IThreadStateManager {
           break;
         case STATE_FAIL:
           mFailNum.getAndIncrement();
-          if (isFail()) {
+          if (hasFailedBlock()) {
             Bundle b = msg.getData();
             mListener.onFail(b.getBoolean(DATA_RETRY, false),
                 (AriaException) b.getSerializable(DATA_ERROR_INFO));
@@ -101,7 +101,7 @@ public class UploadThreadStateManager implements IThreadStateManager {
           break;
         case STATE_COMPLETE:
           mCompleteNum.getAndIncrement();
-          if (isComplete()) {
+          if (isCompleted()) {
             ALog.d(TAG, "isComplete, completeNum = " + mCompleteNum);
             //上传文件不需要合并文件
             mListener.onComplete();
@@ -167,7 +167,7 @@ public class UploadThreadStateManager implements IThreadStateManager {
    * 所有子线程是否都已经失败
    */
   @Override
-  public boolean isFail() {
+  public boolean hasFailedBlock() {
     //ALog.d(TAG,
     //    String.format("isFail; stopNum: %s, cancelNum: %s, failNum: %s, completeNum: %s", mStopNum,
     //        mCancelNum, mFailNum, mCompleteNum));
@@ -179,7 +179,7 @@ public class UploadThreadStateManager implements IThreadStateManager {
    * 所有子线程是否都已经完成
    */
   @Override
-  public boolean isComplete() {
+  public boolean isCompleted() {
     //ALog.d(TAG,
     //    String.format("isComplete; stopNum: %s, cancelNum: %s, failNum: %s, completeNum: %s",
     //        mStopNum,

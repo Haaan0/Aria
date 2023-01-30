@@ -22,7 +22,6 @@ import com.arialyy.aria.core.loader.AbsNormalLoaderUtil;
 import com.arialyy.aria.core.loader.AbsNormalTTBuilderAdapter;
 import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.loader.NormalTTBuilder;
-import com.arialyy.aria.core.loader.NormalThreadStateManager;
 import com.arialyy.aria.core.loader.UploadThreadStateManager;
 import com.arialyy.aria.core.task.IThreadTaskAdapter;
 import com.arialyy.aria.core.upload.UTaskWrapper;

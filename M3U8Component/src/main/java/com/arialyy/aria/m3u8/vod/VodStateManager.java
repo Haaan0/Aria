@@ -110,7 +110,7 @@ public final class VodStateManager implements IThreadStateManager {
 
           getListener().onPeerFail(wrapper.getKey(),
               msg.getData().getString(ISchedulers.DATA_M3U8_PEER_PATH), peerIndex);
-          if (isFail()) {
+          if (hasFailedBlock()) {
             ALog.d(TAG, String.format("vod任务【%s】失败", loader.getTempFile().getName()));
             Bundle b = msg.getData();
             listener.onFail(b.getBoolean(DATA_RETRY, true),
@@ -138,7 +138,7 @@ public final class VodStateManager implements IThreadStateManager {
           if (!loader.isJump()) {
             loader.notifyWaitLock(true);
           }
-          if (isComplete()) {
+          if (isCompleted()) {
             handleTaskComplete();
           }
           break;
@@ -239,12 +239,12 @@ public final class VodStateManager implements IThreadStateManager {
     getEntity().update();
   }
 
-  @Override public boolean isFail() {
+  @Override public boolean hasFailedBlock() {
     printInfo("isFail");
     return failNum.get() != 0 && failNum.get() == loader.getCurrentFlagSize() && !loader.isJump();
   }
 
-  @Override public boolean isComplete() {
+  @Override public boolean isCompleted() {
     if (m3U8Option.isIgnoreFailureTs()) {
       return loader.getCompleteNum() + failNum.get() >= taskRecord.threadRecords.size()
           && !loader.isJump();

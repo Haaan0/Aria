@@ -166,8 +166,8 @@ public abstract class AbsNormalLoader<T extends AbsTaskWrapper> implements ILoad
           try {
             if (mStateManager == null) {
               ALog.e(TAG, "stateManager is null");
-            } else if (mStateManager.isComplete()
-                || mStateManager.isFail()
+            } else if (mStateManager.isCompleted()
+                || mStateManager.hasFailedBlock()
                 || !isRunning()
                 || isBreak()) {
               //ALog.d(TAG, "isComplete = " + mStateManager.isComplete()

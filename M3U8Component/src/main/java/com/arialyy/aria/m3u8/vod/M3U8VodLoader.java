@@ -161,7 +161,7 @@ final class M3U8VodLoader extends BaseM3U8Loader {
 
     // 启动定时器
     startTimer();
-    if (getStateManager().isComplete()){
+    if (getStateManager().isCompleted()){
       Log.d(TAG, "任务已完成");
       getStateManager().handleTaskComplete();
       return;

@@ -137,11 +137,11 @@ final class LiveStateManager implements IThreadStateManager {
     }
   }
 
-  @Override public boolean isFail() {
+  @Override public boolean hasFailedBlock() {
     return false;
   }
 
-  @Override public boolean isComplete() {
+  @Override public boolean isCompleted() {
     return false;
   }
 

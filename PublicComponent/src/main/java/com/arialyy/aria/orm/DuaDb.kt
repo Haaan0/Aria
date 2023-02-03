@@ -20,6 +20,7 @@ import androidx.room.RoomDatabase
 import com.arialyy.aria.orm.dao.DEntityDao
 import com.arialyy.aria.orm.dao.DGEntityDao
 import com.arialyy.aria.orm.dao.MEntityDao
+import com.arialyy.aria.orm.dao.RecordDao
 import com.arialyy.aria.orm.dao.UEntityDao
 import com.arialyy.aria.orm.entity.BlockRecord
 import com.arialyy.aria.orm.entity.DGEntity
@@ -40,4 +41,6 @@ abstract class DuaDb : RoomDatabase() {
   abstract fun getDGEntityDao(): DGEntityDao
 
   abstract fun getMEntityDao(): MEntityDao
+
+  abstract fun getRecordDao(): RecordDao
 }

@@ -116,5 +116,7 @@ public interface ITask {
 
   int getTaskId();
 
+  String getTaskKey();
+
   <T extends ITaskOption> T getTaskOption(Class<T> clazz);
 }

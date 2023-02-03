@@ -51,7 +51,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     )
   }
 
-  override fun interceptor(chain: TaskChain): TaskResp {
+  override suspend fun interceptor(chain: TaskChain): TaskResp {
     if (Looper.myLooper() == Looper.getMainLooper()) {
       throw IllegalThreadStateException("io operations cannot be in the main thread")
     }

@@ -26,8 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class BlockManager(
   val mListener: IEventListener,
   val looper: Looper,
-  private val blockNum: Int,
-  val blockParentDir: String
+  private val blockNum: Int
 ) : IThreadStateManager {
   private val blockList = mutableListOf<BlockState>()
   private val canceledNum = AtomicInteger(0) // 已经取消的线程的数
@@ -40,7 +39,6 @@ class BlockManager(
   private var progress: Long = 0 //当前总进度
 
   private val callback = Callback { msg ->
-    checkLooper()
     when (msg.what) {
       IThreadStateManager.STATE_STOP -> {
         stoppedNum.getAndIncrement()
@@ -69,15 +67,6 @@ class BlockManager(
         completedNum.getAndIncrement()
         if (isCompleted) {
           Timber.d("isComplete, completeNum = %s", completedNum)
-          if (mTaskRecord.isBlock || mTaskRecord.threadNum === 1) {
-            if (mergeFile()) {
-              mListener.onComplete()
-            } else {
-              mListener.onFail(false, null)
-            }
-            quitLooper()
-            break
-          }
           mListener.onComplete()
           quitLooper()
         }
@@ -89,9 +78,7 @@ class BlockManager(
           progress += len
         }
       }
-      IThreadStateManager.STATE_UPDATE_PROGRESS -> if (msg.obj == null) {
-        progress = updateBlockProgress()
-      } else if (msg.obj is Long) {
+      IThreadStateManager.STATE_UPDATE_PROGRESS -> {
         progress = msg.obj as Long
       }
     }
@@ -148,10 +135,4 @@ class BlockManager(
     return callback
   }
 
-  private fun mergeFile(): Boolean {
-    if (blockNum == 1){
-
-      return true
-    }
-  }
 }

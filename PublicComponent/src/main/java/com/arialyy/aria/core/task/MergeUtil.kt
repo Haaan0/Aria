@@ -1,3 +1,5 @@
+package com.arialyy.aria.core.task
+
 /*
  * Copyright (C) 2016 AriaLyy(https://github.com/AriaLyy/Aria)
  *
@@ -13,19 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.task
+object MergeUtil {
 
-/**
- * @Author laoyuyu
- * @Description
- * @Date 1:19 PM 2023/1/28
- **/
-interface ITaskInterceptor {
+  /**
+   * merge block file,if success,return true else return false
+   */
+  fun merge(): Boolean {
 
-  suspend fun interceptor(chain: TaskChain): TaskResp
-
-  interface IChain {
-    fun getTask(): ITask
-    fun proceed(task: ITask): TaskResp
+    return false
   }
 }

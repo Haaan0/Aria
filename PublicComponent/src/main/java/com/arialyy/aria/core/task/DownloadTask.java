@@ -19,6 +19,7 @@ package com.arialyy.aria.core.task;
 import android.net.Uri;
 import com.arialyy.aria.core.download.DTaskOption;
 import com.arialyy.aria.core.inf.ITaskUtil;
+import java.util.Objects;
 
 /**
  * Created by lyy on 2016/8/11.
@@ -44,5 +45,9 @@ public class DownloadTask extends AbsTask {
    */
   @Override public int getTaskType() {
     return ITask.DOWNLOAD;
+  }
+
+  @Override public String getTaskKey() {
+    return Objects.requireNonNull(getTaskOption(DTaskOption.class).getSavePathUri()).toString();
   }
 }

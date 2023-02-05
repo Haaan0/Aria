@@ -16,6 +16,7 @@
 package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.task.BlockUtil
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
@@ -23,6 +24,7 @@ import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.orm.entity.TaskRecord
 import timber.log.Timber
+import java.io.File
 
 /**
  * block interceptor
@@ -32,9 +34,11 @@ import timber.log.Timber
 internal class HttpDBlockInterceptor : ITaskInterceptor {
   private lateinit var task: ITask
   private lateinit var option: HttpDTaskOption
+  private lateinit var blockManager: IBlockManager
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     task = chain.getTask()
+    blockManager = chain.blockManager
     option = task.getTaskOption(HttpDTaskOption::class.java)
     if (task.taskState.fileSize < 0) {
       Timber.e("file size < 0")
@@ -44,12 +48,10 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
     // if task not support resume, don't save record
     if (task.taskState.fileSize == 0L) {
       chain.blockManager.setBlockNum(1)
-      checkBlock()
       return chain.proceed(chain.getTask())
     }
     val blockNum = checkRecord()
     chain.blockManager.setBlockNum(blockNum)
-    checkBlock()
     return chain.proceed(chain.getTask())
   }
 
@@ -77,13 +79,16 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
       return taskRecord.blockNum
     }
     Timber.d("record existed")
+    checkBlock(recordWrapper.taskRecord)
     return recordWrapper.taskRecord.blockNum
   }
 
-  /**
+  /**ø
    * if block already exist, upload progress
    */
-  private fun checkBlock() {
-
+  private fun checkBlock(record: TaskRecord) {
+    for (br in record.blockList) {
+      val block = File()
+    }
   }
 }

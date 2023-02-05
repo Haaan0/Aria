@@ -21,18 +21,15 @@ import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.listener.IDLoadListener;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
-import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.AriaException;
-import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
-import java.util.List;
 
 /**
  * 单文件
@@ -162,7 +159,7 @@ public class NormalLoader<T extends AbsTaskWrapper> extends AbsNormalLoader<T> {
     });
   }
 
-  @Override public void addComponent(IThreadStateManager threadState) {
+  @Override public void addComponent(IBlockManager threadState) {
     mStateManager = threadState;
   }
 

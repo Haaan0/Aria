@@ -21,7 +21,7 @@ import android.os.Looper;
 import android.os.Message;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.loader.ILoaderVisitor;
@@ -36,7 +36,7 @@ import java.nio.charset.Charset;
 
 import static com.arialyy.aria.m3u8.M3U8InfoTask.M3U8_INDEX_FORMAT;
 
-final class LiveStateManager implements IThreadStateManager {
+final class LiveStateManager implements IBlockManager {
   private final String TAG = CommonUtil.getClassName(getClass());
 
   private M3U8Listener mListener;
@@ -83,7 +83,7 @@ final class LiveStateManager implements IThreadStateManager {
         case STATE_RUNNING:
           Bundle b = msg.getData();
           if (b != null) {
-            long len = b.getLong(IThreadStateManager.DATA_ADD_LEN, 0);
+            long len = b.getLong(IBlockManager.DATA_ADD_LEN, 0);
             mProgress += len;
           }
           break;

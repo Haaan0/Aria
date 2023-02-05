@@ -19,7 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
@@ -33,7 +33,7 @@ import timber.log.Timber;
 /**
  * 线程任务管理器，用于处理多线程下载时任务的状态回调
  */
-public class TaskThreadStateManager implements IThreadStateManager {
+public class TaskThreadStateManager implements IBlockManager {
   /**
    * 分块文件路径: 文件路径.blockId.part
    */
@@ -113,7 +113,7 @@ public class TaskThreadStateManager implements IThreadStateManager {
         case STATE_RUNNING:
           Bundle b = msg.getData();
           if (b != null) {
-            long len = b.getLong(IThreadStateManager.DATA_ADD_LEN, 0);
+            long len = b.getLong(IBlockManager.DATA_ADD_LEN, 0);
             mProgress += len;
           }
 

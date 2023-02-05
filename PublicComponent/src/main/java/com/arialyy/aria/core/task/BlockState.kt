@@ -15,7 +15,9 @@
  */
 package com.arialyy.aria.core.task
 
-class BlockState(val blockId: Int, val blockPath: String) {
+import com.arialyy.aria.orm.entity.BlockRecord
+
+class BlockState(val blockState: BlockRecord, val blockPath: String) {
 
   companion object {
     /**
@@ -23,7 +25,7 @@ class BlockState(val blockId: Int, val blockPath: String) {
      */
     const val BLOCK_PATH = "%s/.%s.%d"
 
-    const val BLOCK_SIZE = 1024 * 1024 * 5
+    const val BLOCK_SIZE = 1024 * 1024 * 5L
   }
 
   var curProgress: Long = 0

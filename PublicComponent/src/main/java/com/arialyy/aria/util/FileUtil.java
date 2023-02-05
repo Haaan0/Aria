@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import timber.log.Timber;
 
 /**
  * 文件操作工具类
@@ -319,11 +320,11 @@ public class FileUtil {
    * 合并文件
    *
    * @param targetPath 目标文件
-   * @param subPaths 碎片文件路径
+   * @param blockList 分块列表
    * @return {@code true} 合并成功，{@code false}合并失败
    */
-  public static boolean mergeFile(String targetPath, List<String> subPaths) {
-    Log.d(TAG, "开始合并文件");
+  public static boolean mergeFile(String targetPath, List<File> blockList) {
+    Timber.d("开始合并文件");
     File file = new File(targetPath);
     FileOutputStream fos = null;
     FileChannel foc = null;
@@ -341,10 +342,9 @@ public class FileUtil {
       foc = fos.getChannel();
       List<FileInputStream> streams = new LinkedList<>();
       long fileLen = 0;
-      for (String subPath : subPaths) {
-        File f = new File(subPath);
-        if (!f.exists()) {
-          ALog.d(TAG, String.format("合并文件失败，文件【%s】不存在", subPath));
+      for (File block : blockList) {
+        if (!block.exists()) {
+          ALog.d(TAG, String.format("合并文件失败，文件【%s】不存在", block.getPath()));
           for (FileInputStream fis : streams) {
             fis.close();
           }
@@ -352,10 +352,10 @@ public class FileUtil {
 
           return false;
         }
-        FileInputStream fis = new FileInputStream(subPath);
+        FileInputStream fis = new FileInputStream(block);
         FileChannel fic = fis.getChannel();
-        foc.transferFrom(fic, fileLen, f.length());
-        fileLen += f.length();
+        foc.transferFrom(fic, fileLen, block.length());
+        fileLen += block.length();
         fis.close();
       }
       ALog.d(TAG, String.format("合并文件耗时：%sms", (System.currentTimeMillis() - startTime)));

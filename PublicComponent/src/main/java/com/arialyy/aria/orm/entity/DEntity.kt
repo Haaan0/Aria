@@ -15,9 +15,11 @@
  */
 package com.arialyy.aria.orm.entity
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.BaseEntity
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +29,7 @@ import kotlinx.coroutines.launch
  * Download Entity
  */
 @Entity(indices = [Index(value = ["sourceUrl", "savePath"])])
+@TypeConverters(FilePathConverter::class)
 data class DEntity(
   @PrimaryKey(autoGenerate = true) val did: Int = 0,
 
@@ -39,7 +42,7 @@ data class DEntity(
   /**
    * file save path, it's uri
    */
-  val savePath: String,
+  val savePath: Uri,
   /**
    * extended Information
    */

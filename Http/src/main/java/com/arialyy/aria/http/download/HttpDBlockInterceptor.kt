@@ -16,11 +16,12 @@
 package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.DuaContext
-import com.arialyy.aria.core.task.BlockManager
+import com.arialyy.aria.core.task.BlockUtil
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.orm.entity.TaskRecord
 import timber.log.Timber
 
 /**
@@ -30,29 +31,53 @@ import timber.log.Timber
  */
 internal class HttpDBlockInterceptor : ITaskInterceptor {
   private lateinit var task: ITask
+  private lateinit var option: HttpDTaskOption
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     task = chain.getTask()
+    option = task.getTaskOption(HttpDTaskOption::class.java)
     if (task.taskState.fileSize < 0) {
       Timber.e("file size < 0")
       return TaskResp(TaskResp.CODE_GET_FILE_INFO_FAIL)
     }
 
+    // if task not support resume, don't save record
+    if (task.taskState.fileSize == 0L) {
+      chain.blockManager.setBlockNum(1)
+      checkBlock()
+      return chain.proceed(chain.getTask())
+    }
+    val blockNum = checkRecord()
+    chain.blockManager.setBlockNum(blockNum)
+    checkBlock()
+    return chain.proceed(chain.getTask())
   }
 
   /**
    * check task record, if record no exist, create taskRecord
+   * @return blockNum
    */
-  private suspend fun checkRecord() {
-    val recordWrapper = DuaContext.getServiceManager().getDbService().getDuaDb()?.getRecordDao()
-      ?.getTaskRecordByKey(task.taskKey)
-    if (recordWrapper == null){
+  private suspend fun checkRecord(): Int {
+    val recordDao = DuaContext.getServiceManager().getDbService().getDuaDb().getRecordDao()
+    val recordWrapper = recordDao.getTaskRecordByKey(task.taskKey)
 
+    if (recordWrapper == null) {
+      Timber.i("record not found, create record")
+      val blockNumInfo = BlockUtil.getBlockNum(task.taskState.fileSize)
+      val taskRecord = TaskRecord(
+        taskKey = task.taskKey,
+        filePath = option.savePathUri!!,
+        taskType = ITask.DOWNLOAD,
+        fileLen = task.taskState.fileSize,
+        blockNum = blockNumInfo.first,
+        blockSize = task.taskState.blockSize
+      )
+      taskRecord.blockList.addAll(BlockUtil.createBlockRecord(task.taskState.fileSize))
+      recordDao.insert(taskRecord)
+      return taskRecord.blockNum
     }
-  }
-
-  private fun createBlockManager(): BlockManager {
-
+    Timber.d("record existed")
+    return recordWrapper.taskRecord.blockNum
   }
 
   /**

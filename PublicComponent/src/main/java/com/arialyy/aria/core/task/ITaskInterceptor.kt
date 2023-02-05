@@ -26,6 +26,6 @@ interface ITaskInterceptor {
 
   interface IChain {
     fun getTask(): ITask
-    fun proceed(task: ITask): TaskResp
+    suspend fun proceed(task: ITask): TaskResp
   }
 }

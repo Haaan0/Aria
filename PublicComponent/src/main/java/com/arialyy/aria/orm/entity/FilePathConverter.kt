@@ -1,5 +1,3 @@
-package com.arialyy.aria.core.task
-
 /*
  * Copyright (C) 2016 AriaLyy(https://github.com/AriaLyy/Aria)
  *
@@ -15,13 +13,21 @@ package com.arialyy.aria.core.task
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-object MergeUtil {
+package com.arialyy.aria.orm.entity
 
-  /**
-   * merge block file,if success,return true else return false
-   */
-  fun merge(): Boolean {
+import android.net.Uri
+import androidx.room.ProvidedTypeConverter
+import androidx.room.TypeConverter
 
-    return false
+@ProvidedTypeConverter
+class FilePathConverter {
+  @TypeConverter
+  fun stringToUri(string: String?): Uri? {
+    return Uri.parse(string)
+  }
+
+  @TypeConverter
+  fun uriToString(uri: Uri?): String? {
+    return uri?.toString()
   }
 }

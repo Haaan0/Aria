@@ -17,68 +17,64 @@ package com.arialyy.aria.core.task
 
 import android.os.Handler.Callback
 import android.os.Looper
-import com.arialyy.aria.core.inf.IThreadStateManager
+import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.listener.IEventListener
 import com.arialyy.aria.exception.AriaException
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicInteger
 
-class BlockManager(
-  val mListener: IEventListener,
-  val looper: Looper,
-  private val blockNum: Int
-) : IThreadStateManager {
+class BlockManager(private val eventListener: IEventListener) : IBlockManager {
   private val blockList = mutableListOf<BlockState>()
   private val canceledNum = AtomicInteger(0) // 已经取消的线程的数
   private val stoppedNum = AtomicInteger(0) // 已经停止的线程数
-
   private val failedNum = AtomicInteger(0) // 失败的线程数
-
   private val completedNum = AtomicInteger(0) // 完成的线程数
 
   private var progress: Long = 0 //当前总进度
+  private lateinit var looper: Looper
+  private var blockNum: Int = 1
 
   private val callback = Callback { msg ->
     when (msg.what) {
-      IThreadStateManager.STATE_STOP -> {
+      IBlockManager.STATE_STOP -> {
         stoppedNum.getAndIncrement()
         if (isStopped) {
           quitLooper()
         }
       }
-      IThreadStateManager.STATE_CANCEL -> {
+      IBlockManager.STATE_CANCEL -> {
         canceledNum.getAndIncrement()
         if (isCanceled) {
           quitLooper()
         }
       }
-      IThreadStateManager.STATE_FAIL -> {
+      IBlockManager.STATE_FAIL -> {
         failedNum.getAndIncrement()
         if (hasFailedBlock()) {
           val b = msg.data
-          mListener.onFail(
-            b.getBoolean(IThreadStateManager.DATA_RETRY, false),
-            b.getSerializable(IThreadStateManager.DATA_ERROR_INFO) as AriaException?
+          eventListener.onFail(
+            b.getBoolean(IBlockManager.DATA_RETRY, false),
+            b.getSerializable(IBlockManager.DATA_ERROR_INFO) as AriaException?
           )
           quitLooper()
         }
       }
-      IThreadStateManager.STATE_COMPLETE -> {
+      IBlockManager.STATE_COMPLETE -> {
         completedNum.getAndIncrement()
         if (isCompleted) {
           Timber.d("isComplete, completeNum = %s", completedNum)
-          mListener.onComplete()
+          eventListener.onComplete()
           quitLooper()
         }
       }
-      IThreadStateManager.STATE_RUNNING -> {
+      IBlockManager.STATE_RUNNING -> {
         val b = msg.data
         if (b != null) {
-          val len = b.getLong(IThreadStateManager.DATA_ADD_LEN, 0)
+          val len = b.getLong(IBlockManager.DATA_ADD_LEN, 0)
           progress += len
         }
       }
-      IThreadStateManager.STATE_UPDATE_PROGRESS -> {
+      IBlockManager.STATE_UPDATE_PROGRESS -> {
         progress = msg.obj as Long
       }
     }
@@ -98,6 +94,14 @@ class BlockManager(
 
   fun getBlockState(): BlockState {
     return blockList.removeFirst()
+  }
+
+  override fun setLopper(looper: Looper) {
+    this.looper = looper
+  }
+
+  override fun setBlockNum(blockNum: Int) {
+    this.blockNum = blockNum
   }
 
   override fun hasFailedBlock(): Boolean {

@@ -20,7 +20,7 @@ import android.os.Looper;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.listener.IDLoadListener;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.loader.AbsNormalLoader;
@@ -148,7 +148,7 @@ final class SFtpULoader extends AbsNormalLoader<UTaskWrapper> {
     });
   }
 
-  @Override public void addComponent(IThreadStateManager threadState) {
+  @Override public void addComponent(IBlockManager threadState) {
     mStateManager = threadState;
   }
 

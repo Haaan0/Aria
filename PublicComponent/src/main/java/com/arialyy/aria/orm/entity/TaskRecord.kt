@@ -15,21 +15,31 @@
  */
 package com.arialyy.aria.orm.entity
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.arialyy.aria.core.task.ITask
 
 @Entity(indices = [Index(value = ["taskKey"])])
+@TypeConverters(FilePathConverter::class)
 data class TaskRecord(
   @PrimaryKey(autoGenerate = true) val tId: Int = 0,
   val taskKey: String,
-  val filePath: String,
+  /**
+   * is uri
+   */
+  val filePath: Uri,
+  /**
+   * [ITask.DOWNLOAD] ...
+   */
   val taskType: Int,
   val fileLen: Long,
   val blockNum: Int,
   val blockSize: Long
 ) {
   @Ignore
-  internal var blockList: MutableList<BlockRecord> = mutableListOf()
+  val blockList: MutableList<BlockRecord> = mutableListOf()
 }

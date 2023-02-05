@@ -16,11 +16,13 @@
 package com.arialyy.aria.core.inf;
 
 import android.os.Handler;
+import android.os.Looper;
+import androidx.annotation.NonNull;
 
 /**
  * 线程任务状态
  */
-public interface IThreadStateManager {
+public interface IBlockManager {
   int STATE_STOP = 0x01;
   int STATE_FAIL = 0x02;
   int STATE_CANCEL = 0x03;
@@ -34,6 +36,10 @@ public interface IThreadStateManager {
   String DATA_THREAD_NAME = "DATA_THREAD_NAME";
   String DATA_THREAD_LOCATION = "DATA_THREAD_LOCATION";
   String DATA_ADD_LEN = "DATA_ADD_LEN"; // 增加的长度
+
+  void setLopper(@NonNull Looper looper);
+
+  void setBlockNum(int blockNum);
 
   /**
    * 是否有失败的快

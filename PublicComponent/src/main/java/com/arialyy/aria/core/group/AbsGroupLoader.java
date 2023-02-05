@@ -21,7 +21,7 @@ import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.listener.IDGroupListener;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.loader.IInfoTask;
@@ -360,7 +360,7 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
    * @deprecated 组合任务不需要实现这个，其内部是一个子任务调度器，并不是线程状态管理器
    */
   @Deprecated
-  @Override public void addComponent(IThreadStateManager threadState) {
+  @Override public void addComponent(IBlockManager threadState) {
 
   }
 

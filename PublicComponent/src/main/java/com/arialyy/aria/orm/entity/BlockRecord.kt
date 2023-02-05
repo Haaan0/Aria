@@ -34,9 +34,8 @@ import androidx.room.PrimaryKey
   )]
 )
 data class BlockRecord(
-  @PrimaryKey(autoGenerate = true) val bId: Int = 0,
-
-  val tId: Int,
+  val bId: Int = 0,
+  var tId: Int = 0,
 
   /**
    * 开始位置

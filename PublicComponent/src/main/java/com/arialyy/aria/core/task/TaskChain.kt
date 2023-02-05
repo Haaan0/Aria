@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.task
 
+import com.arialyy.aria.core.inf.IBlockManager
+
 /**
  * @Author laoyuyu
  * @Description
@@ -24,14 +26,15 @@ class TaskChain(
   private val interceptors: List<ITaskInterceptor>,
   private val index: Int = 0,
   private val task: ITask,
+  val blockManager: IBlockManager
 ) : ITaskInterceptor.IChain {
 
   override fun getTask(): ITask {
     return task
   }
 
-  override fun proceed(task: ITask): TaskResp {
-    val next = TaskChain(interceptors, index, task)
+  override suspend fun proceed(task: ITask): TaskResp {
+    val next = TaskChain(interceptors, index, task, blockManager)
     val interceptor = interceptors[index]
     return interceptor.interceptor(next)
   }

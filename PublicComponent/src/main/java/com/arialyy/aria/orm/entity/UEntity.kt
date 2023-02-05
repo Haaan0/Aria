@@ -15,11 +15,14 @@
  */
 package com.arialyy.aria.orm.entity
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 
 @Entity(indices = [Index(value = ["serverUrl", "filePath"])])
+@TypeConverters(FilePathConverter::class)
 data class UEntity(
   @PrimaryKey(autoGenerate = true) val uId: Int = 0,
   /**
@@ -30,7 +33,7 @@ data class UEntity(
   /**
    * file path
    */
-  val filePath: String,
+  val filePath: Uri,
 
   /**
    * extended Information

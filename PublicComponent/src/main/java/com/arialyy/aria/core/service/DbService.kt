@@ -48,14 +48,13 @@ class DbService : IService {
     }
   }
 
-  fun getDuaDb() = duaDb
+  fun getDuaDb() = duaDb!!
 
   override fun init(context: Context) {
     var customDb = findCustomDatabase(context)
     if (customDb == null) {
       customDb = DefaultDbProvider().generateDb(context)
     }
-    duaDb = customDb
-      .build()
+    duaDb = customDb.build()
   }
 }

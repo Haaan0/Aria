@@ -45,7 +45,7 @@ interface RecordDao {
       "com.arialyy.aria.orm.dao.RecordDao.insert"
     )
   )
-  suspend fun insertTaskRecord(taskRecord: TaskRecord)
+  suspend fun insertTaskRecord(taskRecord: TaskRecord): Int
 
   @Insert
   suspend fun insertSubList(blockList: List<BlockRecord>)
@@ -61,7 +61,10 @@ interface RecordDao {
 
   @Transaction
   suspend fun insert(taskRecord: TaskRecord) {
-    insertTaskRecord(taskRecord)
+    val tId = insertTaskRecord(taskRecord)
+    for (br in taskRecord.blockList) {
+      br.tId = tId
+    }
     insertSubList(taskRecord.blockList)
   }
 }

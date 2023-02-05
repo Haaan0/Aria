@@ -17,7 +17,7 @@ package com.arialyy.aria.http.upload;
 
 import android.os.Handler;
 import android.os.Looper;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.loader.AbsNormalLoader;
 import com.arialyy.aria.core.loader.IInfoTask;
@@ -47,7 +47,7 @@ final class HttpULoader extends AbsNormalLoader<UTaskWrapper> {
 
   }
 
-  @Override public void addComponent(IThreadStateManager threadState) {
+  @Override public void addComponent(IBlockManager threadState) {
     mStateManager = threadState;
   }
 

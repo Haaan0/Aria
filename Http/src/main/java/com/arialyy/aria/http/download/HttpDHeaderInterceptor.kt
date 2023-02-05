@@ -21,6 +21,7 @@ import android.os.Looper
 import android.os.Process
 import android.text.TextUtils
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter
+import com.arialyy.aria.core.task.BlockState
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
@@ -61,6 +62,9 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     try {
       val fileSize = getFileSize()
       if (fileSize >= 0) {
+        task.taskState.isSupportResume = fileSize != 0L
+        task.taskState.isSupportBlock =
+          task.taskState.isSupportResume && fileSize > BlockState.BLOCK_SIZE
         task.taskState.fileSize = fileSize
         return chain.proceed(task)
       }

@@ -15,12 +15,12 @@
  */
 package com.arialyy.aria.orm.entity
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.arialyy.aria.orm.DGUrlConverter
 
 /**
  * @Author laoyuyu
@@ -28,7 +28,7 @@ import com.arialyy.aria.orm.DGUrlConverter
  * @Date 4:32 PM 2023/1/16
  **/
 @Entity(indices = [Index(value = ["savePath"])])
-@TypeConverters(DGUrlConverter::class)
+@TypeConverters(DGUrlConverter::class, FilePathConverter::class)
 data class DGEntity(
   @PrimaryKey(autoGenerate = true) val dgId: Int = 0,
 
@@ -40,7 +40,7 @@ data class DGEntity(
   /**
    * 保存路径
    */
-  val savePath: String,
+  val savePath: Uri,
 
   /**
    * 子任务url地址

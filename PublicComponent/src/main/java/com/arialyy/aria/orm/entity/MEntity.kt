@@ -15,15 +15,18 @@
  */
 package com.arialyy.aria.orm.entity
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.orm.DuaDb
 import timber.log.Timber
 import java.util.TimeZone
 
 @Entity(indices = [Index(value = ["sourceUrl", "savePath"])])
+@TypeConverters(FilePathConverter::class)
 data class MEntity(
   @PrimaryKey(autoGenerate = true) val mId: Int = 0,
 
@@ -36,7 +39,7 @@ data class MEntity(
   /**
    * file save path
    */
-  val savePath: String,
+  val savePath: Uri,
   /**
    * extended Information
    */

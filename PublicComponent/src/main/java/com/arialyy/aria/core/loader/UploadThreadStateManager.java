@@ -21,7 +21,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 线程任务管理器，用于处理多线程下载时任务的状态回调
  */
-public class UploadThreadStateManager implements IThreadStateManager {
+public class UploadThreadStateManager implements IBlockManager {
   private final String TAG = CommonUtil.getClassName(this);
 
   /**
@@ -111,7 +111,7 @@ public class UploadThreadStateManager implements IThreadStateManager {
         case STATE_RUNNING:
           Bundle b = msg.getData();
           if (b != null) {
-            long len = b.getLong(IThreadStateManager.DATA_ADD_LEN, 0);
+            long len = b.getLong(IBlockManager.DATA_ADD_LEN, 0);
             mProgress += len;
           }
 

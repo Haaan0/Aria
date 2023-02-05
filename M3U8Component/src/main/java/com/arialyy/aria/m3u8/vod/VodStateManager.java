@@ -23,7 +23,7 @@ import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * m3u8 点播下载状态管理器
  */
-public final class VodStateManager implements IThreadStateManager {
+public final class VodStateManager implements IBlockManager {
   private final String TAG = CommonUtil.getClassName(getClass());
 
   private M3U8Listener listener;
@@ -145,7 +145,7 @@ public final class VodStateManager implements IThreadStateManager {
         case STATE_RUNNING:
           Bundle b = msg.getData();
           if (b != null) {
-            long len = b.getLong(IThreadStateManager.DATA_ADD_LEN, 0);
+            long len = b.getLong(IBlockManager.DATA_ADD_LEN, 0);
             progress += len;
           }
           break;

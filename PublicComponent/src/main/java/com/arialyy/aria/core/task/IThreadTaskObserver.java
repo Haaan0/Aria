@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.task;
 
 import android.os.Bundle;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.exception.AriaException;
 
 /**
@@ -30,7 +30,7 @@ public interface IThreadTaskObserver {
   /**
    * 更新所有状态
    *
-   * @param state state {@link IThreadStateManager#STATE_STOP}..
+   * @param state state {@link IBlockManager#STATE_STOP}..
    */
   void updateState(int state, Bundle bundle);
 

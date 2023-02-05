@@ -23,7 +23,7 @@ import android.util.Log;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.config.Configuration;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.exception.ExceptionFactory;
@@ -58,37 +58,37 @@ final class SimpleSchedulers implements Handler.Callback {
       ALog.w(TAG, "组合任务子任务调度数据为空");
       return true;
     }
-    String threadName = b.getString(IThreadStateManager.DATA_THREAD_NAME);
+    String threadName = b.getString(IBlockManager.DATA_THREAD_NAME);
     AbsSubDLoadUtil loaderUtil = mQueue.getLoaderUtil(threadName);
     if (loaderUtil == null) {
       ALog.e(TAG, String.format("子任务loader不存在，state：%s，key：%s", msg.what, threadName));
       return true;
     }
-    long curLocation = b.getLong(IThreadStateManager.DATA_THREAD_LOCATION,
+    long curLocation = b.getLong(IBlockManager.DATA_THREAD_LOCATION,
         loaderUtil.getLoader().getWrapper().getEntity().getCurrentProgress());
     // 处理状态
     switch (msg.what) {
-      case IThreadStateManager.STATE_RUNNING:
+      case IBlockManager.STATE_RUNNING:
         long range = (long) msg.obj;
         mGState.listener.onSubRunning(loaderUtil.getEntity(), range);
         break;
-      case IThreadStateManager.STATE_PRE:
+      case IBlockManager.STATE_PRE:
         mGState.listener.onSubPre(loaderUtil.getEntity());
         mGState.updateCount(loaderUtil.getKey());
         break;
-      case IThreadStateManager.STATE_START:
+      case IBlockManager.STATE_START:
         mGState.listener.onSubStart(loaderUtil.getEntity());
         break;
-      case IThreadStateManager.STATE_STOP:
+      case IBlockManager.STATE_STOP:
         handleStop(loaderUtil, curLocation);
         ThreadTaskManager.getInstance().removeSingleTaskThread(mKey, threadName);
         break;
-      case IThreadStateManager.STATE_COMPLETE:
+      case IBlockManager.STATE_COMPLETE:
         handleComplete(loaderUtil);
         ThreadTaskManager.getInstance().removeSingleTaskThread(mKey, threadName);
         break;
-      case IThreadStateManager.STATE_FAIL:
-        boolean needRetry = b.getBoolean(IThreadStateManager.DATA_RETRY, false);
+      case IBlockManager.STATE_FAIL:
+        boolean needRetry = b.getBoolean(IBlockManager.DATA_RETRY, false);
         handleFail(loaderUtil, needRetry);
         ThreadTaskManager.getInstance().removeSingleTaskThread(mKey, threadName);
         break;

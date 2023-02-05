@@ -8,7 +8,7 @@ import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
@@ -106,12 +106,12 @@ public final class NormalTTBuilder implements IThreadTaskBuilder {
         currentProgress += endL - startL;
         ALog.d(TAG, String.format("任务【%s】线程__%s__已完成", mWrapper.getKey(), i));
         Message msg = mStateHandler.obtainMessage();
-        msg.what = IThreadStateManager.STATE_COMPLETE;
+        msg.what = IBlockManager.STATE_COMPLETE;
         Bundle b = msg.getData();
         if (b == null) {
           b = new Bundle();
         }
-        b.putString(IThreadStateManager.DATA_THREAD_NAME,
+        b.putString(IBlockManager.DATA_THREAD_NAME,
             CommonUtil.getThreadName(getEntity().getKey(), tr.threadId));
         msg.setData(b);
         msg.sendToTarget();

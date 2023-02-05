@@ -122,18 +122,15 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
    * find DEntity, if that not exist, create and save it
    */
   private suspend fun findDEntityBySavePath(option: HttpDTaskOption): DEntity {
-    val savePath = option.savePathUri?.toString()
-    if (savePath.isNullOrEmpty()) {
-      throw IllegalArgumentException("savePath is null")
-    }
+    val savePath = option.savePathUri
     val dao = DuaContext.getServiceManager().getDbService().getDuaDb()?.getDEntityDao()
-    val de = dao?.getDEntityBySavePath(savePath)
+    val de = dao?.getDEntityBySavePath(savePath.toString())
     if (de != null) {
       return de
     }
     val newDe = DEntity(
       sourceUrl = option.sourUrl!!,
-      savePath = savePath,
+      savePath = savePath!!,
     )
     dao?.insert(newDe)
     return newDe

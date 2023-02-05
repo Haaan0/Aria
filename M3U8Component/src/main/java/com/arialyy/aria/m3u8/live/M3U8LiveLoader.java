@@ -23,7 +23,7 @@ import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.inf.IBlockManager;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.loader.IThreadTaskBuilder;
@@ -333,7 +333,7 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
   /**
    * 需要在{@link #addComponent(IRecordHandler)} 后调用
    */
-  @Override public void addComponent(IThreadStateManager threadState) {
+  @Override public void addComponent(IBlockManager threadState) {
     mStateManager = threadState;
   }
 

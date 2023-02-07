@@ -18,8 +18,8 @@ package com.arialyy.aria.http.download
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.core.task.ThreadTask
 import com.arialyy.aria.orm.entity.BlockRecord
-import java.util.concurrent.BlockingQueue
 
 /**
  * @Author laoyuyu
@@ -29,15 +29,14 @@ import java.util.concurrent.BlockingQueue
 class HttpBlockThreadInterceptor : ITaskInterceptor {
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
-    val queue = chain.blockManager.blockQueue
-    if (queue.isEmpty()) {
+    val unfinishedBlockList = chain.blockManager.unfinishedBlockList
+    if (unfinishedBlockList.isEmpty()) {
       return TaskResp(TaskResp.CODE_BLOCK_QUEUE_NULL)
     }
-    cycleQueue(queue)
+    createThreadTask(unfinishedBlockList)
   }
 
-  private fun cycleQueue(queue: BlockingQueue<BlockRecord>){
-    queue.take()
-
+  private fun createThreadTask(blockRecordList: List<BlockRecord>) {
+    blockRecordList.forEach(ThreadTask())
   }
 }

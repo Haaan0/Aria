@@ -24,8 +24,9 @@ import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.orm.entity.BlockRecord
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
@@ -33,12 +34,11 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
 
 class BlockManager(task: ITask) : IBlockManager {
-  private val unfinishedBlockList = mutableListOf<BlockRecord>()
+  private val unfinishedBlock = mutableListOf<BlockRecord>()
   private val canceledNum = AtomicInteger(0) // 已经取消的线程的数
   private val stoppedNum = AtomicInteger(0) // 已经停止的线程数
   private val failedNum = AtomicInteger(0) // 失败的线程数
   private val completedNum = AtomicInteger(0) // 完成的线程数
-  private val channel = Channel<BlockRecord>()
   private val threadNum = task.getTaskOption(ITaskOption::class.java).threadNum
   private val scope = MainScope()
   private val dispatcher = ThreadPoolExecutor(
@@ -105,18 +105,27 @@ class BlockManager(task: ITask) : IBlockManager {
    */
   private fun quitLooper() {
     looper.quit()
+    scope.cancel()
   }
 
   override fun putUnfinishedBlock(record: BlockRecord) {
-    unfinishedBlockList.add(record)
+    unfinishedBlock.add(record)
   }
 
-  override fun getChannel(): Channel<BlockRecord> {
-    return channel
+  override fun getUnfinishedBlockList(): MutableList<BlockRecord> {
+    return unfinishedBlock
   }
 
-  override fun setLopper(looper: Looper) {
-    this.looper = looper
+  override fun start(threadTaskList: List<ThreadTask>) {
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+      throw IllegalThreadStateException("io operations cannot be in the main thread")
+    }
+    looper = Looper.myLooper()!!
+    threadTaskList.forEach { tt ->
+      scope.launch(dispatcher) {
+        tt.run()
+      }
+    }
   }
 
   override fun setBlockNum(blockNum: Int) {
@@ -135,10 +144,6 @@ class BlockManager(task: ITask) : IBlockManager {
 
   override fun getCurrentProgress(): Long {
     return progress
-  }
-
-  override fun updateCurrentProgress(currentProgress: Long) {
-    progress = currentProgress
   }
 
   /**

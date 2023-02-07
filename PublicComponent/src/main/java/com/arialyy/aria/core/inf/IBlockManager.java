@@ -16,9 +16,9 @@
 package com.arialyy.aria.core.inf;
 
 import android.os.Handler;
-import android.os.Looper;
-import androidx.annotation.NonNull;
+import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.orm.entity.BlockRecord;
+import java.util.List;
 import kotlinx.coroutines.channels.Channel;
 
 /**
@@ -39,13 +39,13 @@ public interface IBlockManager {
   String DATA_THREAD_LOCATION = "DATA_THREAD_LOCATION";
   String DATA_ADD_LEN = "DATA_ADD_LEN"; // 增加的长度
 
-  Channel<BlockRecord> getChannel();
-
-  void setLopper(@NonNull Looper looper);
+  void start(List<ThreadTask> threadTaskList);
 
   void setBlockNum(int blockNum);
 
   void putUnfinishedBlock(BlockRecord record);
+
+  List<BlockRecord> getUnfinishedBlockList();
 
   /**
    * 是否有失败的快
@@ -67,13 +67,6 @@ public interface IBlockManager {
    * @return 任务当前进度
    */
   long getCurrentProgress();
-
-  /**
-   * 更新当前进度
-   *
-   * @param currentProgress 当前进度
-   */
-  void updateCurrentProgress(long currentProgress);
 
   boolean isStopped();
 

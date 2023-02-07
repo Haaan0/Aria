@@ -21,7 +21,7 @@ import java.util.concurrent.Callable;
  * @author lyy
  * Date: 2019-09-18
  */
-public interface IThreadTask extends Callable<IThreadTask> {
+public interface IThreadTask extends Runnable {
 
   /**
    * 销毁任务

@@ -53,6 +53,10 @@ interface RecordDao {
   @Update
   suspend fun update(record: TaskRecord)
 
+  @Transaction
+  @Update
+  suspend fun updateBlockList(blockList: List<BlockRecord>)
+
   @Delete
   suspend fun deleteTaskRecord(record: TaskRecord)
 

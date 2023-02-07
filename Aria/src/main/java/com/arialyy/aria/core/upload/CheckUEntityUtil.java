@@ -18,7 +18,7 @@ package com.arialyy.aria.core.upload;
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import java.io.File;
 
 public class CheckUEntityUtil implements ICheckEntityUtil {
@@ -62,7 +62,7 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
     }
     // 任务是新任务，并且路径冲突就不会继续执行
     if (mWrapper.isNewTask()
-        && !CheckUtil.checkUPathConflicts(mWrapper.isIgnoreFilePathOccupy(), filePath,
+        && !FileUtils.checkUPathConflicts(mWrapper.isIgnoreFilePathOccupy(), filePath,
         mWrapper.getRequestType())) {
       return false;
     }
@@ -86,7 +86,7 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "上传失败，url为null");
       return false;
-    } else if (!CheckUtil.checkUrl(url)) {
+    } else if (!FileUtils.checkUrl(url)) {
       ALog.e(TAG, "上传失败，url【" + url + "】错误");
       return false;
     }

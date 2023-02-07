@@ -23,7 +23,7 @@ import com.arialyy.aria.core.inf.ITargetHandler;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.RecordUtil;
@@ -154,7 +154,7 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
     //设置文件保存路径，如果新文件路径和旧文件路径不同，则修改路径
     if (!filePath.equals(mEntity.getFilePath())) {
       // 检查路径冲突
-      if (!CheckUtil.checkDPathConflicts(mWrapper.isIgnoreFilePathOccupy(), filePath,
+      if (!FileUtils.checkDPathConflicts(mWrapper.isIgnoreFilePathOccupy(), filePath,
           mWrapper.getRequestType())) {
         return false;
       }
@@ -189,7 +189,7 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "下载失败，url为null");
       return false;
-    } else if (!CheckUtil.checkUrl(url)) {
+    } else if (!FileUtils.checkUrl(url)) {
       ALog.e(TAG, "下载失败，url【" + url + "】错误");
       return false;
     }

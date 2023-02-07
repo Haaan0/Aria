@@ -25,7 +25,7 @@ import com.arialyy.aria.exception.AriaM3U8Exception;
 import com.arialyy.aria.http.ConnectionHelp;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
@@ -159,7 +159,7 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
       newUrl = uri.getHost() + newUrl;
     }
 
-    if (!CheckUtil.checkUrl(newUrl)) {
+    if (!FileUtils.checkUrl(newUrl)) {
       fail(new AriaM3U8Exception("下载失败，重定向url错误"), false);
       return;
     }

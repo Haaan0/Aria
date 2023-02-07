@@ -39,7 +39,7 @@ import com.arialyy.aria.core.upload.target.HttpNormalTarget;
 import com.arialyy.aria.core.upload.target.UTargetFactory;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import com.arialyy.aria.util.ComponentUtil;
 import java.util.List;
 import java.util.Set;
@@ -73,7 +73,7 @@ public class UploadReceiver extends AbsReceiver {
 
   public HttpBuilderTarget load(String filePath) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
-    CheckUtil.checkUploadPathIsEmpty(filePath);
+    FileUtils.checkUploadPathIsEmpty(filePath);
     return UTargetFactory.getInstance()
         .generateBuilderTarget(HttpBuilderTarget.class, filePath);
   }
@@ -99,7 +99,7 @@ public class UploadReceiver extends AbsReceiver {
 
   public FtpBuilderTarget loadFtp(String filePath) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
-    CheckUtil.checkUploadPathIsEmpty(filePath);
+    FileUtils.checkUploadPathIsEmpty(filePath);
     return UTargetFactory.getInstance()
         .generateBuilderTarget(FtpBuilderTarget.class, filePath);
   }
@@ -178,7 +178,7 @@ public class UploadReceiver extends AbsReceiver {
    * @return 如果页数大于总页数，返回null
    */
   public List<UploadEntity> getTaskList(int page, int num) {
-    CheckUtil.checkPageParams(page, num);
+    FileUtils.checkPageParams(page, num);
     return DbEntity.findDatas(UploadEntity.class, page, num,
         "isGroupChild=? and downloadPath!=''", "false");
   }
@@ -199,7 +199,7 @@ public class UploadReceiver extends AbsReceiver {
    * @return 如果页数大于总页数，返回null
    */
   public List<UploadEntity> getAllNotCompleteTask(int page, int num) {
-    CheckUtil.checkPageParams(page, num);
+    FileUtils.checkPageParams(page, num);
     return DbEntity.findDatas(UploadEntity.class, page, num,
         "isGroupChild=? and downloadPath!='' and isComplete=?", "false", "false");
   }
@@ -220,7 +220,7 @@ public class UploadReceiver extends AbsReceiver {
    * @return 如果页数大于总页数，返回null
    */
   public List<UploadEntity> getAllCompleteTask(int page, int num) {
-    CheckUtil.checkPageParams(page, num);
+    FileUtils.checkPageParams(page, num);
     return DbEntity.findDatas(UploadEntity.class,
         "isGroupChild=? and downloadPath!='' and isComplete=?", "false", "true");
   }

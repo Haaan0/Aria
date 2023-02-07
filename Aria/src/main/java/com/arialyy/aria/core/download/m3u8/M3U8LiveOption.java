@@ -17,7 +17,7 @@ package com.arialyy.aria.core.download.m3u8;
 
 import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 
 /**
  * m3u8直播参数设置
@@ -38,7 +38,7 @@ public class M3U8LiveOption extends M3U8Option<M3U8LiveOption> {
    * @param liveTsUrlConverter {@link ILiveTsUrlConverter}
    */
   public M3U8LiveOption setLiveTsUrlConvert(ILiveTsUrlConverter liveTsUrlConverter) {
-    CheckUtil.checkMemberClass(liveTsUrlConverter.getClass());
+    FileUtils.checkMemberClass(liveTsUrlConverter.getClass());
     this.liveTsUrlConverter = liveTsUrlConverter;
     return this;
   }

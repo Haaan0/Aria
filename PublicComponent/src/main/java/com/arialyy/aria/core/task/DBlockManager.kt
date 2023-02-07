@@ -20,11 +20,13 @@ import android.os.Looper
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.listener.IEventListener
 import com.arialyy.aria.exception.AriaException
+import com.arialyy.aria.orm.entity.BlockRecord
 import timber.log.Timber
+import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.atomic.AtomicInteger
 
 class BlockManager(private val eventListener: IEventListener) : IBlockManager {
-  private val blockList = mutableListOf<BlockState>()
+  private val unfinishedBlockQueue = LinkedBlockingDeque<BlockRecord>()
   private val canceledNum = AtomicInteger(0) // 已经取消的线程的数
   private val stoppedNum = AtomicInteger(0) // 已经停止的线程数
   private val failedNum = AtomicInteger(0) // 失败的线程数
@@ -88,12 +90,12 @@ class BlockManager(private val eventListener: IEventListener) : IBlockManager {
     looper.quit()
   }
 
-  fun addBlockState(state: BlockState) {
-    blockList.add(state)
+  override fun putUnfinishedBlock(record: BlockRecord) {
+    unfinishedBlockQueue.offer(record)
   }
 
-  fun getBlockState(): BlockState {
-    return blockList.removeFirst()
+  override fun getUnfinishedBlock(): BlockRecord {
+    return unfinishedBlockQueue.remove()
   }
 
   override fun setLopper(looper: Looper) {
@@ -138,5 +140,4 @@ class BlockManager(private val eventListener: IEventListener) : IBlockManager {
   override fun getHandlerCallback(): Callback {
     return callback
   }
-
 }

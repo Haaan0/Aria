@@ -22,7 +22,7 @@ import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
@@ -85,7 +85,7 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
     }
 
     // 检查路径冲突
-    if (mWrapper.isNewTask() && !CheckUtil.checkDGPathConflicts(mWrapper.isIgnoreFilePathOccupy(),
+    if (mWrapper.isNewTask() && !FileUtils.checkDGPathConflicts(mWrapper.isIgnoreFilePathOccupy(),
         dirPath)) {
       return false;
     }

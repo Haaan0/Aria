@@ -1,9 +1,11 @@
 package com.arialyy.aria.core.task
 
-import android.bluetooth.BluetoothClass
+import android.net.Uri
 import com.arialyy.aria.orm.entity.BlockRecord
 import com.arialyy.aria.orm.entity.TaskRecord
+import com.arialyy.aria.util.FileUri
 import com.arialyy.aria.util.FileUtil
+import com.arialyy.aria.util.FileUtils
 import timber.log.Timber
 import java.io.File
 
@@ -24,22 +26,35 @@ import java.io.File
  */
 object BlockUtil {
 
+  fun getBlockPathFormUri(fileSaveUri: Uri, blockId: Int): String {
+    val filePath = FileUri.getPathByUri(fileSaveUri) ?: "/"
+    val fileName = FileUtils.getFileNameFromPath(filePath)
+    val dirPath = FileUtils.getFilePathFromFullPath(filePath)
+
+    return BlockRecord.BLOCK_PATH.format(dirPath, fileName, blockId)
+  }
+
   /**
    * create block record
    */
-  fun createBlockRecord(fileSize: Long): List<BlockRecord> {
+  fun createBlockRecord(fileSaveUri: Uri, fileSize: Long): List<BlockRecord> {
+    val filePath = FileUri.getPathByUri(fileSaveUri) ?: "/"
+    val fileName = FileUtils.getFileNameFromPath(filePath)
+    val dirPath = FileUtils.getFilePathFromFullPath(filePath)
+
     val blockNumInfo = getBlockNum(fileSize)
     val lastIndex = blockNumInfo.first - 1
     val brList = mutableListOf<BlockRecord>()
     for (bi in 0 until blockNumInfo.first) {
-      val sl = bi * BlockState.BLOCK_SIZE
-      val blockSize = if (bi == lastIndex) blockNumInfo.second else BlockState.BLOCK_SIZE
+      val sl = bi * BlockRecord.BLOCK_SIZE
+      val blockSize = if (bi == lastIndex) blockNumInfo.second else BlockRecord.BLOCK_SIZE
       val el = sl + blockSize
       val blockRecord = BlockRecord(
         bId = bi,
-        startLocation = bi * BlockState.BLOCK_SIZE,
+        startLocation = bi * BlockRecord.BLOCK_SIZE,
         endLocation = el,
         blockSize = blockSize,
+        blockPath = BlockRecord.BLOCK_PATH.format(dirPath, fileName, bi)
       )
       brList.add(blockRecord)
     }
@@ -51,11 +66,11 @@ object BlockUtil {
    * @return pair<blockNum, lastBlockSize>
    */
   fun getBlockNum(fileLen: Long): Pair<Int, Long> {
-    if (fileLen <= BlockState.BLOCK_SIZE) {
+    if (fileLen <= BlockRecord.BLOCK_SIZE) {
       return Pair(1, 0)
     }
-    val blockNum = (fileLen / BlockState.BLOCK_SIZE).toInt()
-    val lastBlockSize = fileLen % BlockState.BLOCK_SIZE
+    val blockNum = (fileLen / BlockRecord.BLOCK_SIZE).toInt()
+    val lastBlockSize = fileLen % BlockRecord.BLOCK_SIZE
     return Pair(if (lastBlockSize != 0L) blockNum + 1 else blockNum, lastBlockSize)
   }
 
@@ -68,16 +83,16 @@ object BlockUtil {
     val fileName = targetF.name
     if (record.blockNum == 1) {
       // if this task not support blocks or fileSize < 5m, just need rename
-      return File(BlockState.BLOCK_PATH.format(dir, fileName, 0)).renameTo(targetF)
+      return File(BlockRecord.BLOCK_PATH.format(dir, fileName, 0)).renameTo(targetF)
     }
     val blockList = mutableListOf<File>()
     for (i in 0 until record.blockNum) {
-      val subF = File(BlockState.BLOCK_PATH.format(dir, fileName, i))
+      val subF = File(BlockRecord.BLOCK_PATH.format(dir, fileName, i))
       if (!subF.exists()) {
         Timber.e("this block: $i not exists")
         return false
       }
-      if (subF.length() != BlockState.BLOCK_SIZE.toLong()) {
+      if (subF.length() != BlockRecord.BLOCK_SIZE.toLong()) {
         Timber.e("this block: $i size abnormal, size: ${subF.length()}")
         return false
       }
@@ -85,5 +100,4 @@ object BlockUtil {
     }
     return FileUtil.mergeFile(record.filePath, blockList)
   }
-
 }

@@ -28,7 +28,7 @@ import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.http.request.IRequest
-import com.arialyy.aria.util.CheckUtil
+import com.arialyy.aria.util.FileUtils
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.IOException
@@ -169,7 +169,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
       val uri = Uri.parse(taskOption.sourUrl!!)
       tempUrl = uri.host + newUrl
     }
-    if (!CheckUtil.checkUrl(tempUrl)) {
+    if (!FileUtils.checkUrl(tempUrl)) {
       Timber.e("get redirect url fail, $tempUrl")
       return -1
     }

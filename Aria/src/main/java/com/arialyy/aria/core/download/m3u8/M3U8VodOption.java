@@ -17,7 +17,7 @@ package com.arialyy.aria.core.download.m3u8;
 
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 
 /**
  * m3u8点播文件参数设置
@@ -39,7 +39,7 @@ public class M3U8VodOption extends M3U8Option<M3U8VodOption> {
    * @param vodUrlConverter {@link IVodTsUrlConverter}
    */
   public M3U8VodOption setVodTsUrlConvert(IVodTsUrlConverter vodUrlConverter) {
-    CheckUtil.checkMemberClass(vodUrlConverter.getClass());
+    FileUtils.checkMemberClass(vodUrlConverter.getClass());
     this.vodUrlConverter = vodUrlConverter;
     return this;
   }

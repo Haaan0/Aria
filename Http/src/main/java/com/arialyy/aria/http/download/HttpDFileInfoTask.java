@@ -31,7 +31,7 @@ import com.arialyy.aria.exception.AriaHTTPException;
 import com.arialyy.aria.http.ConnectionHelp;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.RecordUtil;
@@ -262,7 +262,7 @@ final class HttpDFileInfoTask implements IInfoTask, Runnable {
     } else {
       failDownload(new AriaHTTPException(
           String.format("任务下载失败，errorCode：%s, errorMsg: %s, url: %s", code,
-              conn.getResponseMessage(), mEntity.getUrl())), !CheckUtil.httpIsBadRequest(code));
+              conn.getResponseMessage(), mEntity.getUrl())), !FileUtils.httpIsBadRequest(code));
     }
     if (end) {
       doNext(code, isChunked);
@@ -324,7 +324,7 @@ final class HttpDFileInfoTask implements IInfoTask, Runnable {
     ALog.d(TAG, String.format("文件重命名为：%s", newName));
     File oldFile = new File(mEntity.getFilePath());
     String newPath = oldFile.getParent() + "/" + newName;
-    if (!CheckUtil.checkDPathConflicts(false, newPath, mTaskWrapper.getRequestType())) {
+    if (!FileUtils.checkDPathConflicts(false, newPath, mTaskWrapper.getRequestType())) {
       ALog.e(TAG, "文件重命名失败");
       return;
     }
@@ -353,7 +353,7 @@ final class HttpDFileInfoTask implements IInfoTask, Runnable {
       newUrl = uri.getHost() + newUrl;
     }
 
-    if (!CheckUtil.checkUrl(newUrl)) {
+    if (!FileUtils.checkUrl(newUrl)) {
       failDownload(new AriaHTTPException("下载失败，重定向url错误"), false);
       return;
     }

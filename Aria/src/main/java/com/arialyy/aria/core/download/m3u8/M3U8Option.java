@@ -21,7 +21,7 @@ import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import com.arialyy.aria.util.ComponentUtil;
 
 /**
@@ -101,7 +101,7 @@ public class M3U8Option<OP extends M3U8Option> extends BaseOption {
    * 需要注意的是：只有{@link #merge(boolean)}设置合并ts文件，该方法才会生效
    */
   public OP setMergeHandler(ITsMergeHandler mergeHandler) {
-    CheckUtil.checkMemberClass(mergeHandler.getClass());
+    FileUtils.checkMemberClass(mergeHandler.getClass());
     this.mergeHandler = mergeHandler;
     return (OP) this;
   }
@@ -123,7 +123,7 @@ public class M3U8Option<OP extends M3U8Option> extends BaseOption {
    * @param bandWidthUrlConverter {@link IBandWidthUrlConverter}
    */
   public OP setBandWidthUrlConverter(IBandWidthUrlConverter bandWidthUrlConverter) {
-    CheckUtil.checkMemberClass(bandWidthUrlConverter.getClass());
+    FileUtils.checkMemberClass(bandWidthUrlConverter.getClass());
     this.bandWidthUrlConverter = bandWidthUrlConverter;
     return (OP) this;
   }
@@ -134,7 +134,7 @@ public class M3U8Option<OP extends M3U8Option> extends BaseOption {
    * @param keyUrlConverter {@link IKeyUrlConverter}
    */
   public OP setKeyUrlConverter(IKeyUrlConverter keyUrlConverter) {
-    CheckUtil.checkMemberClass(keyUrlConverter.getClass());
+    FileUtils.checkMemberClass(keyUrlConverter.getClass());
     this.keyUrlConverter = keyUrlConverter;
     return (OP) this;
   }

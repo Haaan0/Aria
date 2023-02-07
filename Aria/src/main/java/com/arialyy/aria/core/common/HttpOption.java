@@ -19,7 +19,7 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.processor.IHttpFileNameAdapter;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
@@ -166,7 +166,7 @@ public class HttpOption extends BaseOption {
     if (fileLenAdapter == null) {
       throw new IllegalArgumentException("adapter为空");
     }
-    CheckUtil.checkMemberClass(fileLenAdapter.getClass());
+    FileUtils.checkMemberClass(fileLenAdapter.getClass());
     this.fileLenAdapter = fileLenAdapter;
     return this;
   }
@@ -174,7 +174,7 @@ public class HttpOption extends BaseOption {
     if (fileNameAdapter == null) {
       throw new IllegalArgumentException("adapter为空");
     }
-    CheckUtil.checkMemberClass(fileNameAdapter.getClass());
+    FileUtils.checkMemberClass(fileNameAdapter.getClass());
     this.fileNameAdapter = fileNameAdapter;
     return this;
   }

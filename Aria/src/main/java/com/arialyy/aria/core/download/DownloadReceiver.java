@@ -45,7 +45,7 @@ import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ComponentUtil;
 import com.arialyy.aria.util.DbDataHelper;
@@ -270,7 +270,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果url错误或查找不到数据，则返回null
    */
   public DownloadEntity getFirstDownloadEntity(String downloadUrl) {
-    if (!CheckUtil.checkUrl(downloadUrl)) {
+    if (!FileUtils.checkUrl(downloadUrl)) {
       return null;
     }
     return DbEntity.findFirst(DownloadEntity.class, "url=? and isGroupChild='false'", downloadUrl);
@@ -282,7 +282,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果url错误或查找不到数据，则返回null
    */
   public List<DownloadEntity> getDownloadEntity(String downloadUrl) {
-    if (!CheckUtil.checkUrl(downloadUrl)) {
+    if (!FileUtils.checkUrl(downloadUrl)) {
       return null;
     }
     return DbEntity.findDatas(DownloadEntity.class, "url=? and isGroupChild='false'", downloadUrl);
@@ -308,7 +308,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果实体不存在，返回null
    */
   public DownloadGroupEntity getGroupEntity(List<String> urls) {
-    if (CheckUtil.checkDownloadUrlsIsEmpty(urls)) {
+    if (FileUtils.checkDownloadUrlsIsEmpty(urls)) {
       return null;
     }
     return DbDataHelper.getDGEntityByHash(CommonUtil.getMd5Code(urls));
@@ -321,7 +321,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果实体不存在，返回null
    */
   public DownloadGroupEntity getFtpDirEntity(String url) {
-    if (!CheckUtil.checkUrl(url)) {
+    if (!FileUtils.checkUrl(url)) {
       return null;
     }
     return DbDataHelper.getDGEntityByHash(url);
@@ -387,7 +387,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果页数大于总页数，返回null
    */
   public List<DownloadEntity> getTaskList(int page, int num) {
-    CheckUtil.checkPageParams(page, num);
+    FileUtils.checkPageParams(page, num);
     return DbEntity.findDatas(DownloadEntity.class, page, num,
         "isGroupChild=? and downloadPath!=''", "false");
   }
@@ -408,7 +408,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果页数大于总页数，返回null
    */
   public List<DownloadEntity> getAllNotCompleteTask(int page, int num) {
-    CheckUtil.checkPageParams(page, num);
+    FileUtils.checkPageParams(page, num);
     return DbEntity.findDatas(DownloadEntity.class, page, num,
         "isGroupChild=? and downloadPath!='' and isComplete=?", "false", "false");
   }
@@ -429,7 +429,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果页数大于总页数，返回null
    */
   public List<DownloadEntity> getAllCompleteTask(int page, int num) {
-    CheckUtil.checkPageParams(page, num);
+    FileUtils.checkPageParams(page, num);
     return DbEntity.findDatas(DownloadEntity.class,
         "isGroupChild=? and downloadPath!='' and isComplete=?", "false", "true");
   }

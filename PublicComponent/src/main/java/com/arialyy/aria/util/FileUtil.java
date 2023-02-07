@@ -56,6 +56,7 @@ import timber.log.Timber;
 /**
  * 文件操作工具类
  */
+@Deprecated
 public class FileUtil {
   private static final String TAG = "FileUtil";
   private static final Pattern DIR_SEPORATOR = Pattern.compile("/");

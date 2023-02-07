@@ -18,7 +18,7 @@ package com.arialyy.aria.orm.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
-import androidx.room.PrimaryKey
+import androidx.room.Ignore
 
 /**
  * @Author laoyuyu
@@ -49,5 +49,22 @@ data class BlockRecord(
 
   val blockSize: Long = 0,
 
-  val isComplete: Boolean = false
-)
+  /**
+   * block path
+   */
+  val blockPath: String,
+
+  var isComplete: Boolean = false
+) {
+  companion object {
+    /**
+     * dir/.fileName.blockId
+     */
+    const val BLOCK_PATH = "%s/.%s.%d"
+
+    const val BLOCK_SIZE = 1024 * 1024 * 5L
+  }
+
+  @Ignore
+  var curProgress = 0L
+}

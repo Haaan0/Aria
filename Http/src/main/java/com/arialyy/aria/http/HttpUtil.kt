@@ -17,7 +17,7 @@ package com.arialyy.aria.http
 
 import android.text.TextUtils
 import com.arialyy.aria.http.download.HttpDTaskOption
-import com.arialyy.aria.util.CheckUtil
+import com.arialyy.aria.util.FileUtils
 import com.arialyy.aria.util.Regular
 import timber.log.Timber
 import java.io.IOException
@@ -83,7 +83,7 @@ internal object HttpUtil {
       Timber.e("url is null")
       return false
     }
-    if (!CheckUtil.checkUrl(option.sourUrl!!)) {
+    if (!FileUtils.checkUrl(option.sourUrl!!)) {
       Timber.e("invalid url, ${option.sourUrl}")
       return false
     }
@@ -91,7 +91,7 @@ internal object HttpUtil {
       Timber.e("save path is null")
       return false
     }
-    if (!CheckUtil.checkUri(option.savePathUri)) {
+    if (!FileUtils.uriEffective(option.savePathUri)) {
       Timber.e("invalid uri, ${option.savePathUri}")
       return false
     }

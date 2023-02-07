@@ -34,7 +34,7 @@ import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.AriaFTPException;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.SSLContextUtil;
 import java.io.IOException;
@@ -140,7 +140,7 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
   private FTPClient createFtpClient() throws IOException, InterruptedException {
     FTPClient client = null;
     final FtpUrlEntity urlEntity = mTaskOption.getUrlEntity();
-    if (CheckUtil.checkIp(urlEntity.hostName)) {
+    if (FileUtils.checkIp(urlEntity.hostName)) {
       client = newInstanceClient(urlEntity);
       client.setConnectTimeout(mConnectTimeOut);  // 连接10s超时
       InetAddress ip = InetAddress.getByName(urlEntity.hostName);
@@ -338,7 +338,7 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
       } else {
         msg = String.format("%s, code: %s, msg: %s", msg, client.getReplyCode(),
             client.getReplyString());
-        needRetry = needRetry && !CheckUtil.ftpIsBadRequest(client.getReplyCode());
+        needRetry = needRetry && !FileUtils.ftpIsBadRequest(client.getReplyCode());
       }
 
       callback.onFail(mEntity, new AriaFTPException(msg), needRetry);

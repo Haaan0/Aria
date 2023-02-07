@@ -18,6 +18,7 @@ package com.arialyy.aria.core.inf;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
+import com.arialyy.aria.orm.entity.BlockRecord;
 
 /**
  * 线程任务状态
@@ -40,6 +41,10 @@ public interface IBlockManager {
   void setLopper(@NonNull Looper looper);
 
   void setBlockNum(int blockNum);
+
+  void putUnfinishedBlock(BlockRecord record);
+
+  BlockRecord getUnfinishedBlock();
 
   /**
    * 是否有失败的快

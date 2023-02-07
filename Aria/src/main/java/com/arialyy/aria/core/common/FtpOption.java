@@ -21,7 +21,7 @@ import com.arialyy.aria.core.IdEntity;
 import com.arialyy.aria.core.ProtocolType;
 import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import java.text.DateFormatSymbols;
 import java.util.Collection;
 import java.util.Locale;
@@ -158,7 +158,7 @@ public class FtpOption extends BaseOption {
     if (uploadInterceptor == null) {
       throw new NullPointerException("ftp拦截器为空");
     }
-    CheckUtil.checkMemberClass(uploadInterceptor.getClass());
+    FileUtils.checkMemberClass(uploadInterceptor.getClass());
     this.uploadInterceptor = uploadInterceptor;
     return this;
   }
@@ -212,7 +212,7 @@ public class FtpOption extends BaseOption {
       ALog.e(TAG, "ip为空");
       return this;
     }
-    if (!CheckUtil.checkIp(ip)) {
+    if (!FileUtils.checkIp(ip)) {
       ALog.e(TAG, "ip地址错误：" + ip);
       return this;
     }

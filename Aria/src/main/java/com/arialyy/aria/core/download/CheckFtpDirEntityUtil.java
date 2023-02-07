@@ -20,7 +20,7 @@ import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.FileUtils;
 import java.io.File;
 
 public class CheckFtpDirEntityUtil implements ICheckEntityUtil {
@@ -61,7 +61,7 @@ public class CheckFtpDirEntityUtil implements ICheckEntityUtil {
     }
 
     // 检查路径冲突
-    if (mWrapper.isNewTask() && !CheckUtil.checkDGPathConflicts(mWrapper.isIgnoreFilePathOccupy(),
+    if (mWrapper.isNewTask() && !FileUtils.checkDGPathConflicts(mWrapper.isIgnoreFilePathOccupy(),
         dirPath)) {
       return false;
     }

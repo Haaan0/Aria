@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.http.download
 
+import android.os.Handler
+import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.task.BlockUtil
@@ -22,7 +24,12 @@ import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.orm.entity.BlockRecord
 import com.arialyy.aria.orm.entity.TaskRecord
+import com.arialyy.aria.util.FileUri
+import com.arialyy.aria.util.FileUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 
@@ -35,6 +42,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
   private lateinit var task: ITask
   private lateinit var option: HttpDTaskOption
   private lateinit var blockManager: IBlockManager
+  private lateinit var taskRecord: TaskRecord
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     task = chain.getTask()
@@ -45,14 +53,38 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
       return TaskResp(TaskResp.CODE_GET_FILE_INFO_FAIL)
     }
 
+    val savePath = FileUri.getPathByUri(task.getTaskOption(HttpDTaskOption::class.java).savePathUri)
+    if (savePath.isNullOrEmpty()) {
+      Timber.e("saveUri is null")
+      return TaskResp(TaskResp.CODE_SAVE_URI_NULL)
+    }
+
     // if task not support resume, don't save record
     if (task.taskState.fileSize == 0L) {
       chain.blockManager.setBlockNum(1)
+      // if block exist, delete the existed block
+      removeBlock()
       return chain.proceed(chain.getTask())
     }
     val blockNum = checkRecord()
     chain.blockManager.setBlockNum(blockNum)
+    val result = checkBlock()
+    if (result != TaskResp.CODE_SUCCESS) {
+      return TaskResp(result)
+    }
+
     return chain.proceed(chain.getTask())
+  }
+
+  private fun removeBlock() {
+    val saveUri = task.getTaskOption(HttpDTaskOption::class.java).savePathUri
+    if (!FileUtils.uriEffective(saveUri)) {
+      return
+    }
+    val blockF = File(BlockUtil.getBlockPathFormUri(saveUri!!, 0))
+    if (blockF.exists()) {
+      blockF.delete()
+    }
   }
 
   /**
@@ -74,21 +106,51 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
         blockNum = blockNumInfo.first,
         blockSize = task.taskState.blockSize
       )
-      taskRecord.blockList.addAll(BlockUtil.createBlockRecord(task.taskState.fileSize))
+
+      taskRecord.blockList.addAll(
+        BlockUtil.createBlockRecord(
+          task.getTaskOption(HttpDTaskOption::class.java).savePathUri!!,
+          task.taskState.fileSize
+        )
+      )
       recordDao.insert(taskRecord)
+      this.taskRecord = taskRecord
       return taskRecord.blockNum
     }
     Timber.d("record existed")
-    checkBlock(recordWrapper.taskRecord)
+    taskRecord = recordWrapper.taskRecord
     return recordWrapper.taskRecord.blockNum
   }
 
-  /**ø
+  /**
    * if block already exist, upload progress
    */
-  private fun checkBlock(record: TaskRecord) {
-    for (br in record.blockList) {
-      val block = File()
+  private suspend fun checkBlock(): Int {
+    val handler = Handler(Looper.myLooper()!!, blockManager.handlerCallback)
+    val needUpdateBlockRecord = mutableSetOf<BlockRecord>()
+    for (br in taskRecord.blockList) {
+      val blockF = File(br.blockPath)
+      if (blockF.exists()) {
+        if (br.curProgress == blockF.length() && !br.isComplete) {
+          br.isComplete = true
+          needUpdateBlockRecord.add(br)
+        }
+        if (br.curProgress != blockF.length()) {
+          br.curProgress = blockF.length()
+          needUpdateBlockRecord.add(br)
+          blockManager.putUnfinishedBlock(br)
+        }
+        // update task progress
+        handler.obtainMessage(IBlockManager.STATE_UPDATE_PROGRESS, br.curProgress)
+      }
     }
+    handler.removeCallbacksAndMessages(null)
+
+    // update block record
+    val dao = DuaContext.getServiceManager().getDbService().getDuaDb().getRecordDao()
+    withContext(Dispatchers.IO) {
+      dao.updateBlockList(needUpdateBlockRecord.toMutableList())
+    }
+    return TaskResp.CODE_SUCCESS
   }
 }

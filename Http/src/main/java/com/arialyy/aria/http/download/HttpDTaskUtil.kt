@@ -18,13 +18,13 @@ internal class HttpDTaskUtil : AbsTaskUtil() {
   private var blockManager: BlockManager? = null
   override fun getBlockManager(): IBlockManager {
     if (blockManager == null) {
-      blockManager = BlockManager(getTask().getTaskOption(HttpDTaskOption::class.java).taskListener)
+      blockManager = BlockManager(getTask())
     }
     return blockManager!!
   }
 
   override fun isRunning(): Boolean {
-    TODO("Not yet implemented")
+    return blockManager?.isRunning ?: false
   }
 
   override fun cancel() {

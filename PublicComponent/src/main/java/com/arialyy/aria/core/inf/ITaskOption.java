@@ -24,4 +24,5 @@ import com.arialyy.aria.core.listener.IEventListener;
 public abstract class ITaskOption {
 
   public IEventListener taskListener;
+  public int threadNum;
 }

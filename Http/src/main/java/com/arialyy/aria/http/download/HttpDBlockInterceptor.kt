@@ -134,6 +134,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
         if (br.curProgress == blockF.length() && !br.isComplete) {
           br.isComplete = true
           needUpdateBlockRecord.add(br)
+          handler.obtainMessage(IBlockManager.STATE_COMPLETE)
         }
         if (br.curProgress != blockF.length()) {
           br.curProgress = blockF.length()

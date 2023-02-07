@@ -15,21 +15,29 @@
  */
 package com.arialyy.aria.http.download
 
-import com.arialyy.aria.core.download.DTaskOption
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter
 import com.arialyy.aria.core.task.ITaskInterceptor
-import com.arialyy.aria.http.HttpOption
+import com.arialyy.aria.core.task.TaskChain
+import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.orm.entity.BlockRecord
+import java.util.concurrent.BlockingQueue
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 12:47 PM 2023/1/22
+ * @Date 7:11 PM 2023/2/7
  **/
-class HttpDTaskOption : DTaskOption() {
+class HttpBlockThreadInterceptor : ITaskInterceptor {
 
+  override suspend fun interceptor(chain: TaskChain): TaskResp {
+    val queue = chain.blockManager.blockQueue
+    if (queue.isEmpty()) {
+      return TaskResp(TaskResp.CODE_BLOCK_QUEUE_NULL)
+    }
+    cycleQueue(queue)
+  }
 
-  var httpOption: HttpOption? = null
-  var fileSizeAdapter: IHttpFileLenAdapter? = null
-  var taskInterceptor = mutableListOf<ITaskInterceptor>()
-  var isChunkTask = false
+  private fun cycleQueue(queue: BlockingQueue<BlockRecord>){
+    queue.take()
+
+  }
 }

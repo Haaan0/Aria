@@ -18,23 +18,40 @@ package com.arialyy.aria.core.task
 import android.os.Handler.Callback
 import android.os.Looper
 import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.inf.ITaskOption
 import com.arialyy.aria.core.listener.IEventListener
 import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.orm.entity.BlockRecord
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.isActive
 import timber.log.Timber
-import java.util.concurrent.LinkedBlockingDeque
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
 
-class BlockManager(private val eventListener: IEventListener) : IBlockManager {
-  private val unfinishedBlockQueue = LinkedBlockingDeque<BlockRecord>()
+class BlockManager(task: ITask) : IBlockManager {
+  private val unfinishedBlockList = mutableListOf<BlockRecord>()
   private val canceledNum = AtomicInteger(0) // 已经取消的线程的数
   private val stoppedNum = AtomicInteger(0) // 已经停止的线程数
   private val failedNum = AtomicInteger(0) // 失败的线程数
   private val completedNum = AtomicInteger(0) // 完成的线程数
+  private val channel = Channel<BlockRecord>()
+  private val threadNum = task.getTaskOption(ITaskOption::class.java).threadNum
+  private val scope = MainScope()
+  private val dispatcher = ThreadPoolExecutor(
+    threadNum, threadNum,
+    0L, MILLISECONDS,
+    LinkedBlockingQueue()
+  ).asCoroutineDispatcher()
 
   private var progress: Long = 0 //当前总进度
   private lateinit var looper: Looper
   private var blockNum: Int = 1
+  private var eventListener: IEventListener =
+    task.getTaskOption(ITaskOption::class.java).taskListener
 
   private val callback = Callback { msg ->
     when (msg.what) {
@@ -91,11 +108,11 @@ class BlockManager(private val eventListener: IEventListener) : IBlockManager {
   }
 
   override fun putUnfinishedBlock(record: BlockRecord) {
-    unfinishedBlockQueue.offer(record)
+    unfinishedBlockList.add(record)
   }
 
-  override fun getUnfinishedBlock(): BlockRecord {
-    return unfinishedBlockQueue.remove()
+  override fun getChannel(): Channel<BlockRecord> {
+    return channel
   }
 
   override fun setLopper(looper: Looper) {
@@ -135,6 +152,10 @@ class BlockManager(private val eventListener: IEventListener) : IBlockManager {
   override fun isCanceled(): Boolean {
     // Timber.d("isStopped, blockBum = ${blockNum}, canceledNum = $canceledNum")
     return canceledNum.get() == blockNum
+  }
+
+  override fun isRunning(): Boolean {
+    return scope.isActive
   }
 
   override fun getHandlerCallback(): Callback {

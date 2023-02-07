@@ -34,7 +34,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * 线程任务管理器
  */
-public class ThreadTaskManager {
+@Deprecated
+public class ThreadTaskManager1 {
   private final String TAG = CommonUtil.getClassName(this);
   private static volatile ThreadTaskManager INSTANCE = null;
   private static final int CORE_POOL_NUM = 20;

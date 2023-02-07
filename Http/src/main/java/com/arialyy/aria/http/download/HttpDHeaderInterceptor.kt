@@ -21,13 +21,13 @@ import android.os.Looper
 import android.os.Process
 import android.text.TextUtils
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter
-import com.arialyy.aria.core.task.BlockState
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.http.request.IRequest
+import com.arialyy.aria.orm.entity.BlockRecord
 import com.arialyy.aria.util.FileUtils
 import timber.log.Timber
 import java.io.BufferedReader
@@ -64,7 +64,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
       if (fileSize >= 0) {
         task.taskState.isSupportResume = fileSize != 0L
         task.taskState.isSupportBlock =
-          task.taskState.isSupportResume && fileSize > BlockState.BLOCK_SIZE
+          task.taskState.isSupportResume && fileSize > BlockRecord.BLOCK_SIZE
         task.taskState.fileSize = fileSize
         return chain.proceed(task)
       }

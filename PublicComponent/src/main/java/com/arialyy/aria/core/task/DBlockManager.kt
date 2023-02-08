@@ -94,7 +94,7 @@ class BlockManager(task: ITask) : IBlockManager {
         }
       }
       IBlockManager.STATE_UPDATE_PROGRESS -> {
-        progress = msg.obj as Long
+        progress += msg.obj as Long
       }
     }
     false
@@ -116,7 +116,7 @@ class BlockManager(task: ITask) : IBlockManager {
     return unfinishedBlock
   }
 
-  override fun start(threadTaskList: List<ThreadTask>) {
+  override fun start(threadTaskList: List<IThreadTask>) {
     if (Looper.myLooper() == Looper.getMainLooper()) {
       throw IllegalThreadStateException("io operations cannot be in the main thread")
     }

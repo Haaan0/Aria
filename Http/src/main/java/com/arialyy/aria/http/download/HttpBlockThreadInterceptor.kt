@@ -16,6 +16,7 @@
 package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.task.ITaskInterceptor
+import com.arialyy.aria.core.task.IThreadTask
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.core.task.ThreadTask
@@ -37,6 +38,9 @@ class HttpBlockThreadInterceptor : ITaskInterceptor {
   }
 
   private fun createThreadTask(blockRecordList: List<BlockRecord>) {
-    blockRecordList.forEach(ThreadTask())
+    val threadTaskList = mutableListOf<IThreadTask>()
+    blockRecordList.forEach{
+
+    }
   }
 }

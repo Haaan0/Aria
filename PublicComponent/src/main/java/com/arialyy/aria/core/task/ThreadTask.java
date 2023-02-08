@@ -546,11 +546,10 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     }
   }
 
-  @Override public ThreadTask call() throws Exception {
+  @Override public void run() {
     isDestroy = false;
     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
     TrafficStats.setThreadStatsTag(UUID.randomUUID().toString().hashCode());
-    mAdapter.call(this);
-    return this;
+    mAdapter.run(this);
   }
 }

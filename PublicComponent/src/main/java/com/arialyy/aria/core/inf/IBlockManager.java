@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.inf;
 
 import android.os.Handler;
+import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.orm.entity.BlockRecord;
 import java.util.List;
@@ -39,7 +40,7 @@ public interface IBlockManager {
   String DATA_THREAD_LOCATION = "DATA_THREAD_LOCATION";
   String DATA_ADD_LEN = "DATA_ADD_LEN"; // 增加的长度
 
-  void start(List<ThreadTask> threadTaskList);
+  void start(List<IThreadTask> threadTaskList);
 
   void setBlockNum(int blockNum);
 

@@ -26,7 +26,17 @@ public interface IThreadTaskAdapter {
   /**
    * 执行任务
    */
-  void call(IThreadTask threadTask) throws Exception;
+  void run(IThreadTask threadTask);
+
+  /**
+   * 取消任务
+   */
+  void cancel();
+
+  /**
+   * 停止任务
+   */
+  void stop();
 
   /**
    * 设置当前线程最大下载速度

@@ -15,10 +15,6 @@
  */
 package com.arialyy.aria.core.task;
 
-import android.os.Bundle;
-import com.arialyy.aria.core.inf.IBlockManager;
-import com.arialyy.aria.exception.AriaException;
-
 /**
  * 线程任务观察者
  *
@@ -26,25 +22,6 @@ import com.arialyy.aria.exception.AriaException;
  * Date: 2019-09-18
  */
 public interface IThreadTaskObserver {
-
-  /**
-   * 更新所有状态
-   *
-   * @param state state {@link IBlockManager#STATE_STOP}..
-   */
-  void updateState(int state, Bundle bundle);
-
-  /**
-   * 更新完成的状态
-   */
-  void updateCompleteState();
-
-  /**
-   * 更新失败的状态
-   *
-   * @param needRetry 是否需要重试，一般是网络错误才需要重试
-   */
-  void updateFailState(AriaException e, boolean needRetry);
 
   /**
    * 更新进度

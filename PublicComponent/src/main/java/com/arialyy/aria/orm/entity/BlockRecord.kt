@@ -67,4 +67,7 @@ data class BlockRecord(
 
   @Ignore
   var curProgress = 0L
+
+  @Ignore
+  lateinit var sourUrl: String
 }

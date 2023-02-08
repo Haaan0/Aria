@@ -50,7 +50,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
    * use multi-threaded download file, if file size <= 5m, this setting is not valid
    * @param threadNum  range [1 - 32]
    */
-  fun setThreadNum(threadNum: Long): HttpDStartController {
+  fun setThreadNum(threadNum: Int): HttpDStartController {
     if (threadNum !in 1..32) {
       Timber.e("set thread num fail, only 0 < threadNum < 33, threadNum: $threadNum")
       return this

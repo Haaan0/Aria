@@ -20,7 +20,6 @@ import android.content.Context
 import com.arialyy.aria.core.service.LifecycleManager
 import com.arialyy.aria.core.service.ServiceManager
 import kotlinx.coroutines.MainScope
-import java.util.logging.Handler
 
 /**
  * @Author laoyuyu
@@ -44,4 +43,8 @@ object DuaContext {
   fun getServiceManager() = ServiceManager
 
   fun getLifeManager() = LifecycleManager
+
+  fun getDConfig() = AriaConfig.getInstance().dConfig
+
+  fun getUConfig() = AriaConfig.getInstance().uConfig
 }

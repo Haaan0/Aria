@@ -27,9 +27,20 @@ import com.arialyy.aria.http.HttpOption
  **/
 class HttpDTaskOption : DTaskOption() {
 
-
   var httpOption: HttpOption? = null
   var fileSizeAdapter: IHttpFileLenAdapter? = null
   var taskInterceptor = mutableListOf<ITaskInterceptor>()
   var isChunkTask = false
+
+  /**
+   * whether block is supported, true: supported
+   */
+  var isSupportResume = true
+
+  /**
+   * whether resume task is supported
+   * 1. in download task, if file length not obtained, isSupportResume = false
+   * 2. in upload task, if service not supported resume, isSupportResume = false
+   */
+  var isSupportBlock = true
 }

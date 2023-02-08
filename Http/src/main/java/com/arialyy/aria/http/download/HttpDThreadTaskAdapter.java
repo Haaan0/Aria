@@ -16,11 +16,12 @@
 package com.arialyy.aria.http.download;
 
 import com.arialyy.aria.core.common.RequestEnum;
-import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.task.AbsThreadTaskAdapter;
+import com.arialyy.aria.core.task.ThreadConfig;
 import com.arialyy.aria.exception.AriaHTTPException;
-import com.arialyy.aria.http.BaseHttpThreadTaskAdapter;
 import com.arialyy.aria.http.ConnectionHelp;
+import com.arialyy.aria.http.HttpOption;
+import com.arialyy.aria.http.request.IRequest;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import java.io.BufferedInputStream;
@@ -30,7 +31,6 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -38,41 +38,37 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
 import java.util.Set;
+import timber.log.Timber;
 
 /**
  * Created by lyy on 2017/1/18. 下载线程
  */
-final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
-  private final String TAG = "HttpDThreadTaskAdapter";
-  private DTaskWrapper mTaskWrapper;
+final class HttpDThreadTaskAdapter extends AbsThreadTaskAdapter {
 
-  HttpDThreadTaskAdapter(SubThreadConfig config) {
-    super(config);
+  HttpDThreadTaskAdapter(ThreadConfig threadConfig) {
+    super(threadConfig);
+  }
+
+  private HttpDTaskOption getTaskOption() {
+    return (HttpDTaskOption) getThreadConfig().getOption();
   }
 
   @Override protected void handlerThreadTask() {
-    mTaskWrapper = (DTaskWrapper) getTaskWrapper();
-    if (getThreadRecord().isComplete) {
-      handleComplete();
-      return;
-    }
     HttpURLConnection conn = null;
     BufferedInputStream is = null;
     BufferedRandomAccessFile file = null;
     try {
-      URL url = ConnectionHelp.handleUrl(getThreadConfig().url, mTaskOption);
-      conn = ConnectionHelp.handleConnection(url, mTaskOption);
-      if (mTaskWrapper.isSupportBP()) {
-        ALog.d(TAG,
-            String.format("任务【%s】线程__%s__开始下载【开始位置 : %s，结束位置：%s】", getFileName(),
-                getThreadRecord().threadId, getThreadRecord().startLocation,
-                getThreadRecord().endLocation));
+      HttpDTaskOption taskOption = getTaskOption();
+      HttpOption option = taskOption.getHttpOption();
+      conn = IRequest.Companion.getRequest(option).getDConnection(taskOption.getSourUrl(), option);
+      if (!taskOption.isSupportResume()) {
+        Timber.w("this task not support resume, url: %s", taskOption.getSourUrl());
+      }else {
         conn.setRequestProperty("Range",
-            String.format("bytes=%s-%s", getThreadRecord().startLocation,
-                (getThreadRecord().endLocation - 1)));
-      } else {
-        ALog.w(TAG, "该下载不支持断点");
+            String.format("bytes=%s-%s", getThreadConfig().getBlockRecord().getStartLocation(),
+                (getThreadConfig().getBlockRecord().getEndLocation() - 1)));
       }
+
       ConnectionHelp.setConnectParam(mTaskOption, conn);
       conn.setConnectTimeout(getTaskConfig().getConnectTimeOut());
       conn.setReadTimeout(getTaskConfig().getIOTimeOut());  //设置读取流的等待时间,必须设置该参数
@@ -81,23 +77,6 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
         conn.setChunkedStreamingMode(0);
       }
       conn.connect();
-      // 传递参数
-      if (mTaskOption.getRequestEnum() == RequestEnum.POST) {
-        Map<String, String> params = mTaskOption.getParams();
-        if (params != null) {
-          OutputStreamWriter dos = new OutputStreamWriter(conn.getOutputStream());
-          Set<String> keys = params.keySet();
-          StringBuilder sb = new StringBuilder();
-          for (String key : keys) {
-            sb.append(key).append("=").append(URLEncoder.encode(params.get(key))).append("&");
-          }
-          String paramStr = sb.toString();
-          paramStr = paramStr.substring(0, paramStr.length() - 1);
-          dos.write(paramStr);
-          dos.flush();
-          dos.close();
-        }
-      }
 
       is = new BufferedInputStream(ConnectionHelp.convertInputStream(conn));
       if (mTaskOption.isChunked()) {
@@ -220,7 +199,8 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
       }
       handleComplete();
     } catch (IOException e) {
-      fail(new AriaHTTPException(String.format("文件下载失败，savePath: %s, url: %s", getEntity().getFilePath(),
+      fail(new AriaHTTPException(
+          String.format("文件下载失败，savePath: %s, url: %s", getEntity().getFilePath(),
               getThreadConfig().url), e), true);
     } finally {
       try {
@@ -259,17 +239,11 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
     }
   }
 
-  /**
-   * 处理完成配置文件的更新或事件回调
-   */
-  private void handleComplete() {
-    if (getThreadTask().isBreak()) {
-      return;
-    }
-    if (!getThreadTask().checkBlock()) {
-      return;
-    }
+  @Override public void cancel() {
 
-    complete();
+  }
+
+  @Override public void stop() {
+
   }
 }

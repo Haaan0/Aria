@@ -15,13 +15,8 @@
  */
 package com.arialyy.aria.core.task;
 
-import com.arialyy.aria.core.ThreadRecord;
-import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.config.BaseTaskConfig;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.AriaException;
+import com.arialyy.aria.orm.entity.BlockRecord;
 import com.arialyy.aria.util.BandwidthLimiter;
-import com.arialyy.aria.util.CommonUtil;
 
 /**
  * @author lyy
@@ -29,29 +24,44 @@ import com.arialyy.aria.util.CommonUtil;
  */
 public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
 
-  protected String TAG = CommonUtil.getClassName(getClass());
   /**
    * 速度限制工具
    */
   protected BandwidthLimiter mSpeedBandUtil;
-  private ThreadRecord mThreadRecord;
   private IThreadTaskObserver mObserver;
-  private AbsTaskWrapper mWrapper;
-  private SubThreadConfig mThreadConfig;
-  private IThreadTask mThreadTask;
+  private final ThreadConfig mThreadConfig;
+  private boolean breakTask = false;
 
-  protected AbsThreadTaskAdapter(SubThreadConfig config) {
-    mThreadRecord = config.record;
-    mWrapper = config.taskWrapper;
-    mThreadConfig = config;
-    if (getTaskConfig().getMaxSpeed() > 0) {
-      mSpeedBandUtil = new BandwidthLimiter(getTaskConfig().getMaxSpeed(), config.startThreadNum);
+  protected AbsThreadTaskAdapter(ThreadConfig threadConfig) {
+    mThreadConfig = threadConfig;
+    if (threadConfig.getSpeed() > 0) {
+      mSpeedBandUtil =
+          new BandwidthLimiter(threadConfig.getSpeed(), mThreadConfig.getOption().threadNum);
     }
   }
 
-  @Override public void call(IThreadTask threadTask) throws Exception {
-    mThreadTask = threadTask;
-    handlerThreadTask();
+  @Override public void breakTask() {
+    breakTask = true;
+  }
+
+  protected boolean isBreakTask() {
+    return breakTask;
+  }
+
+  protected BlockRecord getBlockRecord() {
+    return mThreadConfig.getBlockRecord();
+  }
+
+  protected ThreadConfig getThreadConfig() {
+    return mThreadConfig;
+  }
+
+  @Override public void run() {
+    try {
+      handlerThreadTask();
+    } catch (Exception e) {
+      fail(e);
+    }
   }
 
   /**
@@ -66,32 +76,6 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
     return mObserver.getThreadProgress();
   }
 
-  protected ThreadRecord getThreadRecord() {
-    return mThreadRecord;
-  }
-
-  protected AbsTaskWrapper getTaskWrapper() {
-    return mWrapper;
-  }
-
-  /**
-   * 获取任务配置信息
-   */
-  protected BaseTaskConfig getTaskConfig() {
-    return getTaskWrapper().getConfig();
-  }
-
-  protected IThreadTask getThreadTask() {
-    return mThreadTask;
-  }
-
-  /**
-   * 获取线程配置信息
-   */
-  protected SubThreadConfig getThreadConfig() {
-    return mThreadConfig;
-  }
-
   @Override public void attach(IThreadTaskObserver observer) {
     mObserver = observer;
   }
@@ -99,26 +83,26 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
   @Override public void setMaxSpeed(int speed) {
     if (mSpeedBandUtil == null) {
       mSpeedBandUtil =
-          new BandwidthLimiter(getTaskConfig().getMaxSpeed(), getThreadConfig().startThreadNum);
+          new BandwidthLimiter(mThreadConfig.getSpeed(), mThreadConfig.getOption().threadNum);
     }
     mSpeedBandUtil.setMaxRate(speed);
   }
 
   protected void complete() {
     if (mObserver != null) {
-      mObserver.updateCompleteState();
+      mObserver.onComplete();
     }
   }
 
-  protected void fail(AriaException ex, boolean needRetry) {
+  protected void fail(Exception ex) {
     if (mObserver != null) {
-      mObserver.updateFailState(ex, needRetry);
+      mObserver.onFail(ex);
     }
   }
 
   protected void progress(long len) {
     if (mObserver != null) {
-      mObserver.updateProgress(len);
+      mObserver.onProgress(len);
     }
   }
 }

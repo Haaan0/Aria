@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 AriaLyy(https://github.com/AriaLyy/Aria)
+ * Copyright (C) 2016  AriaLyy(https://github.com/AriaLyy/Aria)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,37 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.task;
+package com.arialyy.aria.core.task
+
+import com.arialyy.aria.core.inf.ITaskOption
+import com.arialyy.aria.orm.entity.BlockRecord
 
 /**
- * 线程适配器
- *
- * @author lyy
- * Date: 2019-09-18
- */
-public interface IThreadTaskAdapter {
-
-  int BUF_SIZE = 4096;
-
-  /**
-   * 执行任务
-   */
-  void run();
-
-  /**
-   * 中断任务
-   */
-  void breakTask();
-
-  /**
-   * 设置当前线程最大下载速度
-   *
-   * @param speed 单位为：kb
-   */
-  void setMaxSpeed(int speed);
-
-  /**
-   * 注册观察者
-   */
-  void attach(IThreadTaskObserver observer);
-}
+ * @Author laoyuyu
+ * @Description
+ * @Date 23:12 PM 2023/2/8
+ **/
+data class ThreadConfig(val blockRecord: BlockRecord, val option: ITaskOption, val speed: Int)

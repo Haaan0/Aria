@@ -28,10 +28,14 @@ public interface IThreadTaskObserver {
    *
    * @param len 新增的长度
    */
-  void updateProgress(long len);
+  void onProgress(long len);
 
   /**
    * 获取线程当前进度
    */
   long getThreadProgress();
+
+  void onFail(Exception e);
+
+  void onComplete();
 }

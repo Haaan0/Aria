@@ -17,10 +17,8 @@ package com.arialyy.aria.core.inf;
 
 import android.os.Handler;
 import com.arialyy.aria.core.task.IThreadTask;
-import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.orm.entity.BlockRecord;
 import java.util.List;
-import kotlinx.coroutines.channels.Channel;
 
 /**
  * 线程任务状态
@@ -39,6 +37,8 @@ public interface IBlockManager {
   String DATA_THREAD_NAME = "DATA_THREAD_NAME";
   String DATA_THREAD_LOCATION = "DATA_THREAD_LOCATION";
   String DATA_ADD_LEN = "DATA_ADD_LEN"; // 增加的长度
+
+  void setLooper();
 
   void start(List<IThreadTask> threadTaskList);
 
@@ -78,5 +78,5 @@ public interface IBlockManager {
   /**
    * 创建handler 回调
    */
-  Handler.Callback getHandlerCallback();
+  Handler getHandler();
 }

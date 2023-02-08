@@ -331,7 +331,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    * @param len 新增的长度
    */
   @Override
-  public synchronized void updateProgress(long len) {
+  public synchronized void onProgress(long len) {
     mRangeProgress += len;
     Thread loopThread = mStateHandler.getLooper().getThread();
     if (!loopThread.isAlive() || loopThread.isInterrupted()) {

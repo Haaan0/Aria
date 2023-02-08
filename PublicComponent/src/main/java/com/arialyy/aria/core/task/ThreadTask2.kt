@@ -47,7 +47,7 @@ class ThreadTask2(
   }
 
   override fun run() {
-    adapter.run(this)
+    adapter.run()
   }
 
   override fun cancel() {
@@ -117,7 +117,7 @@ class ThreadTask2(
   /**
    * update current thread progress, once a second
    */
-  override fun updateProgress(len: Long) {
+  override fun onProgress(len: Long) {
     record.curProgress += len
     if (System.currentTimeMillis() - lastUpdateTime > 1000) {
       lastUpdateTime = System.currentTimeMillis()

@@ -45,7 +45,4 @@ public interface IThreadTask extends Runnable {
    */
   boolean isRunning();
 
-  void onFail(Exception e);
-
-  void onComplete();
 }

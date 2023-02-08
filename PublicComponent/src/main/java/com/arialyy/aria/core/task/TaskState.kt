@@ -43,17 +43,6 @@ class TaskState {
    */
   var curProgress: Long = 0
 
-  /**
-   * whether block is supported, true: supported
-   */
-  var isSupportBlock = false
-
-  /**
-   * whether resume task is supported
-   * 1. in download task, if file length not obtained, isSupportResume = false
-   * 2. in upload task, if service not supported resume, isSupportResume = false
-   */
-  var isSupportResume = false
 
   /**
    * Bytes transferred in 1 second, if file size 0, return 0

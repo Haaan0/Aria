@@ -15,8 +15,6 @@
  */
 package com.arialyy.aria.http.download
 
-import android.os.Handler
-import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.task.BlockUtil
@@ -126,7 +124,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
    * if block already exist, upload progress
    */
   private suspend fun checkBlock(): Int {
-    val handler = Handler(Looper.myLooper()!!, blockManager.handlerCallback)
+    val handler = blockManager.handler
     val needUpdateBlockRecord = mutableSetOf<BlockRecord>()
     for (br in taskRecord.blockList) {
       val blockF = File(br.blockPath)
@@ -145,7 +143,6 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
         handler.obtainMessage(IBlockManager.STATE_UPDATE_PROGRESS, br.curProgress)
       }
     }
-    handler.removeCallbacksAndMessages(null)
 
     // update block record
     val dao = DuaContext.getServiceManager().getDbService().getDuaDb().getRecordDao()

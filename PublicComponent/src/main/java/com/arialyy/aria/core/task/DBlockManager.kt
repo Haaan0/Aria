@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.task
 
+import android.os.Handler
 import android.os.Handler.Callback
 import android.os.Looper
 import com.arialyy.aria.core.inf.IBlockManager
@@ -49,6 +50,7 @@ class BlockManager(task: ITask) : IBlockManager {
 
   private var progress: Long = 0 //当前总进度
   private lateinit var looper: Looper
+  private lateinit var handler: Handler
   private var blockNum: Int = 1
   private var eventListener: IEventListener =
     task.getTaskOption(ITaskOption::class.java).taskListener
@@ -105,6 +107,7 @@ class BlockManager(task: ITask) : IBlockManager {
    */
   private fun quitLooper() {
     looper.quit()
+    handler.removeCallbacksAndMessages(null)
     scope.cancel()
   }
 
@@ -116,11 +119,15 @@ class BlockManager(task: ITask) : IBlockManager {
     return unfinishedBlock
   }
 
-  override fun start(threadTaskList: List<IThreadTask>) {
+  override fun setLooper() {
     if (Looper.myLooper() == Looper.getMainLooper()) {
       throw IllegalThreadStateException("io operations cannot be in the main thread")
     }
     looper = Looper.myLooper()!!
+    handler = Handler(looper, callback)
+  }
+
+  override fun start(threadTaskList: List<IThreadTask>) {
     threadTaskList.forEach { tt ->
       scope.launch(dispatcher) {
         tt.run()
@@ -163,7 +170,7 @@ class BlockManager(task: ITask) : IBlockManager {
     return scope.isActive
   }
 
-  override fun getHandlerCallback(): Callback {
-    return callback
+  override fun getHandler(): Handler {
+    return handler
   }
 }

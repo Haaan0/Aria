@@ -15,11 +15,13 @@
  */
 package com.arialyy.aria.http.download
 
+import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.IThreadTask
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
-import com.arialyy.aria.core.task.ThreadTask
+import com.arialyy.aria.core.task.ThreadConfig
+import com.arialyy.aria.core.task.ThreadTask2
 import com.arialyy.aria.orm.entity.BlockRecord
 
 /**
@@ -34,13 +36,25 @@ class HttpBlockThreadInterceptor : ITaskInterceptor {
     if (unfinishedBlockList.isEmpty()) {
       return TaskResp(TaskResp.CODE_BLOCK_QUEUE_NULL)
     }
-    createThreadTask(unfinishedBlockList)
+    createThreadTask(unfinishedBlockList, chain)
+    return TaskResp(TaskResp.CODE_SUCCESS)
   }
 
-  private fun createThreadTask(blockRecordList: List<BlockRecord>) {
+  private fun createThreadTask(blockRecordList: List<BlockRecord>, chain: TaskChain) {
     val threadTaskList = mutableListOf<IThreadTask>()
-    blockRecordList.forEach{
 
+    blockRecordList.forEach {
+      val option = chain.getTask().getTaskOption(HttpDTaskOption::class.java)
+      val threadConfig = ThreadConfig(it, option, DuaContext.getDConfig().maxSpeed)
+      threadTaskList.add(
+        ThreadTask2(
+          adapter = if (option.isChunkTask) HttpDCTTaskAdapter(threadConfig) else HttpDThreadTaskAdapter(
+            threadConfig
+          ),
+          handler = chain.blockManager.handler,
+          record = it
+        )
+      )
     }
   }
 }

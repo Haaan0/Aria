@@ -62,10 +62,9 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     try {
       val fileSize = getFileSize()
       if (fileSize >= 0) {
-        task.taskState.isSupportResume = fileSize != 0L
-        task.taskState.isSupportBlock =
-          task.taskState.isSupportResume && fileSize > BlockRecord.BLOCK_SIZE
         task.taskState.fileSize = fileSize
+        taskOption.isSupportResume = fileSize != 0L
+        taskOption.isSupportBlock = taskOption.isSupportResume && fileSize > BlockRecord.BLOCK_SIZE
         return chain.proceed(task)
       }
     } catch (e: IOException) {

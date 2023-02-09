@@ -30,6 +30,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
@@ -42,11 +43,12 @@ class BlockManager(task: ITask) : IBlockManager {
   private val completedNum = AtomicInteger(0) // 完成的线程数
   private val threadNum = task.getTaskOption(ITaskOption::class.java).threadNum
   private val scope = MainScope()
-  private val dispatcher = ThreadPoolExecutor(
+  private val threadPool = ThreadPoolExecutor(
     threadNum, threadNum,
     0L, MILLISECONDS,
-    LinkedBlockingQueue()
-  ).asCoroutineDispatcher()
+    LinkedBlockingQueue(),
+  )
+  private val dispatcher = threadPool.asCoroutineDispatcher()
 
   private var progress: Long = 0 //当前总进度
   private lateinit var looper: Looper
@@ -115,7 +117,7 @@ class BlockManager(task: ITask) : IBlockManager {
     unfinishedBlock.add(record)
   }
 
-  override fun getUnfinishedBlockList(): MutableList<BlockRecord> {
+  override fun getUnfinishedBlockList(): List<BlockRecord> {
     return unfinishedBlock
   }
 
@@ -133,6 +135,10 @@ class BlockManager(task: ITask) : IBlockManager {
         tt.run()
       }
     }
+  }
+
+  override fun stop() {
+    quitLooper()
   }
 
   override fun setBlockNum(blockNum: Int) {

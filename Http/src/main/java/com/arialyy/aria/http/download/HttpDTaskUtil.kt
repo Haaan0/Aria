@@ -20,6 +20,8 @@ import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.task.AbsTaskUtil
 import com.arialyy.aria.core.task.BlockManager
+import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.exception.AriaException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -47,7 +49,7 @@ internal class HttpDTaskUtil : AbsTaskUtil() {
   }
 
   override fun stop() {
-    TODO("Not yet implemented")
+    blockManager?.stop()
   }
 
   override fun start() {
@@ -64,6 +66,14 @@ internal class HttpDTaskUtil : AbsTaskUtil() {
       addCoreInterceptor(HttpDBlockInterceptor())
       addCoreInterceptor(HttpBlockThreadInterceptor())
       val resp = interceptor()
+      if (resp == null || resp.code != TaskResp.CODE_SUCCESS) {
+        getTask().getTaskOption(HttpDTaskOption::class.java).taskListener.onFail(
+          false,
+          AriaException("start task fail, task interrupt, code: ${resp?.code ?: TaskResp.CODE_INTERRUPT}")
+        )
+        blockManager?.stop()
+        return@launch
+      }
       Looper.loop()
     }
   }

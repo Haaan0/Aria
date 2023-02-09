@@ -42,6 +42,8 @@ public interface IBlockManager {
 
   void start(List<IThreadTask> threadTaskList);
 
+  void stop();
+
   void setBlockNum(int blockNum);
 
   void putUnfinishedBlock(BlockRecord record);

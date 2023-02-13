@@ -45,7 +45,7 @@ public abstract class AbsTask implements ITask {
     mUtil = util;
     taskId = TaskStatePool.INSTANCE.buildTaskId$PublicComponent_debug();
     TaskStatePool.INSTANCE.putTaskState(getTaskId(), mTaskState);
-    util.init(this, taskOption.taskListener);
+    util.init(this, taskOption.eventListener);
   }
 
   @Override public void setState(int state) {

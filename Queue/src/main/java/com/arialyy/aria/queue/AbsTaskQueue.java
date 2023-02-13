@@ -20,7 +20,7 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IPool;
 import com.arialyy.aria.core.inf.ITaskQueue;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.core.manager.ThreadTaskManager;
+import com.arialyy.aria.core.task.ThreadTaskManager2;
 import com.arialyy.aria.core.task.ITask;
 import timber.log.Timber;
 
@@ -68,8 +68,8 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
       return true;
     }
     TASK task = getExePool().getTask(taskId);
-    if (task == null && ThreadTaskManager.getInstance().taskIsRunning(taskId)) {
-      ThreadTaskManager.getInstance().removeTaskThread(taskId);
+    if (task == null && ThreadTaskManager2.INSTANCE.taskIsRunning(taskId)) {
+      ThreadTaskManager2.INSTANCE.stopThreadTask(taskId);
     }
     return task != null && task.isRunning() && taskExists(taskId);
   }
@@ -129,7 +129,7 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
         task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
       }
     }
-    ThreadTaskManager.getInstance().removeAllThreadTask();
+    ThreadTaskManager2.INSTANCE.removeAllThreadTask();
     getCachePool().clear();
   }
 
@@ -163,8 +163,8 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
         if (taskIsRunning(task.getTaskId())) {
           getCachePool().removeTask(task.getTaskId());
           getExePool().removeTask(task.getTaskId());
-          if (ThreadTaskManager.getInstance().taskIsRunning(task.getTaskId())) {
-            ThreadTaskManager.getInstance().removeTaskThread(task.getTaskId());
+          if (ThreadTaskManager2.INSTANCE.taskIsRunning(task.getTaskId())) {
+            ThreadTaskManager2.INSTANCE.stopThreadTask(task.getTaskId());
           }
         }
         break;

@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.inf;
+package com.arialyy.aria.http.download
 
-import com.arialyy.aria.core.listener.IEventListener;
+import com.arialyy.aria.core.listener.AbsEventListener
+import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.util.FileUtils
 
-/**
- * Created by AriaL on 2017/6/29.
- * 任务信息设置接口
- */
-public abstract class ITaskOption {
+class HttpDEventListener(task: DownloadTask) : AbsEventListener(task) {
 
-  public IEventListener eventListener;
-  public int threadNum;
+  override fun handleCancel() {
+
+  }
+
+  override fun handleComplete() {
+
+  }
+
+
 }

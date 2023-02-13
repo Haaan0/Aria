@@ -15,9 +15,8 @@
  */
 package com.arialyy.aria.http.download
 
-import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.inf.ITaskOption
-import com.arialyy.aria.core.manager.ThreadTaskManager
+import com.arialyy.aria.core.task.ThreadTaskManager2
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
@@ -61,12 +60,12 @@ open class TimerInterceptor : ITaskInterceptor {
               || blockManager.hasFailedBlock()
               || !isRunning(chain.getTask())
             ) {
-              ThreadTaskManager.getInstance().removeTaskThread(chain.getTask().taskId)
+              ThreadTaskManager2.stopThreadTask(chain.getTask().taskId)
               closeTimer()
               return
             }
             if (chain.getTask().taskState.curProgress >= 0) {
-              chain.getTask().getTaskOption(ITaskOption::class.java).taskListener.onProgress(
+              chain.getTask().getTaskOption(ITaskOption::class.java).eventListener.onProgress(
                 blockManager.currentProgress
               )
               return
@@ -86,6 +85,6 @@ open class TimerInterceptor : ITaskInterceptor {
   }
 
   @Synchronized fun isRunning(task: ITask): Boolean {
-    return ThreadTaskManager.getInstance().taskIsRunning(task.taskId)
+    return ThreadTaskManager2.taskIsRunning(task.taskId)
   }
 }

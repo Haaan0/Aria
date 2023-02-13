@@ -51,13 +51,13 @@ class ThreadTask2(
   }
 
   override fun cancel() {
-    adapter.cancel()
+    adapter.breakTask()
     isCanceled = true
     handler.obtainMessage(IBlockManager.STATE_CANCEL)
   }
 
   override fun stop() {
-    adapter.stop()
+    adapter.breakTask()
     isStopped = true
     handler.obtainMessage(IBlockManager.STATE_STOP)
   }

@@ -24,7 +24,7 @@ import com.arialyy.aria.util.DeleteDRecord;
 /**
  * 下载监听类
  */
-public class BaseDListener extends BaseListener implements IDLoadListener {
+public class BaseDListener extends AbsEventListener implements IDLoadListener {
 
   @Override
   public void onPostPre(long fileSize) {

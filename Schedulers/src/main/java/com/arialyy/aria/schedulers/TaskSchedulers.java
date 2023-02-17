@@ -15,22 +15,21 @@
  */
 package com.arialyy.aria.schedulers;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
+import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaConfig;
+import com.arialyy.aria.core.DuaContext;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.group.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.ITaskQueue;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.listener.ISchedulers;
-import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.core.queue.DGroupTaskQueue;
-import com.arialyy.aria.core.queue.DTaskQueue;
-import com.arialyy.aria.core.queue.ITaskQueue;
-import com.arialyy.aria.core.queue.UTaskQueue;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.core.task.DownloadTask;
@@ -43,6 +42,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import timber.log.Timber;
 
 /**
  * Created by lyy on 2017/6/4. 事件调度器，用于处理任务状态的调度
@@ -77,15 +77,15 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    *
    * @param taskType 任务类型
    */
-  ITaskQueue getQueue(int taskType) {
+  ITaskQueue<ITask> getQueue(int taskType) {
     if (taskType == ITask.DOWNLOAD) {
-      return DTaskQueue.getInstance();
+      return DuaContext.INSTANCE.getServiceManager().getDownloadQueue();
     }
     if (taskType == ITask.DOWNLOAD_GROUP) {
-      return DGroupTaskQueue.getInstance();
+      return DuaContext.INSTANCE.getServiceManager().getDownloadGroupQueue();
     }
     if (taskType == ITask.UPLOAD) {
-      return UTaskQueue.getInstance();
+      return DuaContext.INSTANCE.getServiceManager().getUploadQueue();
     }
     throw new NullPointerException("任务类型错误，type = " + taskType);
   }
@@ -96,6 +96,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    * @param obj 观察者类
    * @param taskEnum 任务类型 {@link TaskEnum}
    */
+  @Override
   public void register(Object obj, TaskEnum taskEnum) {
     String targetName = obj.getClass().getName();
     Map<TaskEnum, Object> listeners = mObservers.get(getKey(obj));
@@ -136,6 +137,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    *
    * @param obj 观察者类
    */
+  @Override
   public void unRegister(Object obj) {
     if (!mObservers.containsKey(getKey(obj))) {
       return;
@@ -303,32 +305,32 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    * 处理普通任务和任务组的事件
    */
   private void handleNormalEvent(TASK task, int what) {
-    ITaskQueue queue = getQueue(task.getTaskType());
+    ITaskQueue<ITask> queue = getQueue(task.getTaskType());
     switch (what) {
       case STOP:
-        if (task.getTaskState() == IEntity.STATE_WAIT) {
-          break;
-        }
-        queue.removeTaskFormQueue(task.getKey());
-        if (queue.getCurrentExePoolNum() < queue.getMaxTaskNum()) {
-          ALog.d(TAG, String.format("停止任务【%s】成功，尝试开始下一任务", task.getTaskName()));
+        queue.stopTask(task);
+        if (!queue.isFull()) {
+          Timber.d("stop task success, if there is a task, start the next task, taskId: %s",
+              task.getTaskId());
           startNextTask(queue, task.getSchedulerType());
         } else {
-          ALog.d(TAG, String.format("停止任务【%s】成功", task.getTaskName()));
+          Timber.d("stop task success, taskId: %s", task.getTaskId());
         }
         break;
       case CANCEL:
-        queue.removeTaskFormQueue(task.getKey());
-        if (queue.getCurrentExePoolNum() < queue.getMaxTaskNum()) {
-          ALog.d(TAG, String.format("删除任务【%s】成功，尝试开始下一任务", task.getTaskName()));
+        queue.removeTask(task);
+
+        if (!queue.isFull()) {
+          Timber.d("remove task success, if there is a task, start the next task, taskId: %s",
+              task.getTaskId());
           startNextTask(queue, task.getSchedulerType());
         } else {
-          ALog.d(TAG, String.format("删除任务【%s】成功", task.getTaskName()));
+          Timber.d("remove task success, taskId: %s", task.getTaskId());
         }
         break;
       case COMPLETE:
-        queue.removeTaskFormQueue(task.getKey());
-        ALog.d(TAG, String.format("任务【%s】处理完成", task.getTaskName()));
+        queue.removeTask(task);
+        Timber.d("task complete, taskId: %s", task.getTaskId());
         startNextTask(queue, task.getSchedulerType());
         break;
       case FAIL:
@@ -338,14 +340,6 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
 
     if (what == FAIL || what == CHECK_FAIL) {
       return;
-    }
-
-    if (what == CANCEL || what == COMPLETE) {
-      TaskWrapperManager.getInstance().removeTaskWrapper(task.getTaskWrapper());
-    } else {
-      if (what != RUNNING) {
-        TaskWrapperManager.getInstance().putTaskWrapper(task.getTaskWrapper());
-      }
     }
     normalTaskCallback(what, task);
   }
@@ -425,7 +419,8 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
     }
   }
 
-  private void normalTaskCallback(int state, TASK task, NormalTaskListenerInterface<TASK> listener) {
+  private void normalTaskCallback(int state, TASK task,
+      NormalTaskListenerInterface<TASK> listener) {
     if (listener != null) {
       if (task == null && state != ISchedulers.CHECK_FAIL) {
         ALog.e(TAG, "TASK 为null，回调失败");
@@ -518,22 +513,19 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    *
    * @param task 下载任务
    */
-  private void handleFailTask(final ITaskQueue queue, final TASK task) {
-    if (!task.isNeedRetry() || task.isStop() || task.isCancel()) {
-      queue.removeTaskFormQueue(task.getKey());
+  private void handleFailTask(final ITaskQueue<ITask> queue, final TASK task) {
+    if (!task.getTaskState().getNeedRetry() || task.isStop() || task.isCancel()) {
+      queue.removeTask(task);
       startNextTask(queue, task.getSchedulerType());
       normalTaskCallback(FAIL, task);
       return;
     }
 
-    int num = task.getTaskWrapper().getConfig().getReTryNum();
     boolean isNotNetRetry = mAriaConfig.getAConfig().isNotNetRetry();
 
-    if ((!NetUtils.isConnected(mAriaConfig.getAPP()) && !isNotNetRetry)
-        || task.getTaskWrapper().getEntity().getFailNum() > num) {
-      queue.removeTaskFormQueue(task.getKey());
+    if ((!NetUtils.isConnected(mAriaConfig.getAPP()) && !isNotNetRetry)) {
+      queue.removeTask(task);
       startNextTask(queue, task.getSchedulerType());
-      TaskWrapperManager.getInstance().removeTaskWrapper(task.getTaskWrapper());
       normalTaskCallback(FAIL, task);
       return;
     }
@@ -544,7 +536,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
   /**
    * 启动下一个任务，条件：任务停止，取消下载，任务完成
    */
-  void startNextTask(final ITaskQueue queue, int schedulerType) {
+  void startNextTask(final ITaskQueue<ITask> queue, int schedulerType) {
     if (schedulerType == TaskSchedulerType.TYPE_STOP_NOT_NEXT) {
       return;
     }
@@ -555,8 +547,12 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
       }
       return;
     }
-    if (newTask.getTaskState() == IEntity.STATE_WAIT) {
+    if (newTask.getTaskState().getState() == IEntity.STATE_WAIT) {
       queue.startTask(newTask);
     }
+  }
+
+  @Override public void init(@NonNull Context context) {
+
   }
 }

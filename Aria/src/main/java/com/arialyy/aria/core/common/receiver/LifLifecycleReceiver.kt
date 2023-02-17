@@ -20,7 +20,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IComponentLoader
 import com.arialyy.aria.core.inf.IDuaReceiver
-import com.arialyy.aria.schedulers.TaskSchedulers
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
 
@@ -52,12 +51,13 @@ class LifLifecycleReceiver(val lifecycle: LifecycleOwner) : IDuaReceiver {
         lifecycle.lifecycle.addObserver(object : DefaultLifecycleObserver {
           override fun onCreate(owner: LifecycleOwner) {
             super.onCreate(owner)
-            com.arialyy.aria.schedulers.TaskSchedulers.getInstance().register(lifecycle, loader.getTaskEnum())
+            DuaContext.getServiceManager().getSchedulerImp()
+              .register(lifecycle, loader.getTaskEnum())
           }
 
           override fun onDestroy(owner: LifecycleOwner) {
             super.onDestroy(owner)
-            com.arialyy.aria.schedulers.TaskSchedulers.getInstance().unRegister(lifecycle)
+            DuaContext.getServiceManager().getSchedulerImp().unRegister(lifecycle)
             DuaContext.getLifeManager().removeLoader(lifecycle)
             DuaContext.getLifeManager().removeCustomListener(lifecycle)
           }

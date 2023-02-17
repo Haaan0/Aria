@@ -20,7 +20,9 @@ import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.ITaskQueue
 import com.arialyy.aria.core.listener.ISchedulers
+import com.arialyy.aria.core.task.DownloadGroupTask
 import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.UploadTask
 import com.arialyy.aria.exception.AriaException
 import timber.log.Timber
@@ -71,21 +73,38 @@ object ServiceManager {
   /**
    * get downloadQueue service, if already [registerService] custom queue, return custom queue
    */
-  fun getDownloadQueue(): ITaskQueue<DownloadTask> {
+  fun getDownloadQueue(): ITaskQueue<ITask> {
     return (serviceCache[DuaContext.D_QUEUE]
-      ?: throw AriaException("queue not found: ${DuaContext.D_QUEUE}")) as ITaskQueue<DownloadTask>
+      ?: throw AriaException("queue not found: ${DuaContext.D_QUEUE}")) as ITaskQueue<ITask>
+  }
+
+  /**
+   * get downloadGroupQueue service, if already [registerService] custom queue, return custom queue
+   */
+  fun getDownloadGroupQueue(): ITaskQueue<ITask> {
+    return (serviceCache[DuaContext.DG_QUEUE]
+      ?: throw AriaException("queue not found: ${DuaContext.DG_QUEUE}")) as ITaskQueue<ITask>
   }
 
   /**
    * get uploadQueue service, if already [registerService] custom queue, return custom queue
    */
-  fun getUploadQueue(): ITaskQueue<UploadTask> {
+  fun getUploadQueue(): ITaskQueue<ITask> {
     return (serviceCache[DuaContext.U_QUEUE]
-      ?: throw AriaException("queue not found: ${DuaContext.U_QUEUE}")) as ITaskQueue<UploadTask>
+      ?: throw AriaException("queue not found: ${DuaContext.U_QUEUE}")) as ITaskQueue<ITask>
   }
 
   /**
-   * get uploadQueue service, if already [registerService] custom queue, return custom queue
+   * get [ISchedulers] service
+   */
+  fun getSchedulerImp(): ISchedulers {
+    return serviceCache[DuaContext.SCHEDULER] as ISchedulers?
+      ?: throw AriaException("queue not found: ${DuaContext.SCHEDULER}")
+  }
+
+  /**
+   * key [DuaContext.SCHEDULER]
+   * get scheduler service, if already [registerService] custom [ISchedulers], return custom [ISchedulers] Handler
    */
   fun getSchedulerHandler(): Handler {
     if (schedulerHandler != null) {

@@ -30,10 +30,11 @@ import kotlinx.coroutines.MainScope
 object DuaContext {
   const val DB_SERVICE = "DB_SERVICE"
   const val D_QUEUE = "D_QUEUE"
+  const val DG_QUEUE = "DG_QUEUE"
   const val U_QUEUE = "U_QUEUE"
   const val SCHEDULER = "SCHEDULER"
 
-  private val serviceArray = arrayOf(DB_SERVICE, D_QUEUE, U_QUEUE, SCHEDULER)
+  private val serviceArray = arrayOf(DB_SERVICE, D_QUEUE, DG_QUEUE, U_QUEUE, SCHEDULER)
   val duaScope = MainScope()
 
   lateinit var context: Context
@@ -43,6 +44,8 @@ object DuaContext {
   fun getServiceManager() = ServiceManager
 
   fun getLifeManager() = LifecycleManager
+
+  fun getCommonConfig() = AriaConfig.getInstance().cConfig
 
   fun getDConfig() = AriaConfig.getInstance().dConfig
 

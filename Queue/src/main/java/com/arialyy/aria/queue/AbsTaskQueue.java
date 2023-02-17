@@ -37,6 +37,10 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
     maxSize = getMaxTaskSize();
   }
 
+  @Override public boolean isFull() {
+    return getExePool().size() < maxSize;
+  }
+
   protected IPool<TASK> getCachePool() {
     return DEF_CACHE_POOL;
   }

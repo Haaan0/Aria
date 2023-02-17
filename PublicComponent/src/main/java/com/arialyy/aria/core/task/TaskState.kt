@@ -17,6 +17,7 @@ package com.arialyy.aria.core.task
 
 import com.arialyy.aria.core.config.Configuration
 import com.arialyy.aria.core.inf.IEntity
+import com.arialyy.aria.orm.entity.BlockRecord
 import com.arialyy.aria.util.CommonUtil
 
 /**
@@ -72,7 +73,7 @@ class TaskState {
    */
   var timeLeft: Int = Int.Companion.MAX_VALUE
 
-  val blockSize = BlockState.BLOCK_SIZE
+  val blockSize = BlockRecord.BLOCK_SIZE
 
   fun getPercent() = ((curProgress * 100) / fileSize).toInt()
 

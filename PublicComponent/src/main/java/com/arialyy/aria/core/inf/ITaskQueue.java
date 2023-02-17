@@ -82,6 +82,13 @@ public interface ITaskQueue<TASK extends ITask> extends IService {
   void setQueueSize(int size);
 
   /**
+   * queue is full
+   *
+   * @return true full
+   */
+  boolean isFull();
+
+  /**
    * get task by id
    */
   TASK getTask(int taskId);

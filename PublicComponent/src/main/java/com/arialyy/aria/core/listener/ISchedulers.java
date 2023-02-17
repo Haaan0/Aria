@@ -17,6 +17,7 @@
 package com.arialyy.aria.core.listener;
 
 import android.os.Handler;
+import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.service.IService;
@@ -183,4 +184,11 @@ public interface ISchedulers extends Handler.Callback, IService {
    * M3U8切片下载失败
    */
   int M3U8_PEER_FAIL = 0xb3;
+
+  void register(Object obj, TaskEnum taskEnum);
+
+  /**
+   * unRegister object
+   */
+  void unRegister(Object obj);
 }

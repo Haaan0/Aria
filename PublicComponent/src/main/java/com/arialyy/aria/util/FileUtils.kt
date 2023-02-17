@@ -20,7 +20,9 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.orm.entity.BlockRecord
 import timber.log.Timber
+import java.io.File
 import java.io.InputStream
 import java.util.Locale
 
@@ -31,6 +33,22 @@ object FileUtils {
       "(https?)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]",
       RegexOption.IGNORE_CASE
     )
+
+  fun mergeBlock(blockRecordList: List<BlockRecord>, targetPath: Uri): Boolean {
+    if (blockRecordList.isEmpty()) {
+      Timber.e("block record list empty")
+      return false
+    }
+    if (!uriEffective(targetPath)) {
+      Timber.e("invalid uri: $targetPath")
+      return false
+    }
+    val fileList = arrayListOf<File>()
+    blockRecordList.forEach {
+      fileList.add(File(it.blockPath))
+    }
+    return FileUtil.mergeFile()
+  }
 
   /**
    * check if url is correct

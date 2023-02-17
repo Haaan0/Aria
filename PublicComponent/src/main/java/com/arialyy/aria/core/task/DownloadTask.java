@@ -29,7 +29,6 @@ public class DownloadTask extends AbsTask {
 
   public DownloadTask(DTaskOption taskOption, ITaskUtil util) {
     super(taskOption, util);
-    taskOption.taskListener.setParams(this);
   }
 
   public Uri getSavePath() {

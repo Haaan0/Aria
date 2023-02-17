@@ -20,7 +20,9 @@ import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.task.AbsTaskUtil
 import com.arialyy.aria.core.task.BlockManager
+import com.arialyy.aria.core.task.DownloadTask
 import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.core.task.ThreadTaskManager2
 import com.arialyy.aria.exception.AriaException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,6 +35,12 @@ import kotlinx.coroutines.launch
 internal class HttpDTaskUtil : AbsTaskUtil() {
 
   private var blockManager: BlockManager? = null
+
+  init {
+    getTask().getTaskOption(HttpDTaskOption::class.java).eventListener =
+      HttpDEventListener(getTask() as DownloadTask)
+  }
+
   override fun getBlockManager(): IBlockManager {
     if (blockManager == null) {
       blockManager = BlockManager(getTask())
@@ -45,11 +53,15 @@ internal class HttpDTaskUtil : AbsTaskUtil() {
   }
 
   override fun cancel() {
-    TODO("Not yet implemented")
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      ThreadTaskManager2.stopThreadTask(getTask().taskId, true)
+    }
   }
 
   override fun stop() {
-    blockManager?.stop()
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      ThreadTaskManager2.stopThreadTask(getTask().taskId)
+    }
   }
 
   override fun start() {
@@ -67,7 +79,7 @@ internal class HttpDTaskUtil : AbsTaskUtil() {
       addCoreInterceptor(HttpBlockThreadInterceptor())
       val resp = interceptor()
       if (resp == null || resp.code != TaskResp.CODE_SUCCESS) {
-        getTask().getTaskOption(HttpDTaskOption::class.java).taskListener.onFail(
+        getTask().getTaskOption(HttpDTaskOption::class.java).eventListener.onFail(
           false,
           AriaException("start task fail, task interrupt, code: ${resp?.code ?: TaskResp.CODE_INTERRUPT}")
         )

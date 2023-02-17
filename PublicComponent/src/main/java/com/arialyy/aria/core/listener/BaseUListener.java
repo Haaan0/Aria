@@ -23,7 +23,7 @@ import com.arialyy.aria.util.DeleteURecord;
 /**
  * 下载监听类
  */
-public class BaseUListener extends BaseListener implements IUploadListener {
+public class BaseUListener extends AbsEventListener implements IUploadListener {
 
   @Override protected void handleCancel() {
     int sType = getTask(UploadTask.class).getSchedulerType();

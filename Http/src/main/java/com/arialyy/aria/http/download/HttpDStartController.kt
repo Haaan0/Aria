@@ -123,8 +123,8 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
    */
   private suspend fun findDEntityBySavePath(option: HttpDTaskOption): DEntity {
     val savePath = option.savePathUri
-    val dao = DuaContext.getServiceManager().getDbService().getDuaDb()?.getDEntityDao()
-    val de = dao?.getDEntityBySavePath(savePath.toString())
+    val dao = DuaContext.getServiceManager().getDbService().getDuaDb().getDEntityDao()
+    val de = dao.getDEntityBySavePath(savePath.toString())
     if (de != null) {
       return de
     }
@@ -132,7 +132,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
       sourceUrl = option.sourUrl!!,
       savePath = savePath!!,
     )
-    dao?.insert(newDe)
+    dao.insert(newDe)
     return newDe
   }
 

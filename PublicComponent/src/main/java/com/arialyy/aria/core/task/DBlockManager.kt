@@ -30,7 +30,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
@@ -55,19 +54,21 @@ class BlockManager(task: ITask) : IBlockManager {
   private lateinit var handler: Handler
   private var blockNum: Int = 1
   private var eventListener: IEventListener =
-    task.getTaskOption(ITaskOption::class.java).taskListener
+    task.getTaskOption(ITaskOption::class.java).eventListener
 
   private val callback = Callback { msg ->
     when (msg.what) {
       IBlockManager.STATE_STOP -> {
         stoppedNum.getAndIncrement()
         if (isStopped) {
+          eventListener.onStop(currentProgress)
           quitLooper()
         }
       }
       IBlockManager.STATE_CANCEL -> {
         canceledNum.getAndIncrement()
         if (isCanceled) {
+          eventListener.onCancel()
           quitLooper()
         }
       }

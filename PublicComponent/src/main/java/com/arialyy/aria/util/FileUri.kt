@@ -114,14 +114,14 @@ object FileUri {
     return uri?.use {
       Timber.i(
         "FileUri getPathByUri -> " +
-          "Uri: " + uri +
-          ", Authority: " + uri.authority +
-          ", Fragment: " + uri.fragment +
-          ", Port: " + uri.port +
-          ", Query: " + uri.query +
-          ", Scheme: " + uri.scheme +
-          ", Host: " + uri.host +
-          ", Segments: " + uri.pathSegments.toString()
+            "Uri: " + uri +
+            ", Authority: " + uri.authority +
+            ", Fragment: " + uri.fragment +
+            ", Port: " + uri.port +
+            ", Query: " + uri.query +
+            ", Scheme: " + uri.scheme +
+            ", Host: " + uri.host +
+            ", Segments: " + uri.pathSegments.toString()
       )
 
       // 以 file:// 开头的使用第三方应用打开 (open with third-party applications starting with file://)
@@ -384,4 +384,5 @@ object FileUri {
   private fun isHuaWeiUri(uri: Uri?): Boolean {
     return "com.huawei.hidisk.fileprovider".equals(uri?.authority, true)
   }
+
 }

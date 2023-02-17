@@ -20,37 +20,41 @@ import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.DuaContext;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.ITask;
-import com.arialyy.aria.core.task.TaskState;
-import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.core.task.TaskCachePool;
+import com.arialyy.aria.core.task.TaskState;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.ErrorHelp;
 import java.lang.ref.WeakReference;
 import timber.log.Timber;
 
-public abstract class BaseListener implements IEventListener {
+public abstract class AbsEventListener implements IEventListener {
   static final int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
   protected Handler outHandler;
   private long mLastLen;   //上一次发送长度
   private boolean isFirst = true;
-  private ITask mTask;
+  private final ITask mTask;
   long mLastSaveTime;
-  private long mUpdateInterval;
+  private final long mUpdateInterval;
 
-  @Override public IEventListener setParams(ITask task) {
+  /**
+   * 处理任务取消
+   */
+  protected abstract void handleCancel();
+
+  protected abstract void handleComplete();
+
+  protected AbsEventListener(ITask task) {
     this.outHandler = DuaContext.INSTANCE.getServiceManager().getSchedulerHandler();
     mTask = new WeakReference<>(task).get();
     mUpdateInterval = AriaConfig.getInstance().getCConfig().getUpdateInterval();
     mLastLen = task.getTaskState().getCurProgress();
     mLastSaveTime = System.currentTimeMillis();
-    return this;
   }
 
-  protected <TASK extends AbsTask> TASK getTask(Class<TASK> clazz) {
-    return (TASK) mTask;
+  protected ITask getTask() {
+    return mTask;
   }
 
   @Override public void onPre() {
@@ -93,7 +97,7 @@ public abstract class BaseListener implements IEventListener {
   }
 
   @Override public void onComplete() {
-    saveData(IEntity.STATE_COMPLETE, mEntity.getFileSize());
+    saveData(IEntity.STATE_COMPLETE, mTask.getTaskState().getFileSize());
     handleSpeed(0);
     sendInState2Target(ISchedulers.COMPLETE);
   }
@@ -128,29 +132,7 @@ public abstract class BaseListener implements IEventListener {
       speed = speed * 1000 / mUpdateInterval;
     }
     mTask.getTaskState().setSpeed(speed);
-
-    int taskType = mTaskWrapper.getRequestType();
-    if (taskType != ITaskWrapper.M3U8_VOD && taskType != ITaskWrapper.M3U8_LIVE) {
-      mEntity.setPercent((int) (mEntity.getFileSize() <= 0 ? 0
-          : mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
-    }
   }
-
-  /**
-   * 处理任务完成后的情况
-   */
-  private void handleComplete() {
-    mEntity.setComplete(true);
-    mEntity.setCompleteTime(System.currentTimeMillis());
-    mEntity.setCurrentProgress(mEntity.getFileSize());
-    mEntity.setPercent(100);
-    handleSpeed(0);
-  }
-
-  /**
-   * 处理任务取消
-   */
-  protected abstract void handleCancel();
 
   /**
    * 将任务状态发送给下载器

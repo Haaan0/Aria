@@ -19,7 +19,7 @@ import android.os.Bundle;
 import android.os.Message;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.core.listener.BaseListener;
+import com.arialyy.aria.core.listener.AbsEventListener;
 import com.arialyy.aria.core.listener.IDLoadListener;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.task.DownloadTask;
@@ -29,7 +29,7 @@ import com.arialyy.aria.util.DeleteM3u8Record;
 /**
  * 下载监听类
  */
-public final class M3U8Listener extends BaseListener implements IDLoadListener {
+public final class M3U8Listener extends AbsEventListener implements IDLoadListener {
 
   @Override
   public void onPostPre(long fileSize) {

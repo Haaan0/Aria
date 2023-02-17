@@ -34,7 +34,7 @@ import static com.arialyy.aria.core.task.AbsTask.ERROR_INFO_KEY;
 /**
  * Created by Aria.Lao on 2017/7/20. 任务组下载事件
  */
-public class DownloadGroupListener extends BaseListener implements IDGroupListener {
+public class DownloadGroupListener extends AbsEventListener implements IDGroupListener {
   private GroupSendParams<DownloadGroupTask, DownloadEntity> mSeedEntity;
 
   @Override public IEventListener setParams(AbsTask task, Handler outHandler) {

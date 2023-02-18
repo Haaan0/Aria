@@ -43,11 +43,9 @@ public abstract class AbsEventListener implements IEventListener {
    */
   protected abstract void handleCancel();
 
-  protected abstract void handleComplete();
-
   protected AbsEventListener(ITask task) {
     this.outHandler = DuaContext.INSTANCE.getServiceManager().getSchedulerHandler();
-    mTask = new WeakReference<>(task).get();
+    mTask = task;
     mUpdateInterval = AriaConfig.getInstance().getCConfig().getUpdateInterval();
     mLastLen = task.getTaskState().getCurProgress();
     mLastSaveTime = System.currentTimeMillis();
@@ -96,12 +94,6 @@ public abstract class AbsEventListener implements IEventListener {
     sendInState2Target(ISchedulers.STOP);
   }
 
-  @Override public void onComplete() {
-    saveData(IEntity.STATE_COMPLETE, mTask.getTaskState().getFileSize());
-    handleSpeed(0);
-    sendInState2Target(ISchedulers.COMPLETE);
-  }
-
   @Override public void onCancel() {
     saveData(IEntity.STATE_CANCEL, -1);
     handleSpeed(0);
@@ -127,7 +119,7 @@ public abstract class AbsEventListener implements IEventListener {
     }
   }
 
-  private void handleSpeed(long speed) {
+  protected void handleSpeed(long speed) {
     if (mUpdateInterval != 1000) {
       speed = speed * 1000 / mUpdateInterval;
     }
@@ -153,9 +145,6 @@ public abstract class AbsEventListener implements IEventListener {
       return;
     }
 
-    if (state == IEntity.STATE_COMPLETE) {
-      handleComplete();
-    }
     TaskCachePool.INSTANCE.updateState(mTask.getTaskId(), state, location);
   }
 }

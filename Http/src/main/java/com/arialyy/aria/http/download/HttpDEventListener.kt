@@ -15,19 +15,54 @@
  */
 package com.arialyy.aria.http.download
 
+import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.listener.AbsEventListener
+import com.arialyy.aria.core.listener.ISchedulers
 import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.TaskCachePool
+import com.arialyy.aria.exception.AriaException
+import com.arialyy.aria.orm.entity.DEntity
+import com.arialyy.aria.util.BlockUtil
+import com.arialyy.aria.util.FileUri
 import com.arialyy.aria.util.FileUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.io.File
 
 class HttpDEventListener(task: DownloadTask) : AbsEventListener(task) {
 
+  /**
+   * merge block file, if merge fail call [onFail]
+   */
+  override fun onComplete() {
+    val b = BlockUtil.mergeFile(task.taskState.taskRecord)
+
+    if (!b) {
+      Timber.e("merge block fail")
+      onFail(false, AriaException("merge block fail"))
+      return
+    }
+    handleSpeed(0)
+    sendInState2Target(ISchedulers.COMPLETE)
+  }
+
+  /**
+   * 1.remove all block
+   * 2.remove record
+   */
   override fun handleCancel() {
+    val file = FileUri.getPathByUri(task.taskState.taskRecord.filePath)?.let { File(it) }
+    file?.parentFile?.let {
+      FileUtils.deleteDir(it)
+    }
 
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      val entity = TaskCachePool.getEntity(taskId = task.taskId)
+      val db = DuaContext.getServiceManager().getDbService().getDuaDb()
+      db.getRecordDao().deleteTaskRecord(task.taskState.taskRecord)
+      db.getDEntityDao().delete(entity as DEntity)
+    }
   }
-
-  override fun handleComplete() {
-
-  }
-
 
 }

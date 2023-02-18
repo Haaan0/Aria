@@ -17,7 +17,7 @@ package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
-import com.arialyy.aria.core.task.BlockUtil
+import com.arialyy.aria.util.BlockUtil
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
@@ -65,6 +65,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
       return chain.proceed(chain.getTask())
     }
     val blockNum = checkRecord()
+    task.taskState.taskRecord = taskRecord
     chain.blockManager.setBlockNum(blockNum)
     val result = checkBlock()
     if (result != TaskResp.CODE_SUCCESS) {

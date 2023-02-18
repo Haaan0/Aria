@@ -18,6 +18,7 @@ package com.arialyy.aria.core.task
 import com.arialyy.aria.core.config.Configuration
 import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.orm.entity.BlockRecord
+import com.arialyy.aria.orm.entity.TaskRecord
 import com.arialyy.aria.util.CommonUtil
 
 /**
@@ -26,6 +27,8 @@ import com.arialyy.aria.util.CommonUtil
  * @Date 10:04 PM 2023/1/24
  **/
 class TaskState {
+
+  lateinit var taskRecord: TaskRecord
 
   /**
    * need to try again?，default: false
@@ -43,7 +46,6 @@ class TaskState {
    * current task progress, unit: byte
    */
   var curProgress: Long = 0
-
 
   /**
    * Bytes transferred in 1 second, if file size 0, return 0

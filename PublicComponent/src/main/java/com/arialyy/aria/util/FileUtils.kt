@@ -20,9 +20,9 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.arialyy.aria.core.DuaContext
-import com.arialyy.aria.orm.entity.BlockRecord
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.util.Locale
 
@@ -34,20 +34,99 @@ object FileUtils {
       RegexOption.IGNORE_CASE
     )
 
-  fun mergeBlock(blockRecordList: List<BlockRecord>, targetPath: Uri): Boolean {
-    if (blockRecordList.isEmpty()) {
-      Timber.e("block record list empty")
+  /**
+   * 创建文件 当文件不存在的时候就创建一个文件。 如果文件存在，先删除原文件，然后重新创建一个新文件
+   *
+   * @return `true` 创建成功、`false` 创建失败
+   */
+  fun createFile(path: String): Boolean {
+    return createFile(File(path))
+  }
+
+  /**
+   * 创建文件 当文件不存在的时候就创建一个文件。 如果文件存在，先删除原文件，然后重新创建一个新文件
+   *
+   * @return `true` 创建成功、`false` 创建失败
+   */
+  fun createFile(file: File): Boolean {
+    if (file.parentFile == null || file.parentFile?.exists() == false) {
+      Timber.d("目标文件所在路径不存在，准备创建……")
+      if (!createDir(file.parent!!)) {
+        Timber.d("创建目录文件所在的目录失败！文件路径【" + file.path + "】")
+      }
+    }
+    // 文件存在，删除文件
+    deleteFile(file)
+    try {
+      if (file.createNewFile()) {
+        //ALog.d(TAG, "创建文件成功:" + file.getAbsolutePath());
+        return true
+      }
+    } catch (e: IOException) {
+      e.printStackTrace()
       return false
     }
-    if (!uriEffective(targetPath)) {
-      Timber.e("invalid uri: $targetPath")
+    return false
+  }
+
+  /**
+   * 创建目录 当目录不存在的时候创建文件，否则返回false
+   */
+  fun createDir(path: String): Boolean {
+    val file = File(path)
+    if (!file.exists()) {
+      if (!file.mkdirs()) {
+        Timber.d("创建失败，请检查路径和是否配置文件权限！")
+        return false
+      }
+      return true
+    }
+    return false
+  }
+
+  /**
+   * 删除文件夹
+   */
+  fun deleteDir(dirFile: File): Boolean {
+    // 如果dir对应的文件不存在，则退出
+    if (!dirFile.exists()) {
       return false
     }
-    val fileList = arrayListOf<File>()
-    blockRecordList.forEach {
-      fileList.add(File(it.blockPath))
+    if (dirFile.isFile) {
+      return dirFile.delete()
     }
-    return FileUtil.mergeFile()
+    dirFile.listFiles()?.forEach {
+      deleteDir(it)
+    }
+    return dirFile.delete()
+  }
+
+  /**
+   * 删除文件
+   *
+   * @param path 文件路径
+   * @return `true`删除成功、`false`删除失败
+   */
+  fun deleteFile(path: String): Boolean {
+    return deleteFile(File(path))
+  }
+
+  /**
+   * 删除文件
+   *
+   * @param file 文件路径
+   * @return `true`删除成功、`false`删除失败
+   */
+  fun deleteFile(file: File): Boolean {
+    if (file.exists()) {
+      val to = File(file.absolutePath + System.currentTimeMillis())
+      return if (file.renameTo(to)) {
+        to.delete()
+      } else {
+        file.delete()
+      }
+    }
+    return false
   }
 
   /**

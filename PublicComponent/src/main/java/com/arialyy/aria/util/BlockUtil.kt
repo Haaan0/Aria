@@ -1,13 +1,12 @@
-package com.arialyy.aria.core.task
+package com.arialyy.aria.util
 
 import android.net.Uri
 import com.arialyy.aria.orm.entity.BlockRecord
 import com.arialyy.aria.orm.entity.TaskRecord
-import com.arialyy.aria.util.FileUri
-import com.arialyy.aria.util.FileUtil
-import com.arialyy.aria.util.FileUtils
 import timber.log.Timber
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 /*
  * Copyright (C) 2016 AriaLyy(https://github.com/AriaLyy/Aria)
@@ -78,8 +77,23 @@ object BlockUtil {
    * merge block file,if success,return true else return false
    */
   fun mergeFile(record: TaskRecord): Boolean {
-    val targetF = File(record.filePath)
-    val dir = targetF.parentFile ?: return false
+    val blockRecordList = record.blockList
+    val targetPath = FileUri.getPathByUri(record.filePath)
+    if (blockRecordList.isEmpty()) {
+      Timber.e("block record list empty")
+      return false
+    }
+    if (targetPath.isNullOrEmpty()) {
+      Timber.e("invalid uri: $targetPath")
+      return false
+    }
+    val fileList = arrayListOf<File>()
+    blockRecordList.forEach {
+      fileList.add(File(it.blockPath))
+    }
+
+    val targetF = File(targetPath)
+    val dir = targetF.parentFile
     val fileName = targetF.name
     if (record.blockNum == 1) {
       // if this task not support blocks or fileSize < 5m, just need rename
@@ -98,6 +112,43 @@ object BlockUtil {
       }
       blockList.add(subF)
     }
-    return FileUtil.mergeFile(record.filePath, blockList)
+    return mergeFile(targetF, blockList)
+  }
+
+  /**
+   * 合并文件
+   *
+   * @param targetFile 目标文件
+   * @param blockList 分块列表
+   * @return `true` 合并成功，`false`合并失败
+   */
+  fun mergeFile(targetFile: File, blockList: List<File>): Boolean {
+    Timber.d("开始合并文件")
+    if (targetFile.exists() && targetFile.isDirectory) {
+      Timber.w("路径【%s】是文件夹，将删除该文件夹", targetFile.path)
+      FileUtils.deleteDir(targetFile)
+    }
+    if (!targetFile.exists()) {
+      FileUtils.createFile(targetFile)
+    }
+
+    val startTime = System.currentTimeMillis()
+    var fileLen: Long = 0
+    FileOutputStream(targetFile).use { fos ->
+      fos.channel.use { foc ->
+        for (block in blockList) {
+          if (!block.exists()) {
+            Timber.d("合并文件失败，文件【${block.path}】不存在")
+            return false
+          }
+          FileInputStream(block).channel.use { fic ->
+            foc.transferFrom(fic, fileLen, block.length())
+            fileLen += block.length()
+          }
+        }
+      }
+    }
+    Timber.d("merge file time：${System.currentTimeMillis() - startTime}ms, fileSize = $fileLen")
+    return false
   }
 }

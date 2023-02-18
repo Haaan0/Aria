@@ -54,12 +54,10 @@ data class DEntity(
 
 ) : BaseEntity() {
   override fun update() {
-    fun update() {
-      updateTime = System.currentTimeMillis()
-      DuaContext.duaScope.launch(Dispatchers.IO) {
-        DuaContext.getServiceManager().getDbService().getDuaDb()?.getDEntityDao()
-          ?.update(this@DEntity)
-      }
+    updateTime = System.currentTimeMillis()
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      DuaContext.getServiceManager().getDbService().getDuaDb().getDEntityDao()
+        .update(this@DEntity)
     }
   }
 }

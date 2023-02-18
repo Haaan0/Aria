@@ -111,59 +111,9 @@ public class FileUtil {
     return String.format("%s/.%s_%s", file.getParent(), file.getName(), bandWidth);
   }
 
-  /**
-   * 创建目录 当目录不存在的时候创建文件，否则返回false
-   */
-  public static boolean createDir(String path) {
-    File file = new File(path);
-    if (!file.exists()) {
-      if (!file.mkdirs()) {
-        ALog.d(TAG, "创建失败，请检查路径和是否配置文件权限！");
-        return false;
-      }
-      return true;
-    }
-    return false;
-  }
 
-  /**
-   * 创建文件 当文件不存在的时候就创建一个文件。 如果文件存在，先删除原文件，然后重新创建一个新文件
-   *
-   * @return {@code true} 创建成功、{@code false} 创建失败
-   */
-  public static boolean createFile(String path) {
-    if (TextUtils.isEmpty(path)) {
-      ALog.e(TAG, "文件路径不能为null");
-      return false;
-    }
-    return createFile(new File(path));
-  }
 
-  /**
-   * 创建文件 当文件不存在的时候就创建一个文件。 如果文件存在，先删除原文件，然后重新创建一个新文件
-   *
-   * @return {@code true} 创建成功、{@code false} 创建失败
-   */
-  public static boolean createFile(File file) {
-    if (file.getParentFile() == null || !file.getParentFile().exists()) {
-      ALog.d(TAG, "目标文件所在路径不存在，准备创建……");
-      if (!createDir(file.getParent())) {
-        ALog.d(TAG, "创建目录文件所在的目录失败！文件路径【" + file.getPath() + "】");
-      }
-    }
-    // 文件存在，删除文件
-    deleteFile(file);
-    try {
-      if (file.createNewFile()) {
-        //ALog.d(TAG, "创建文件成功:" + file.getAbsolutePath());
-        return true;
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-      return false;
-    }
-    return false;
-  }
+
 
   /**
    * 创建文件名，如果url链接有后缀名，则使用url中的后缀名
@@ -189,59 +139,6 @@ public class FileUtil {
       fileName = CommonUtil.keyToHashKey(url);
     }
     return fileName;
-  }
-
-  /**
-   * 删除文件
-   *
-   * @param path 文件路径
-   * @return {@code true}删除成功、{@code false}删除失败
-   */
-  public static boolean deleteFile(String path) {
-    if (TextUtils.isEmpty(path)) {
-      ALog.e(TAG, "删除文件失败，路径为空");
-      return false;
-    }
-    return deleteFile(new File(path));
-  }
-
-  /**
-   * 删除文件
-   *
-   * @param file 文件路径
-   * @return {@code true}删除成功、{@code false}删除失败
-   */
-  public static boolean deleteFile(File file) {
-    if (file.exists()) {
-      final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
-      if (file.renameTo(to)) {
-        return to.delete();
-      } else {
-        return file.delete();
-      }
-    }
-    return false;
-  }
-
-  /**
-   * 删除文件夹
-   */
-  public static boolean deleteDir(File dirFile) {
-    // 如果dir对应的文件不存在，则退出
-    if (!dirFile.exists()) {
-      return false;
-    }
-
-    if (dirFile.isFile()) {
-      return dirFile.delete();
-    } else {
-
-      for (File file : dirFile.listFiles()) {
-        deleteDir(file);
-      }
-    }
-
-    return dirFile.delete();
   }
 
   /**
@@ -317,66 +214,7 @@ public class FileUtil {
     return null;
   }
 
-  /**
-   * 合并文件
-   *
-   * @param targetPath 目标文件
-   * @param blockList 分块列表
-   * @return {@code true} 合并成功，{@code false}合并失败
-   */
-  public static boolean mergeFile(String targetPath, List<File> blockList) {
-    Timber.d("开始合并文件");
-    File file = new File(targetPath);
-    FileOutputStream fos = null;
-    FileChannel foc = null;
-    long startTime = System.currentTimeMillis();
-    try {
-      if (file.exists() && file.isDirectory()) {
-        ALog.w(TAG, String.format("路径【%s】是文件夹，将删除该文件夹", targetPath));
-        FileUtil.deleteDir(file);
-      }
-      if (!file.exists()) {
-        FileUtil.createFile(file);
-      }
 
-      fos = new FileOutputStream(targetPath);
-      foc = fos.getChannel();
-      List<FileInputStream> streams = new LinkedList<>();
-      long fileLen = 0;
-      for (File block : blockList) {
-        if (!block.exists()) {
-          ALog.d(TAG, String.format("合并文件失败，文件【%s】不存在", block.getPath()));
-          for (FileInputStream fis : streams) {
-            fis.close();
-          }
-          streams.clear();
-
-          return false;
-        }
-        FileInputStream fis = new FileInputStream(block);
-        FileChannel fic = fis.getChannel();
-        foc.transferFrom(fic, fileLen, block.length());
-        fileLen += block.length();
-        fis.close();
-      }
-      ALog.d(TAG, String.format("合并文件耗时：%sms", (System.currentTimeMillis() - startTime)));
-      return true;
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        if (foc != null) {
-          foc.close();
-        }
-        if (fos != null) {
-          fos.close();
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    return false;
-  }
 
   /**
    * 合并sftp的分块文件，sftp的分块可能会超出规定的长度，因此需要使用本方法

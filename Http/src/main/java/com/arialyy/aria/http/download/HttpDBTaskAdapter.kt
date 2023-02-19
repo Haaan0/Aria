@@ -18,6 +18,7 @@ package com.arialyy.aria.http.download
 import com.arialyy.aria.core.task.AbsThreadTaskAdapter
 import com.arialyy.aria.core.task.ThreadConfig
 import com.arialyy.aria.http.ConnectionHelp
+import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.http.request.IRequest.Companion.getRequest
 import timber.log.Timber
 import java.io.BufferedInputStream
@@ -32,7 +33,7 @@ import java.nio.channels.Channels
  * @Description
  * @Date 23:07 PM 2023/2/8
  **/
-class HttpDTTaskAdapter(threadConfig: ThreadConfig) : AbsThreadTaskAdapter(threadConfig) {
+class HttpDBTaskAdapter(threadConfig: ThreadConfig) : AbsThreadTaskAdapter(threadConfig) {
 
   private fun getTaskOption(): HttpDTaskOption {
     return threadConfig.option as HttpDTaskOption
@@ -54,7 +55,7 @@ class HttpDTTaskAdapter(threadConfig: ThreadConfig) : AbsThreadTaskAdapter(threa
     }
 
     conn.connect()
-    BufferedInputStream(ConnectionHelp.convertInputStream(conn)).use {
+    BufferedInputStream(HttpUtil.convertInputStream(conn)).use {
       readBytes(it)
     }
   }

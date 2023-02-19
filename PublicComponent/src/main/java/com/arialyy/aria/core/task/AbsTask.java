@@ -218,7 +218,7 @@ public abstract class AbsTask implements ITask {
    * @return {@code true}任务已经取消
    */
   @Override
-  public boolean isCancel() {
+  public boolean isCanceled() {
     return isCancel;
   }
 
@@ -228,7 +228,7 @@ public abstract class AbsTask implements ITask {
    * @return {@code true}任务已经停止
    */
   @Override
-  public boolean isStop() {
+  public boolean isStopped() {
     return isStop;
   }
 

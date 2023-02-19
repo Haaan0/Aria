@@ -23,17 +23,15 @@ import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.DuaContext;
-import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.group.GroupSendParams;
-import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.ITaskQueue;
-import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.core.task.ITask;
+import com.arialyy.aria.core.task.TaskCachePool;
 import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -164,13 +162,9 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
   private ISchedulerListener createListener(String proxyClassName) {
     ISchedulerListener listener = null;
     try {
-      Class clazz = Class.forName(proxyClassName);
+      Class<?> clazz = Class.forName(proxyClassName);
       listener = (ISchedulerListener) clazz.newInstance();
-    } catch (ClassNotFoundException e) {
-      ALog.e(TAG, e.getMessage());
-    } catch (InstantiationException e) {
-      ALog.e(TAG, e.getMessage());
-    } catch (IllegalAccessException e) {
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
       ALog.e(TAG, e.getMessage());
     }
     return listener;
@@ -312,7 +306,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         if (!queue.isFull()) {
           Timber.d("stop task success, if there is a task, start the next task, taskId: %s",
               task.getTaskId());
-          startNextTask(queue, task.getSchedulerType());
+          queue.startNextTask();
         } else {
           Timber.d("stop task success, taskId: %s", task.getTaskId());
         }
@@ -323,7 +317,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         if (!queue.isFull()) {
           Timber.d("remove task success, if there is a task, start the next task, taskId: %s",
               task.getTaskId());
-          startNextTask(queue, task.getSchedulerType());
+          queue.startNextTask();
         } else {
           Timber.d("remove task success, taskId: %s", task.getTaskId());
         }
@@ -331,7 +325,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
       case COMPLETE:
         queue.removeTask(task);
         Timber.d("task complete, taskId: %s", task.getTaskId());
-        startNextTask(queue, task.getSchedulerType());
+        queue.startNextTask();
         break;
       case FAIL:
         handleFailTask(queue, task);
@@ -350,8 +344,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    * @param taskType 任务类型
    */
   private void handlePreFailTask(int taskType) {
-    startNextTask(getQueue(taskType), TaskSchedulerType.TYPE_DEFAULT);
-
+    getQueue(taskType).startNextTask();
     // 发送广播
     boolean canSend = mAriaConfig.getAConfig().isUseBroadcast();
     if (canSend) {
@@ -478,11 +471,9 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
     }
     int type = task.getTaskType();
     if (type == ITask.DOWNLOAD || type == ITask.DOWNLOAD_GROUP) {
-      mAriaConfig.getAPP().sendBroadcast(
-          createData(state, type, task.getTaskWrapper().getEntity()));
+      mAriaConfig.getAPP().sendBroadcast(createData(task));
     } else if (type == ITask.UPLOAD) {
-      mAriaConfig.getAPP().sendBroadcast(
-          createData(state, type, task.getTaskWrapper().getEntity()));
+      mAriaConfig.getAPP().sendBroadcast(createData(task));
     } else {
       ALog.w(TAG, "发送广播失败，没有对应的任务");
     }
@@ -490,20 +481,16 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
 
   /**
    * 创建广播发送的数据
-   *
-   * @param taskState 任务状态 {@link ISchedulers}
-   * @param taskType 任务类型 {@link ITask}
-   * @param entity 任务实体
    */
-  private Intent createData(int taskState, int taskType, AbsEntity entity) {
+  private Intent createData(ITask task) {
     Intent intent = new Intent(ISchedulers.ARIA_TASK_INFO_ACTION);
     intent.setPackage(mAriaConfig.getAPP().getPackageName());
     Bundle b = new Bundle();
-    b.putInt(ISchedulers.TASK_TYPE, taskType);
-    b.putInt(ISchedulers.TASK_STATE, taskState);
-    b.putLong(ISchedulers.TASK_SPEED, entity.getSpeed());
-    b.putInt(ISchedulers.TASK_PERCENT, entity.getPercent());
-    b.putParcelable(ISchedulers.TASK_ENTITY, entity);
+    b.putInt(ISchedulers.TASK_TYPE, task.getTaskType());
+    b.putInt(ISchedulers.TASK_STATE, task.getTaskState().getState());
+    b.putLong(ISchedulers.TASK_SPEED, task.getTaskState().getSpeed());
+    b.putInt(ISchedulers.TASK_PERCENT, task.getTaskState().getPercent());
+    b.putParcelable(ISchedulers.TASK_ENTITY, TaskCachePool.INSTANCE.getEntity(task.getTaskId()));
     intent.putExtras(b);
     return intent;
   }
@@ -514,9 +501,9 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    * @param task 下载任务
    */
   private void handleFailTask(final ITaskQueue<ITask> queue, final TASK task) {
-    if (!task.getTaskState().getNeedRetry() || task.isStop() || task.isCancel()) {
+    if (!task.getTaskState().getNeedRetry() || task.isStopped() || task.isCanceled()) {
       queue.removeTask(task);
-      startNextTask(queue, task.getSchedulerType());
+      queue.startNextTask();
       normalTaskCallback(FAIL, task);
       return;
     }
@@ -525,31 +512,12 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
 
     if ((!NetUtils.isConnected(mAriaConfig.getAPP()) && !isNotNetRetry)) {
       queue.removeTask(task);
-      startNextTask(queue, task.getSchedulerType());
+      queue.startNextTask();
       normalTaskCallback(FAIL, task);
       return;
     }
 
     mFailureTaskHandler.offer(task);
-  }
-
-  /**
-   * 启动下一个任务，条件：任务停止，取消下载，任务完成
-   */
-  void startNextTask(final ITaskQueue<ITask> queue, int schedulerType) {
-    if (schedulerType == TaskSchedulerType.TYPE_STOP_NOT_NEXT) {
-      return;
-    }
-    TASK newTask = (TASK) queue.getNextTask();
-    if (newTask == null) {
-      if (queue.getCurrentExePoolNum() == 0) {
-        ALog.i(TAG, "没有等待中的任务");
-      }
-      return;
-    }
-    if (newTask.getTaskState().getState() == IEntity.STATE_WAIT) {
-      queue.startTask(newTask);
-    }
   }
 
   @Override public void init(@NonNull Context context) {

@@ -26,7 +26,6 @@ import com.arialyy.aria.core.task.TaskState;
 import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.ErrorHelp;
-import java.lang.ref.WeakReference;
 import timber.log.Timber;
 
 public abstract class AbsEventListener implements IEventListener {
@@ -142,7 +141,11 @@ public abstract class AbsEventListener implements IEventListener {
 
     if (state == IEntity.STATE_CANCEL) {
       handleCancel();
+      TaskCachePool.INSTANCE.removeTask(getTask().getTaskId());
       return;
+    }
+    if (state == IEntity.STATE_COMPLETE || state == IEntity.STATE_STOP) {
+      TaskCachePool.INSTANCE.removeTask(getTask().getTaskId());
     }
 
     TaskCachePool.INSTANCE.updateState(mTask.getTaskId(), state, location);

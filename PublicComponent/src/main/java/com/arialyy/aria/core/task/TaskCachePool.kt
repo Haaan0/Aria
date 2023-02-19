@@ -15,10 +15,12 @@
  */
 package com.arialyy.aria.core.task
 
+import android.net.Uri
 import com.arialyy.aria.core.inf.BaseEntity
 import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.core.inf.ITaskUtil
 import timber.log.Timber
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @Author laoyuyu
@@ -29,25 +31,35 @@ object TaskCachePool {
   /**
    * key: taskId
    */
-  private val entityMap = hashMapOf<Int, BaseEntity>()
-  private val taskUtilMap = hashMapOf<String, ITaskUtil>()
+  private val entityMap = ConcurrentHashMap<Int, BaseEntity>()
+  private val taskUtilMap = ConcurrentHashMap<Uri, ITaskUtil>()
+  private val taskMap = ConcurrentHashMap<Int, ITask>()
 
-  /**
-   * @param taskKey task unique identifier, like: savePath, sourceUrl
-   */
-  fun putTaskUtil(taskKey: String, taskUtil: ITaskUtil) {
-    if (taskKey.isEmpty()) {
-      Timber.e("invalid taskKey: $taskKey")
-      return
-    }
-    taskUtilMap[taskKey] = taskUtil
+  fun removeTask(taskId: Int) {
+    taskMap.remove(taskId)
   }
 
   /**
-   * @param taskKey task unique identifier, like: savePath, sourceUrl
+   * if task is completed, stopped, canceled, return null
    */
-  fun getTaskUtil(taskKey: String): ITaskUtil? {
-    return taskUtilMap[taskKey]
+  fun getTask(taskId: Int) = taskMap[taskId]
+
+  fun putTask(task: ITask) {
+    taskMap[task.taskId] = task
+  }
+
+  /**
+   * @param filePath task unique identifier, like: savePath, sourceUrl
+   */
+  fun putTaskUtil(filePath: Uri, taskUtil: ITaskUtil) {
+    taskUtilMap[filePath] = taskUtil
+  }
+
+  /**
+   * @param  filePath unique identifier, like: savePath, sourceUrl
+   */
+  fun getTaskUtil(filePath: Uri): ITaskUtil? {
+    return taskUtilMap[filePath]
   }
 
   fun putEntity(taskId: Int, entity: BaseEntity) {

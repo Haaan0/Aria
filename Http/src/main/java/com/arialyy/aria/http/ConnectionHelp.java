@@ -78,26 +78,6 @@ public final class ConnectionHelp {
   }
 
   /**
-   * 转换HttpUrlConnect的inputStream流
-   *
-   * @return {@link GZIPInputStream}、{@link InflaterInputStream}
-   * @throws IOException
-   */
-  public static InputStream convertInputStream(HttpURLConnection connection) throws IOException {
-    String encoding = connection.getHeaderField("Content-Encoding");
-    if (TextUtils.isEmpty(encoding)) {
-      return connection.getInputStream();
-    }
-    if (encoding.contains("gzip")) {
-      return new GZIPInputStream(connection.getInputStream());
-    } else if (encoding.contains("deflate")) {
-      return new InflaterInputStream(connection.getInputStream());
-    } else {
-      return connection.getInputStream();
-    }
-  }
-
-  /**
    * 处理链接
    *
    * @throws IOException

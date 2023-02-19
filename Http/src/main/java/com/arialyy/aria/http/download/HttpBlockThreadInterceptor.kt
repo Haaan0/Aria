@@ -48,7 +48,7 @@ class HttpBlockThreadInterceptor : ITaskInterceptor {
       val threadConfig = ThreadConfig(it, option, DuaContext.getDConfig().maxSpeed)
       threadTaskList.add(
         ThreadTask2(
-          adapter = if (option.isChunkTask) HttpDCTTaskAdapter(threadConfig) else HttpDThreadTaskAdapter(
+          adapter = if (option.isChunkTask) HttpDCTTaskAdapter(threadConfig) else HttpDBTaskAdapter(
             threadConfig
           ),
           handler = chain.blockManager.handler,

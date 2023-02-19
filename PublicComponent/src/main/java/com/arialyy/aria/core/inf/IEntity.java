@@ -15,12 +15,13 @@
  */
 package com.arialyy.aria.core.inf;
 
+import android.os.Parcelable;
 import androidx.room.Ignore;
 
 /**
  * Created by lyy on 2017/2/23.
  */
-public interface IEntity {
+public interface IEntity extends Parcelable {
   /**
    * 其它状态
    */

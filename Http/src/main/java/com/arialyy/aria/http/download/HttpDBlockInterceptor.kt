@@ -92,13 +92,13 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
    */
   private suspend fun checkRecord(): Int {
     val recordDao = DuaContext.getServiceManager().getDbService().getDuaDb().getRecordDao()
-    val recordWrapper = recordDao.getTaskRecordByKey(task.taskKey)
+    val recordWrapper = recordDao.getTaskRecordByKey(task.filePath)
 
     if (recordWrapper == null) {
       Timber.i("record not found, create record")
       val blockNumInfo = BlockUtil.getBlockNum(task.taskState.fileSize)
       val taskRecord = TaskRecord(
-        taskKey = task.taskKey,
+        taskKey = task.filePath,
         filePath = option.savePathUri!!,
         taskType = ITask.DOWNLOAD,
         fileLen = task.taskState.fileSize,

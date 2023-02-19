@@ -16,6 +16,8 @@
 package com.arialyy.aria.orm.entity
 
 import android.net.Uri
+import android.os.Parcel
+import android.os.Parcelable.Creator
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -53,11 +55,46 @@ data class DEntity(
   val fileSize: Long = 0
 
 ) : BaseEntity() {
+  constructor(parcel: Parcel) : this(
+    parcel.readInt(),
+    parcel.readInt(),
+    parcel.readString()!!,
+    parcel.readParcelable(Uri::class.java.classLoader)!!,
+    parcel.readString(),
+    parcel.readByte() != 0.toByte(),
+    parcel.readLong()
+  ) {
+  }
+
   override fun update() {
     updateTime = System.currentTimeMillis()
     DuaContext.duaScope.launch(Dispatchers.IO) {
       DuaContext.getServiceManager().getDbService().getDuaDb().getDEntityDao()
         .update(this@DEntity)
+    }
+  }
+
+  override fun writeToParcel(parcel: Parcel, flags: Int) {
+    parcel.writeInt(did)
+    parcel.writeInt(parentId)
+    parcel.writeString(sourceUrl)
+    parcel.writeParcelable(savePath, flags)
+    parcel.writeString(ext)
+    parcel.writeByte(if (isSub) 1 else 0)
+    parcel.writeLong(fileSize)
+  }
+
+  override fun describeContents(): Int {
+    return 0
+  }
+
+  companion object CREATOR : Creator<DEntity> {
+    override fun createFromParcel(parcel: Parcel): DEntity {
+      return DEntity(parcel)
+    }
+
+    override fun newArray(size: Int): Array<DEntity?> {
+      return arrayOfNulls(size)
     }
   }
 }

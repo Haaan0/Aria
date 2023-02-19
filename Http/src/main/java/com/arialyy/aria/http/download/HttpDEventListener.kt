@@ -16,6 +16,7 @@
 package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.core.listener.AbsEventListener
 import com.arialyy.aria.core.listener.ISchedulers
 import com.arialyy.aria.core.task.DownloadTask
@@ -45,6 +46,7 @@ class HttpDEventListener(task: DownloadTask) : AbsEventListener(task) {
     }
     handleSpeed(0)
     sendInState2Target(ISchedulers.COMPLETE)
+    saveData(IEntity.STATE_COMPLETE, task.taskState.fileSize)
   }
 
   /**

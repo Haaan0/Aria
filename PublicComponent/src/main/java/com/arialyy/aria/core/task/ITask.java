@@ -99,14 +99,14 @@ public interface ITask {
    *
    * @return {@code true}任务已经停止
    */
-  boolean isStop();
+  boolean isStopped();
 
   /**
    * 任务是否取消了
    *
    * @return {@code true}任务已经取消
    */
-  boolean isCancel();
+  boolean isCanceled();
 
   /**
    * 任务的调度类型
@@ -116,7 +116,10 @@ public interface ITask {
 
   int getTaskId();
 
-  String getTaskKey();
+  /**
+   * @return task unique identifier, like: savePath
+   */
+  String getFilePath();
 
   <T extends ITaskOption> T getTaskOption(Class<T> clazz);
 }

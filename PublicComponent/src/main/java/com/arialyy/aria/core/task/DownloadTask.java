@@ -46,7 +46,7 @@ public class DownloadTask extends AbsTask {
     return ITask.DOWNLOAD;
   }
 
-  @Override public String getTaskKey() {
+  @Override public String getFilePath() {
     return Objects.requireNonNull(getTaskOption(DTaskOption.class).getSavePathUri()).toString();
   }
 }

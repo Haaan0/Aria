@@ -24,7 +24,7 @@ import com.arialyy.aria.core.processor.IHttpFileLenAdapter
 import com.arialyy.aria.core.task.DownloadTask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
-import com.arialyy.aria.http.HttpBaseController
+import com.arialyy.aria.http.HttpBaseStartController
 import com.arialyy.aria.http.HttpOption
 import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.orm.entity.DEntity
@@ -37,7 +37,7 @@ import java.net.HttpURLConnection
  * @Description
  * @Date 12:38 PM 2023/1/22
  **/
-class HttpDStartController(target: Any, val url: String) : HttpBaseController(target),
+class HttpDStartStartController(target: Any, val url: String) : HttpBaseStartController(target),
   IStartController {
 
   private var httpDTaskOption = HttpDTaskOption()
@@ -50,7 +50,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
    * use multi-threaded download file, if file size <= 5m, this setting is not valid
    * @param threadNum  range [1 - 32]
    */
-  fun setThreadNum(threadNum: Int): HttpDStartController {
+  fun setThreadNum(threadNum: Int): HttpDStartStartController {
     if (threadNum !in 1..32) {
       Timber.e("set thread num fail, only 0 < threadNum < 33, threadNum: $threadNum")
       return this
@@ -62,7 +62,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
   /**
    * set http params, link Header
    */
-  fun setHttpOption(httpOption: HttpOption): HttpDStartController {
+  fun setHttpOption(httpOption: HttpOption): HttpDStartStartController {
     httpDTaskOption.httpOption = httpOption
     return this
   }
@@ -70,7 +70,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
   /**
    * Maybe the server has special rules, you need set [IHttpFileLenAdapter] to get the file length from [HttpURLConnection.getHeaderFields]
    */
-  fun setHttpFileLenAdapter(adapter: IHttpFileLenAdapter): HttpDStartController {
+  fun setHttpFileLenAdapter(adapter: IHttpFileLenAdapter): HttpDStartStartController {
     httpDTaskOption.fileSizeAdapter = adapter
     return this
   }
@@ -79,7 +79,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
    * if you want to do something before the task is executed, you can set up a task interceptor
    * eg: determine the network status before task execution
    */
-  fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpDStartController {
+  fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpDStartStartController {
     httpDTaskOption.taskInterceptor.add(taskInterceptor)
     return this
   }
@@ -87,7 +87,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
   /**
    * set download listener
    */
-  fun setListener(listener: HttpDownloadListener): HttpDStartController {
+  fun setListener(listener: HttpDownloadListener): HttpDStartStartController {
     DuaContext.getLifeManager().addCustomListener(target, listener)
     return this
   }
@@ -95,7 +95,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
   /**
    * set file save path, eg: /mnt/sdcard/Downloads/test.zip
    */
-  fun setSavePath(savePath: Uri): HttpDStartController {
+  fun setSavePath(savePath: Uri): HttpDStartStartController {
     httpDTaskOption.savePathUri = savePath
     return this
   }
@@ -104,7 +104,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
     if (HttpUtil.checkHttpDParams(httpDTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
-    val savePath = httpDTaskOption.savePathUri!!.toString()
+    val savePath = httpDTaskOption.savePathUri!!
     var util = TaskCachePool.getTaskUtil(savePath)
     if (util == null) {
       util = HttpDTaskUtil()
@@ -115,6 +115,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseController(ta
       val dEntity = findDEntityBySavePath(httpDTaskOption)
       TaskCachePool.putEntity(task.taskId, dEntity)
     }
+    TaskCachePool.putTask(task)
     return task
   }
 

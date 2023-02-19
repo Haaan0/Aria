@@ -13,15 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.http
+package com.arialyy.aria.http.download
 
-import com.arialyy.aria.http.download.HttpDownloader
+import android.net.Uri
+import com.arialyy.aria.core.task.TaskCachePool
+import timber.log.Timber
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 12:40 PM 2023/1/22
+ * @Date 20:25 2023/2/19
  **/
-open class HttpBaseController(val target: Any) {
+class HttpDStopController(val taskId: Int) {
+
+  fun cancel() {
+    val task = TaskCachePool.getTask(taskId)
+    if (task == null) {
+      Timber.e("task not found, taskId: $taskId")
+      return
+    }
+    HttpDStopController2(Uri.parse(task.filePath)).cancel()
+  }
+
+  fun stop() {
+    val task = TaskCachePool.getTask(taskId)
+    if (task == null) {
+      Timber.e("task not found, taskId: $taskId")
+      return
+    }
+    HttpDStopController2(Uri.parse(task.filePath)).stop()
+  }
 
 }

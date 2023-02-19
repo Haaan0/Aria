@@ -18,6 +18,7 @@ package com.arialyy.aria.http.download
 import com.arialyy.aria.core.task.AbsThreadTaskAdapter
 import com.arialyy.aria.core.task.ThreadConfig
 import com.arialyy.aria.http.ConnectionHelp
+import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.http.request.IRequest.Companion.getRequest
 import java.io.BufferedInputStream
 import java.io.FileOutputStream
@@ -45,7 +46,7 @@ class HttpDCTTaskAdapter(threadConfig: ThreadConfig) : AbsThreadTaskAdapter(thre
     conn.setChunkedStreamingMode(0)
 
     conn.connect()
-    BufferedInputStream(ConnectionHelp.convertInputStream(conn)).use {
+    BufferedInputStream(HttpUtil.convertInputStream(conn)).use {
       readBytes(it)
     }
   }

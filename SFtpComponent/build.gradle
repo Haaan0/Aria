@@ -1,32 +1,3 @@
-plugins {
-  id 'com.android.library'
-  id 'org.jetbrains.kotlin.android'
-}
-
-android {
-  compileSdkVersion libs.versions.compilesdk.get().toInteger()
-  buildToolsVersion libs.versions.buildToolsVersion.get()
-
-  defaultConfig {
-    minSdkVersion libs.versions.minSdk.get().toInteger()
-    targetSdkVersion libs.versions.targetsdk.get().toInteger()
-
-    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    consumerProguardFiles 'consumer-rules.pro'
-  }
-
-  buildTypes {
-    release {
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-    }
-  }
-  lintOptions {
-    abortOnError false
-  }
-
-}
-
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -36,7 +7,7 @@ dependencies {
 }
 
 //apply from: 'bintray-release.gradle'
-ext{
+ext {
   PUBLISH_ARTIFACT_ID = 'sftp'
 }
 apply from: '../gradle/mavenCentral-release.gradle'

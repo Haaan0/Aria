@@ -25,17 +25,41 @@ dependencyResolutionManagement {
 
   versionCatalogs {
     libs {
-      //      from("com.lyy.kpa.version:catalog:0.0.1")
       from(files('libs.versions.toml'))
-      // 我们也可以重写覆盖catalog中的groovy版本
-      //      version("groovy", "3.0.6")
     }
   }
-
 }
 
-include ':app', ':Aria', ':AriaAnnotations', ':AriaCompiler', ':AppFrame', ':Http', ':M3U8Component', ':SFtpComponent',
-    ':FtpComponent', ':PublicComponent'
-rootProject.name='Aria'
-include ':Queue'
-include ':Schedulers'
+gradle.rootProject {
+  it.subprojects { sub ->
+    beforeEvaluate {
+      print(sub.name)
+      switch (sub.name) {
+        case "app":
+          break
+        case "AriaAnnotations":
+        case "AriaCompiler":
+          sub.apply {
+            from "${project.rootDir.path}/javaComponent.gradle"
+          }
+          break
+        default:
+          sub.apply {
+            from "${project.rootDir.path}/androidComponent.gradle"
+          }
+          sub.android.namespace = "com.lyy.dua.${sub.name}"
+          break
+      }
+    }
+  }
+}
+
+def componentList = [':app', ':Aria', ':AriaAnnotations', ':AriaCompiler',
+    ':AppFrame', ':Http', ':M3U8Component', ':SFtpComponent', ':FtpComponent', ':PublicComponent',
+    ':Queue', ':Schedulers'
+]
+
+componentList.forEach {
+  include(it)
+}
+rootProject.name = 'Aria'

@@ -1,0 +1,15 @@
+dependencies {
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+  implementation project(path: ':PublicComponent')
+  implementation project(path: ':Http')
+  implementation(libs.bundles.room)
+  implementation(libs.kt.coroutines)
+  kapt libs.room.compiler
+}
+
+//apply from: 'bintray-release.gradle'
+ext {
+  PUBLISH_ARTIFACT_ID = 'http'
+}
+apply from: '../gradle/mavenCentral-release.gradle'

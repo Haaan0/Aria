@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.task;
+package com.arialyy.dua.group
 
-import com.arialyy.aria.core.download.DTaskOption;
-import com.arialyy.aria.core.inf.ITaskOption;
-import com.arialyy.aria.core.inf.ITaskUtil;
-import java.util.Objects;
+import android.content.Context
+import com.arialyy.aria.core.inf.IComponentInit
 
 /**
- * Created by AriaL on 2017/6/27.
- * 任务组任务
- */
-public class DownloadGroupTask extends AbsTask {
+ * @Author laoyuyu
+ * @Description
+ * @Date 21:51 2023/2/20
+ **/
+class HttpGroupComponent : IComponentInit {
+  override fun init(context: Context) {
 
-  protected DownloadGroupTask(ITaskOption taskOption, ITaskUtil util) {
-    super(taskOption, util);
-  }
-
-  @Override public int getTaskType() {
-    return DOWNLOAD_GROUP;
-  }
-
-  @Override public String getFilePath() {
-    return Objects.requireNonNull(getTaskOption(DTaskOption.class).getSavePathUri()).toString();
   }
 }

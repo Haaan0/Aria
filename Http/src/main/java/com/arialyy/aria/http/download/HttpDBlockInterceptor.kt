@@ -22,6 +22,7 @@ import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.orm.entity.BlockRecord
 import com.arialyy.aria.orm.entity.TaskRecord
 import com.arialyy.aria.util.FileUri
@@ -38,20 +39,20 @@ import java.io.File
  */
 internal class HttpDBlockInterceptor : ITaskInterceptor {
   private lateinit var task: ITask
-  private lateinit var option: HttpDTaskOption
+  private lateinit var option: HttpTaskOption
   private lateinit var blockManager: IBlockManager
   private lateinit var taskRecord: TaskRecord
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     task = chain.getTask()
     blockManager = chain.blockManager
-    option = task.getTaskOption(HttpDTaskOption::class.java)
+    option = task.getTaskOption(HttpTaskOption::class.java)
     if (task.taskState.fileSize < 0) {
       Timber.e("file size < 0")
       return TaskResp(TaskResp.CODE_GET_FILE_INFO_FAIL)
     }
 
-    val savePath = FileUri.getPathByUri(task.getTaskOption(HttpDTaskOption::class.java).savePathUri)
+    val savePath = FileUri.getPathByUri(task.getTaskOption(HttpTaskOption::class.java).savePathUri)
     if (savePath.isNullOrEmpty()) {
       Timber.e("saveUri is null")
       return TaskResp(TaskResp.CODE_SAVE_URI_NULL)
@@ -76,7 +77,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
   }
 
   private fun removeBlock() {
-    val saveUri = task.getTaskOption(HttpDTaskOption::class.java).savePathUri
+    val saveUri = task.getTaskOption(HttpTaskOption::class.java).savePathUri
     if (!FileUtils.uriEffective(saveUri)) {
       return
     }
@@ -108,7 +109,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
 
       taskRecord.blockList.addAll(
         BlockUtil.createBlockRecord(
-          task.getTaskOption(HttpDTaskOption::class.java).savePathUri!!,
+          task.getTaskOption(HttpTaskOption::class.java).savePathUri!!,
           task.taskState.fileSize
         )
       )

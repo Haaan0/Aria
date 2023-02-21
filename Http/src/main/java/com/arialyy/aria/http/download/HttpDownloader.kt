@@ -35,8 +35,8 @@ class HttpDownloader(val target: Any) : IDownloader {
    * start, create a task
    * @param url download url
    */
-  fun load(url: String): HttpDStartStartController {
-    return HttpDStartStartController(target, url)
+  fun load(url: String): HttpDStartController {
+    return HttpDStartController(target, url)
   }
 
   /**

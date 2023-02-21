@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.inf
+package com.arialyy.aria.http.upload
 
+import android.net.Uri
 import com.arialyy.annotations.TaskEnum
+import com.arialyy.aria.core.inf.IUploader
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 10:44 AM 2023/1/20
+ * @Date 2:24 PM 2023/2/20
  **/
-interface IComponentLoader {
-
-  companion object {
-    val proxyMethods = arrayOf("download", "upload")
+class HttpULoader(val target: Any) : IUploader {
+  override fun getTaskEnum(): TaskEnum {
+    return TaskEnum.UPLOAD
   }
 
-  // fun upload()
-
-  fun <T : IDownloader> download(): T
-
-  fun <T : IUploader> upload(): T
-
-  fun getTaskEnum(): TaskEnum
+  fun load(filePath: Uri): HttpUStartController {
+    return HttpUStartController(target, filePath)
+  }
 }

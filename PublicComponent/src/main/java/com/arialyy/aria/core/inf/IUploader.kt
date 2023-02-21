@@ -15,24 +15,9 @@
  */
 package com.arialyy.aria.core.inf
 
-import com.arialyy.annotations.TaskEnum
-
 /**
  * @Author laoyuyu
  * @Description
- * @Date 10:44 AM 2023/1/20
+ * @Date 14:04 AM 2023/1/20
  **/
-interface IComponentLoader {
-
-  companion object {
-    val proxyMethods = arrayOf("download", "upload")
-  }
-
-  // fun upload()
-
-  fun <T : IDownloader> download(): T
-
-  fun <T : IUploader> upload(): T
-
-  fun getTaskEnum(): TaskEnum
-}
+interface IUploader : IBaseLoader

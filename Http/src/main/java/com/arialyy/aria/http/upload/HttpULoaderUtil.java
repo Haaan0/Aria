@@ -37,7 +37,7 @@ public final class HttpULoaderUtil extends AbsNormalLoaderUtil {
   @Override public AbsNormalLoader getLoader() {
     if (mLoader == null) {
       getTaskWrapper().generateTaskOption(HttpTaskOption.class);
-      mLoader = new HttpULoader((UTaskWrapper) getTaskWrapper(), getListener());
+      mLoader = new HttpULoader1((UTaskWrapper) getTaskWrapper(), getListener());
     }
     return mLoader;
   }

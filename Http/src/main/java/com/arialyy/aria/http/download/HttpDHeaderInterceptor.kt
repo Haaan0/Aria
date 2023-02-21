@@ -25,6 +25,7 @@ import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.http.request.IRequest
 import com.arialyy.aria.orm.entity.BlockRecord
@@ -43,7 +44,7 @@ import java.util.UUID
  **/
 internal class HttpDHeaderInterceptor : ITaskInterceptor {
   private lateinit var task: ITask
-  private lateinit var taskOption: HttpDTaskOption
+  private lateinit var taskOption: HttpTaskOption
 
   companion object {
     private val CODE_30X = listOf(
@@ -58,7 +59,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     }
     Timber.i("step 1. get file info")
     task = chain.getTask()
-    taskOption = task.getTaskOption(HttpDTaskOption::class.java)
+    taskOption = task.getTaskOption(HttpTaskOption::class.java)
     try {
       val fileSize = getFileSize()
       if (fileSize >= 0) {
@@ -70,7 +71,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     } catch (e: IOException) {
       Timber.e(
         "download fail, url: ${
-          chain.getTask().getTaskOption(HttpDTaskOption::class.java).sourUrl
+          chain.getTask().getTaskOption(HttpTaskOption::class.java).sourUrl
         }"
       )
       return TaskResp(TaskResp.CODE_GET_FILE_INFO_FAIL)
@@ -191,7 +192,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
    */
   private fun getFileSizeFromHeader(
     header: Map<String, List<String>>,
-    taskOption: HttpDTaskOption
+    taskOption: HttpTaskOption
   ): Long {
     var lenAdapter = taskOption.fileSizeAdapter
     if (lenAdapter == null) {

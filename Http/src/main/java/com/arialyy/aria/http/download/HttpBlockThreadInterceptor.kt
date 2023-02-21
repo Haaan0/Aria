@@ -22,6 +22,7 @@ import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.core.task.ThreadConfig
 import com.arialyy.aria.core.task.ThreadTask2
+import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.orm.entity.BlockRecord
 
 /**
@@ -44,7 +45,7 @@ class HttpBlockThreadInterceptor : ITaskInterceptor {
     val threadTaskList = mutableListOf<IThreadTask>()
 
     blockRecordList.forEach {
-      val option = chain.getTask().getTaskOption(HttpDTaskOption::class.java)
+      val option = chain.getTask().getTaskOption(HttpTaskOption::class.java)
       val threadConfig = ThreadConfig(it, option, DuaContext.getDConfig().maxSpeed)
       threadTaskList.add(
         ThreadTask2(

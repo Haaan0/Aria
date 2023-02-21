@@ -30,8 +30,8 @@ import com.arialyy.aria.exception.AriaHTTPException;
 import com.arialyy.aria.util.ALog;
 import java.util.List;
 
-final class HttpULoader extends AbsNormalLoader<UTaskWrapper> {
-  HttpULoader(UTaskWrapper wrapper, IEventListener listener) {
+final class HttpULoader1 extends AbsNormalLoader<UTaskWrapper> {
+  HttpULoader1(UTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
   }
 

@@ -23,7 +23,7 @@ import com.arialyy.aria.core.inf.ITaskOption
  * @Description
  * @Date 4:16 PM 2023/1/25
  **/
-open class DTaskOption : ITaskOption() {
+open class TaskOption : ITaskOption() {
   var sourUrl: String? = null
   var savePathUri: Uri? = null
   var redirectUrl: String? = null

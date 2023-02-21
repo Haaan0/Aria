@@ -26,10 +26,10 @@ import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseStartController
 import com.arialyy.aria.http.HttpOption
+import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.orm.entity.DEntity
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.net.HttpURLConnection
 
 /**
@@ -37,57 +37,37 @@ import java.net.HttpURLConnection
  * @Description
  * @Date 12:38 PM 2023/1/22
  **/
-class HttpDStartStartController(target: Any, val url: String) : HttpBaseStartController(target),
+class HttpDStartController(target: Any, val url: String) : HttpBaseStartController(target),
   IStartController {
 
-  private var httpDTaskOption = HttpDTaskOption()
-
   init {
-    httpDTaskOption.sourUrl = url
+    httpTaskOption.sourUrl = url
   }
 
-  /**
-   * use multi-threaded download file, if file size <= 5m, this setting is not valid
-   * @param threadNum  range [1 - 32]
-   */
-  fun setThreadNum(threadNum: Int): HttpDStartStartController {
-    if (threadNum !in 1..32) {
-      Timber.e("set thread num fail, only 0 < threadNum < 33, threadNum: $threadNum")
-      return this
-    }
-    httpDTaskOption.threadNum = threadNum
-    return this
+  override fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpDStartController {
+    return super.setTaskInterceptor(taskInterceptor) as HttpDStartController
   }
 
-  /**
-   * set http params, link Header
-   */
-  fun setHttpOption(httpOption: HttpOption): HttpDStartStartController {
-    httpDTaskOption.httpOption = httpOption
-    return this
+  override fun setThreadNum(threadNum: Int): HttpDStartController {
+    return super.setThreadNum(threadNum) as HttpDStartController
+  }
+
+  override fun setHttpOption(httpOption: HttpOption): HttpDStartController {
+    return super.setHttpOption(httpOption) as HttpDStartController
   }
 
   /**
    * Maybe the server has special rules, you need set [IHttpFileLenAdapter] to get the file length from [HttpURLConnection.getHeaderFields]
    */
-  fun setHttpFileLenAdapter(adapter: IHttpFileLenAdapter): HttpDStartStartController {
-    httpDTaskOption.fileSizeAdapter = adapter
-    return this
-  }
-
-  /**
-   * if you want to do something before the task is executed, you can set up a task interceptor
-   * eg: determine the network status before task execution
-   */
-  fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpDStartStartController {
-    httpDTaskOption.taskInterceptor.add(taskInterceptor)
+  fun setHttpFileLenAdapter(adapter: IHttpFileLenAdapter): HttpDStartController {
+    httpTaskOption.fileSizeAdapter = adapter
     return this
   }
 
   /**
    * set download listener
    */
-  fun setListener(listener: HttpDownloadListener): HttpDStartStartController {
+  fun setListener(listener: HttpDownloadListener): HttpDStartController {
     DuaContext.getLifeManager().addCustomListener(target, listener)
     return this
   }
@@ -95,24 +75,24 @@ class HttpDStartStartController(target: Any, val url: String) : HttpBaseStartCon
   /**
    * set file save path, eg: /mnt/sdcard/Downloads/test.zip
    */
-  fun setSavePath(savePath: Uri): HttpDStartStartController {
-    httpDTaskOption.savePathUri = savePath
+  fun setSavePath(savePath: Uri): HttpDStartController {
+    httpTaskOption.savePathUri = savePath
     return this
   }
 
   private fun createTask(): DownloadTask {
-    if (HttpUtil.checkHttpDParams(httpDTaskOption)) {
+    if (HttpUtil.checkHttpDParams(httpTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
-    val savePath = httpDTaskOption.savePathUri!!
+    val savePath = httpTaskOption.savePathUri!!
     var util = TaskCachePool.getTaskUtil(savePath)
     if (util == null) {
       util = HttpDTaskUtil()
       TaskCachePool.putTaskUtil(savePath, util)
     }
-    val task = DownloadTask(httpDTaskOption, util)
+    val task = DownloadTask(httpTaskOption, util)
     DuaContext.duaScope.launch {
-      val dEntity = findDEntityBySavePath(httpDTaskOption)
+      val dEntity = findDEntityBySavePath(httpTaskOption)
       TaskCachePool.putEntity(task.taskId, dEntity)
     }
     TaskCachePool.putTask(task)
@@ -122,7 +102,7 @@ class HttpDStartStartController(target: Any, val url: String) : HttpBaseStartCon
   /**
    * find DEntity, if that not exist, create and save it
    */
-  private suspend fun findDEntityBySavePath(option: HttpDTaskOption): DEntity {
+  private suspend fun findDEntityBySavePath(option: HttpTaskOption): DEntity {
     val savePath = option.savePathUri
     val dao = DuaContext.getServiceManager().getDbService().getDuaDb().getDEntityDao()
     val de = dao.getDEntityBySavePath(savePath.toString())
@@ -138,7 +118,7 @@ class HttpDStartStartController(target: Any, val url: String) : HttpBaseStartCon
   }
 
   override fun add(): Int {
-    if (!HttpUtil.checkHttpDParams(httpDTaskOption)) {
+    if (!HttpUtil.checkHttpDParams(httpTaskOption)) {
       return -1
     }
     val task = createTask()
@@ -147,7 +127,7 @@ class HttpDStartStartController(target: Any, val url: String) : HttpBaseStartCon
   }
 
   override fun start(): Int {
-    if (!HttpUtil.checkHttpDParams(httpDTaskOption)) {
+    if (!HttpUtil.checkHttpDParams(httpTaskOption)) {
       return -1
     }
     val task = createTask()

@@ -20,7 +20,9 @@ import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBaseLoader
 import com.arialyy.aria.core.inf.IComponentLoader
 import com.arialyy.aria.core.inf.IDownloader
+import com.arialyy.aria.core.inf.IUploader
 import com.arialyy.aria.http.download.HttpDownloader
+import com.arialyy.aria.http.upload.HttpULoader
 import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 
 /**
@@ -33,11 +35,21 @@ class HttpComponentLoader : IComponentLoader {
   private val downloader by lazy(SYNCHRONIZED) {
     HttpDownloader(DuaContext.getLifeManager().getTargetByLoader(this)!!)
   }
+
+  private val uploader by lazy(SYNCHRONIZED) {
+    HttpULoader(DuaContext.getLifeManager().getTargetByLoader(this)!!)
+  }
+
   private lateinit var loader: IBaseLoader
 
   override fun <T : IDownloader> download(): T {
     loader = downloader
     return downloader as T
+  }
+
+  override fun <T : IUploader> upload(): T {
+    loader = uploader
+    return uploader as T
   }
 
   override fun getTaskEnum(): TaskEnum {

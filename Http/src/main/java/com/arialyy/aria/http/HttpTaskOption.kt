@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.http.download
+package com.arialyy.aria.http
 
-import com.arialyy.aria.core.download.DTaskOption
+import com.arialyy.aria.core.download.TaskOption
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter
 import com.arialyy.aria.core.task.ITaskInterceptor
-import com.arialyy.aria.http.HttpOption
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 12:47 PM 2023/1/22
  **/
-class HttpDTaskOption : DTaskOption() {
+class HttpTaskOption : TaskOption() {
 
   var httpOption: HttpOption? = null
   var fileSizeAdapter: IHttpFileLenAdapter? = null

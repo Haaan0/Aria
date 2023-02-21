@@ -17,7 +17,7 @@ package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.task.AbsThreadTaskAdapter
 import com.arialyy.aria.core.task.ThreadConfig
-import com.arialyy.aria.http.ConnectionHelp
+import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.http.request.IRequest.Companion.getRequest
 import timber.log.Timber
@@ -35,8 +35,8 @@ import java.nio.channels.Channels
  **/
 class HttpDBTaskAdapter(threadConfig: ThreadConfig) : AbsThreadTaskAdapter(threadConfig) {
 
-  private fun getTaskOption(): HttpDTaskOption {
-    return threadConfig.option as HttpDTaskOption
+  private fun getTaskOption(): HttpTaskOption {
+    return threadConfig.option as HttpTaskOption
   }
 
   override fun handlerThreadTask() {

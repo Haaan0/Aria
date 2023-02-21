@@ -24,6 +24,7 @@ import com.arialyy.aria.core.task.DownloadTask
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.core.task.ThreadTaskManager2
 import com.arialyy.aria.exception.AriaException
+import com.arialyy.aria.http.HttpTaskOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -37,7 +38,7 @@ internal class HttpDTaskUtil : AbsTaskUtil() {
   private var blockManager: BlockManager? = null
 
   init {
-    getTask().getTaskOption(HttpDTaskOption::class.java).eventListener =
+    getTask().getTaskOption(HttpTaskOption::class.java).eventListener =
       HttpDEventListener(getTask() as DownloadTask)
   }
 
@@ -65,7 +66,7 @@ internal class HttpDTaskUtil : AbsTaskUtil() {
   }
 
   override fun start() {
-    getTask().getTaskOption(HttpDTaskOption::class.java).taskInterceptor.let {
+    getTask().getTaskOption(HttpTaskOption::class.java).taskInterceptor.let {
       if (it.isNotEmpty()) {
         addInterceptors(it)
       }
@@ -79,7 +80,7 @@ internal class HttpDTaskUtil : AbsTaskUtil() {
       addCoreInterceptor(HttpBlockThreadInterceptor())
       val resp = interceptor()
       if (resp == null || resp.code != TaskResp.CODE_SUCCESS) {
-        getTask().getTaskOption(HttpDTaskOption::class.java).eventListener.onFail(
+        getTask().getTaskOption(HttpTaskOption::class.java).eventListener.onFail(
           false,
           AriaException("start task fail, task interrupt, code: ${resp?.code ?: TaskResp.CODE_INTERRUPT}")
         )

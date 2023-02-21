@@ -20,6 +20,4 @@ package com.arialyy.aria.core.inf
  * @Description
  * @Date 14:04 AM 2023/1/20
  **/
-interface IDownloader : IBaseLoader {
-
-}
+interface IDownloader : IBaseLoader

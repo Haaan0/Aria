@@ -19,7 +19,6 @@ import android.net.Uri
 import android.text.TextUtils
 import com.arialyy.aria.core.inf.ITaskUtil
 import com.arialyy.aria.core.task.TaskCachePool
-import com.arialyy.aria.http.download.HttpDTaskOption
 import com.arialyy.aria.http.download.HttpDTaskUtil
 import com.arialyy.aria.util.FileUtils
 import com.arialyy.aria.util.Regular
@@ -88,7 +87,7 @@ internal object HttpUtil {
     return connection.inputStream
   }
 
-  fun checkHttpDParams(option: HttpDTaskOption?): Boolean {
+  fun checkHttpDParams(option: HttpTaskOption?): Boolean {
     if (option == null) {
       Timber.e("option is null")
       return false

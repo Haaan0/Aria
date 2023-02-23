@@ -44,4 +44,18 @@ class HttpDStopController(val taskId: Int) {
     HttpDStopController2(Uri.parse(task.filePath)).stop()
   }
 
+  fun resume() {
+    val task = TaskCachePool.getTask(taskId)
+    if (task == null) {
+      Timber.e("task not found, taskId: $taskId")
+      return
+    }
+    val util = TaskCachePool.getTaskUtil(Uri.parse(task.filePath))
+    if (util == null) {
+      Timber.e("resume fail, please restart task, taskId: $taskId")
+      return
+    }
+    util.start()
+  }
+
 }

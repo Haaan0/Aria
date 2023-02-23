@@ -76,10 +76,10 @@ dependencies {
   // aria
   kapt project(':AriaCompiler')
   implementation project(':Aria')
-  implementation project(':M3U8Component')
-  implementation project(':FtpComponent')
+//  implementation project(':M3U8Component')
+//  implementation project(':FtpComponent')
   implementation project(path: ':AriaAnnotations')
-  implementation project(path: ':SFtpComponent')
+//  implementation project(path: ':SFtpComponent')
 
 
 //    implementation 'com.arialyy.aria:core:3.8.12'

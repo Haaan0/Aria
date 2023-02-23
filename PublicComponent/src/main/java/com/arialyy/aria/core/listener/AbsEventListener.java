@@ -144,7 +144,7 @@ public abstract class AbsEventListener implements IEventListener {
       TaskCachePool.INSTANCE.removeTask(getTask().getTaskId());
       return;
     }
-    if (state == IEntity.STATE_COMPLETE || state == IEntity.STATE_STOP) {
+    if (state == IEntity.STATE_COMPLETE) {
       TaskCachePool.INSTANCE.removeTask(getTask().getTaskId());
     }
 

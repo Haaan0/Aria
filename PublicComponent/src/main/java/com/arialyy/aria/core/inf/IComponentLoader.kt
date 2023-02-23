@@ -32,7 +32,7 @@ interface IComponentLoader {
 
   fun <T : IDownloader> download(): T
 
-  fun <T : IUploader> upload(): T
+//  fun <T : IUploader> upload(): T
 
   fun getTaskEnum(): TaskEnum
 }

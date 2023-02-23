@@ -19,6 +19,7 @@ import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.task.AbsTaskUtil
+import com.arialyy.aria.core.task.BlockManager
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.http.HttpTaskOption
@@ -35,12 +36,17 @@ import kotlinx.coroutines.launch
  * @Date 9:21 PM 2023/2/21
  **/
 class HttpUTaskUtil : AbsTaskUtil() {
+  private var blockManager: BlockManager? = null
+
   override fun getBlockManager(): IBlockManager {
-    TODO("Not yet implemented")
+    if (blockManager == null) {
+      blockManager = BlockManager(getTask())
+    }
+    return blockManager!!
   }
 
   override fun isRunning(): Boolean {
-    TODO("Not yet implemented")
+    return blockManager?.isRunning ?: false
   }
 
   override fun cancel() {

@@ -55,8 +55,9 @@ gradle.rootProject {
 }
 
 def componentList = [':app', ':Aria', ':AriaAnnotations', ':AriaCompiler',
-    ':AppFrame', ':Http', ':M3U8Component', ':SFtpComponent', ':FtpComponent', ':PublicComponent',
-    ':Queue', ':Schedulers', ":HttpGroup"
+    ':AppFrame', ':Http', ':PublicComponent', ':Queue', ':Schedulers',
+//    ':M3U8Component', ':SFtpComponent', ':FtpComponent',
+    ":HttpGroup"
 ]
 
 componentList.forEach {

@@ -32,7 +32,7 @@ import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.M3U8Entity;
+import com.arialyy.aria.core.common.M3U8Entity;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
 import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.IKeyUrlConverter;

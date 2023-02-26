@@ -17,9 +17,9 @@ package com.arialyy.aria.http
 
 import android.net.Uri
 import android.text.TextUtils
-import com.arialyy.aria.core.inf.ITaskUtil
+import com.arialyy.aria.core.inf.ITaskAdapter
 import com.arialyy.aria.core.task.TaskCachePool
-import com.arialyy.aria.http.download.HttpDTaskUtil
+import com.arialyy.aria.http.download.HttpDTaskAdapter
 import com.arialyy.aria.util.FileUtils
 import com.arialyy.aria.util.Regular
 import timber.log.Timber
@@ -37,10 +37,10 @@ import java.util.zip.InflaterInputStream
  **/
 internal object HttpUtil {
 
-  fun getDTaskUtil(filePath: Uri): ITaskUtil {
-    var util = TaskCachePool.getTaskUtil(filePath)
+  fun getDTaskUtil(filePath: Uri): ITaskAdapter {
+    var util = TaskCachePool.getTaskAdapter(filePath)
     if (util == null) {
-      util = HttpDTaskUtil()
+      util = HttpDTaskAdapter()
       TaskCachePool.putTaskUtil(filePath, util)
     }
     return util

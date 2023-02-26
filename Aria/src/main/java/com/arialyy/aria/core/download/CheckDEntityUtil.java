@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.M3U8Entity;
 import com.arialyy.aria.core.common.controller.FeatureController;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.IOptionConstant;

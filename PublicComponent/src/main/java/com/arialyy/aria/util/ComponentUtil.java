@@ -19,7 +19,7 @@ import android.os.Handler;
 import com.arialyy.aria.core.TaskOptionParams;
 import com.arialyy.aria.core.inf.IEventHandler;
 import com.arialyy.aria.core.inf.ITaskOption;
-import com.arialyy.aria.core.inf.ITaskUtil;
+import com.arialyy.aria.core.inf.ITaskAdapter;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
@@ -104,7 +104,7 @@ public class ComponentUtil {
    *
    * @return 返回任务工具
    */
-  public synchronized <T extends ITaskUtil> T buildUtil(AbsTaskWrapper wrapper,
+  public synchronized <T extends ITaskAdapter> T buildUtil(AbsTaskWrapper wrapper,
       IEventListener listener) {
     int requestType = wrapper.getRequestType();
     String className = null;

@@ -21,6 +21,7 @@ import com.arialyy.aria.core.inf.ITaskQueue;
 import com.arialyy.aria.core.task.ITask;
 import java.util.ArrayList;
 import java.util.List;
+import timber.log.Timber;
 
 /**
  * Created by AriaL on 2017/6/29.
@@ -53,8 +54,13 @@ public abstract class AbsCmd implements ICmd {
    * if interruption occurred, stop cmd
    */
   protected CmdResp interceptor() {
+    if (mTask == null) {
+      Timber.e("task is null");
+      return new CmdResp(CmdResp.CODE_TASK_NOT_FOUND);
+    }
     if (userInterceptors == null || userInterceptors.isEmpty()) {
-      return null;
+      Timber.e("not any interceptor");
+      return new CmdResp(CmdResp.CODE_INTERRUPT);
     }
     List<ICmdInterceptor> interceptors = new ArrayList<>();
     interceptors.addAll(userInterceptors);
@@ -64,6 +70,10 @@ public abstract class AbsCmd implements ICmd {
   }
 
   public ITaskQueue<ITask> getTaskQueue() {
+    if (mTask == null) {
+      Timber.e("task is null");
+      return null;
+    }
     ITaskQueue<?> itq = null;
     switch (mTask.getTaskType()) {
       case ITask.DOWNLOAD: {

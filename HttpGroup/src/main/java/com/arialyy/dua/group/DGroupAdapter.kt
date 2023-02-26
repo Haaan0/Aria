@@ -13,32 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.orm.annotation;
+package com.arialyy.dua.group
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.task.AbsTaskAdapter
 
 /**
- * Created by AriaL on 2017/7/4.
- * 一对多
- */
-@Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME) public @interface Many {
-  /**
-   * 父表对应的字段名
-   */
-  String parentColumn();
+ * @Author laoyuyu
+ * @Description
+ * @Date 21:58 2023/2/20
+ **/
+internal class DGroupAdapter : AbsTaskAdapter() {
+  override fun getBlockManager(): IBlockManager {
+    TODO("Not yet implemented")
+  }
 
-  /**
-   * 父表在子表对应的字段
-   */
-  String entityColumn();
+  override fun isRunning(): Boolean {
+    TODO("Not yet implemented")
+  }
 
-  ///**
-  // * 是否是一对一关系
-  // *
-  // * @return {@code true} 是，{@code false} 不是
-  // */
-  //boolean isOne2One() default false;
+  override fun cancel() {
+    TODO("Not yet implemented")
+  }
+
+  override fun stop() {
+    TODO("Not yet implemented")
+  }
+
+  override fun start() {
+    TODO("Not yet implemented")
+  }
 }

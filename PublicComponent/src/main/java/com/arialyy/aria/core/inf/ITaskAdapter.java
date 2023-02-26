@@ -13,18 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download
 
-import android.net.Uri
-import com.arialyy.aria.core.inf.ITaskOption
+package com.arialyy.aria.core.inf;
+
+import com.arialyy.aria.core.listener.IEventListener;
+import com.arialyy.aria.core.task.ITask;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * @Author laoyuyu
- * @Description
- * @Date 4:16 PM 2023/1/25
- **/
-open class TaskOption : ITaskOption() {
-  var sourUrl: String? = null
-  var savePathUri: Uri? = null
-  var redirectUrl: String? = null
+ * Created by lyy on 2016/10/31.
+ * 任务功能接口
+ */
+public interface ITaskAdapter {
+
+  void init(@NotNull ITask task, @NotNull IEventListener listener);
+
+  /**
+   * 任务是否正在执行
+   *
+   * @return {@code true} 任务正在执行
+   */
+  boolean isRunning();
+
+  /**
+   * 取消
+   */
+  void cancel();
+
+  /**
+   * 停止
+   */
+  void stop();
+
+  /**
+   * 开始
+   */
+  void start();
 }

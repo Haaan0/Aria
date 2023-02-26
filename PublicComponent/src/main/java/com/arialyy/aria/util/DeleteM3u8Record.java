@@ -20,7 +20,7 @@ import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.M3U8Entity;
+import com.arialyy.aria.core.common.M3U8Entity;
 import com.arialyy.aria.orm.DbEntity;
 import java.io.File;
 

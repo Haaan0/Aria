@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.group;
 
-import com.arialyy.aria.core.inf.ITaskUtil;
+import com.arialyy.aria.core.inf.ITaskAdapter;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
@@ -26,7 +26,7 @@ import com.arialyy.aria.util.CommonUtil;
  * Created by AriaL on 2017/6/30.
  * 任务组核心逻辑
  */
-public abstract class AbsGroupLoaderUtil implements ITaskUtil {
+public abstract class AbsGroupLoaderAdapter implements ITaskAdapter {
 
   protected String TAG = CommonUtil.getClassName(getClass());
   private IEventListener mListener;
@@ -35,7 +35,7 @@ public abstract class AbsGroupLoaderUtil implements ITaskUtil {
   private boolean isStop = false, isCancel = false;
 
 
-  @Override public ITaskUtil setParams(AbsTaskWrapper taskWrapper, IEventListener listener) {
+  @Override public ITaskAdapter setParams(AbsTaskWrapper taskWrapper, IEventListener listener) {
     mTaskWrapper = taskWrapper;
     mListener = listener;
     mLoader = getLoader();

@@ -1,8 +1,6 @@
 package com.arialyy.simple.core.download.m3u8;
 
 import android.annotation.SuppressLint;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -15,7 +13,7 @@ import android.widget.SeekBar;
 import androidx.annotation.RequiresApi;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.M3U8Entity;
+import com.arialyy.aria.core.common.M3U8Entity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.base.BaseFragment;
 import com.arialyy.simple.R;

@@ -84,13 +84,8 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
     if (HttpUtil.checkHttpDParams(httpTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
-    val savePath = httpTaskOption.savePathUri!!
-    var util = TaskCachePool.getTaskUtil(savePath)
-    if (util == null) {
-      util = HttpDTaskUtil()
-      TaskCachePool.putTaskUtil(savePath, util)
-    }
-    val task = DownloadTask(httpTaskOption, util)
+    val task = DownloadTask(httpTaskOption)
+    task.adapter = HttpDTaskAdapter()
     DuaContext.duaScope.launch {
       val dEntity = findDEntityBySavePath(httpTaskOption)
       TaskCachePool.putEntity(task.taskId, dEntity)

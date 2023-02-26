@@ -18,7 +18,7 @@ package com.arialyy.aria.http.download
 import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
-import com.arialyy.aria.core.task.AbsTaskUtil
+import com.arialyy.aria.core.task.AbsTaskAdapter
 import com.arialyy.aria.core.task.BlockManager
 import com.arialyy.aria.core.task.DownloadTask
 import com.arialyy.aria.core.task.TaskResp
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
  * @Description
  * @Date 1:47 PM 2023/1/28
  **/
-internal class HttpDTaskUtil : AbsTaskUtil() {
+internal class HttpDTaskAdapter : AbsTaskAdapter() {
 
   private var blockManager: BlockManager? = null
 

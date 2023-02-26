@@ -16,6 +16,7 @@
 package com.arialyy.aria.http.download
 
 import android.net.Uri
+import com.arialyy.aria.core.command.StopCmd
 import com.arialyy.aria.core.task.TaskCachePool
 import timber.log.Timber
 
@@ -41,7 +42,7 @@ class HttpDStopController(val taskId: Int) {
       Timber.e("task not found, taskId: $taskId")
       return
     }
-    HttpDStopController2(Uri.parse(task.filePath)).stop()
+    StopCmd(task).executeCmd()
   }
 
   fun resume() {
@@ -50,7 +51,7 @@ class HttpDStopController(val taskId: Int) {
       Timber.e("task not found, taskId: $taskId")
       return
     }
-    val util = TaskCachePool.getTaskUtil(Uri.parse(task.filePath))
+    val util = TaskCachePool.getTaskAdapter(Uri.parse(task.filePath))
     if (util == null) {
       Timber.e("resume fail, please restart task, taskId: $taskId")
       return

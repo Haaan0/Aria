@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.task;
 
+import com.arialyy.aria.core.inf.ITaskAdapter;
 import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 
@@ -51,6 +52,8 @@ public interface ITask {
    * 未知
    */
   int OTHER = -1;
+
+  ITaskAdapter getAdapter();
 
   /**
    * 获取任务类型

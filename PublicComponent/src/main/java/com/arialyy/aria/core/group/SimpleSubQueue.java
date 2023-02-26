@@ -27,18 +27,18 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 组合任务队列，该队列生命周期和{@link AbsGroupLoaderUtil}生命周期一致
+ * 组合任务队列，该队列生命周期和{@link AbsGroupLoaderAdapter}生命周期一致
  */
-final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
+final class SimpleSubQueue implements ISubQueue<AbsSubDLoadAdapter> {
   private final String TAG = CommonUtil.getClassName(getClass());
   /**
    * 缓存下载器
    */
-  private Map<String, AbsSubDLoadUtil> mCache = new ConcurrentHashMap<>();
+  private Map<String, AbsSubDLoadAdapter> mCache = new ConcurrentHashMap<>();
   /**
    * 执行中的下载器
    */
-  private Map<String, AbsSubDLoadUtil> mExec = new ConcurrentHashMap<>();
+  private Map<String, AbsSubDLoadAdapter> mExec = new ConcurrentHashMap<>();
 
   /**
    * 最大执行任务数
@@ -58,8 +58,8 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     return new SimpleSubQueue();
   }
 
-  synchronized AbsSubDLoadUtil getLoaderUtil(String key) {
-    AbsSubDLoadUtil sub = mExec.get(key);
+  synchronized AbsSubDLoadAdapter getLoaderUtil(String key) {
+    AbsSubDLoadAdapter sub = mExec.get(key);
     if (sub != null) {
       return sub;
     }
@@ -81,11 +81,11 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     return isStopAll;
   }
 
-  @Override public void addTask(AbsSubDLoadUtil fileer) {
+  @Override public void addTask(AbsSubDLoadAdapter fileer) {
     mCache.put(fileer.getKey(), fileer);
   }
 
-  @Override public void startTask(AbsSubDLoadUtil fileer) {
+  @Override public void startTask(AbsSubDLoadAdapter fileer) {
     if (mExec.size() < mMaxExecSize) {
       mCache.remove(fileer.getKey());
       mExec.put(fileer.getKey(), fileer);
@@ -98,7 +98,7 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     addTask(fileer);
   }
 
-  @Override public void stopTask(AbsSubDLoadUtil fileer) {
+  @Override public void stopTask(AbsSubDLoadAdapter fileer) {
     fileer.stop();
     mExec.remove(fileer.getKey());
   }
@@ -109,7 +109,7 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     mCache.clear();
     Set<String> keys = mExec.keySet();
     for (String key : keys) {
-      AbsSubDLoadUtil loader = mExec.get(key);
+      AbsSubDLoadAdapter loader = mExec.get(key);
       if (loader != null) {
         ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
         loader.stop();
@@ -133,7 +133,7 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     if (oldSize < num) { // 处理队列变小的情况，该情况下将停止队尾任务，并将这些任务添加到缓存队列中
       if (mExec.size() > num) {
         Set<String> keys = mExec.keySet();
-        List<AbsSubDLoadUtil> caches = new ArrayList<>();
+        List<AbsSubDLoadAdapter> caches = new ArrayList<>();
         int i = 0;
         for (String key : keys) {
           if (i > num) {
@@ -141,12 +141,12 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
           }
           i++;
         }
-        Collection<AbsSubDLoadUtil> temp = mCache.values();
+        Collection<AbsSubDLoadAdapter> temp = mCache.values();
         mCache.clear();
-        for (AbsSubDLoadUtil cache : caches) {
+        for (AbsSubDLoadAdapter cache : caches) {
           addTask(cache);
         }
-        for (AbsSubDLoadUtil t : temp) {
+        for (AbsSubDLoadAdapter t : temp) {
           addTask(t);
         }
       }
@@ -155,7 +155,7 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     // 处理队列变大的情况，该情况下将增加任务
     if (mExec.size() < num) {
       for (int i = 0; i < diff; i++) {
-        AbsSubDLoadUtil next = getNextTask();
+        AbsSubDLoadAdapter next = getNextTask();
         if (next != null) {
           startTask(next);
         } else {
@@ -165,11 +165,11 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     }
   }
 
-  @Override public void removeTaskFromExecQ(AbsSubDLoadUtil fileer) {
+  @Override public void removeTaskFromExecQ(AbsSubDLoadAdapter fileer) {
     mExec.remove(fileer.getKey());
   }
 
-  @Override public void removeTask(AbsSubDLoadUtil fileer) {
+  @Override public void removeTask(AbsSubDLoadAdapter fileer) {
     removeTaskFromExecQ(fileer);
     mCache.remove(fileer.getKey());
   }
@@ -178,7 +178,7 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     ALog.d(TAG, "删除组合任务");
     Set<String> keys = mExec.keySet();
     for (String key : keys) {
-      AbsSubDLoadUtil loader = mExec.get(key);
+      AbsSubDLoadAdapter loader = mExec.get(key);
       if (loader != null) {
         ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
         loader.cancel();
@@ -186,7 +186,7 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     }
   }
 
-  @Override public AbsSubDLoadUtil getNextTask() {
+  @Override public AbsSubDLoadAdapter getNextTask() {
     Iterator<String> keys = mCache.keySet().iterator();
     if (keys.hasNext()) {
       return mCache.get(keys.next());

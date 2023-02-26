@@ -17,7 +17,7 @@ package com.arialyy.aria.core.task;
 
 import com.arialyy.aria.core.download.DTaskOption;
 import com.arialyy.aria.core.inf.ITaskOption;
-import com.arialyy.aria.core.inf.ITaskUtil;
+import com.arialyy.aria.core.inf.ITaskAdapter;
 import java.util.Objects;
 
 /**
@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 public class DownloadGroupTask extends AbsTask {
 
-  protected DownloadGroupTask(ITaskOption taskOption, ITaskUtil util) {
+  protected DownloadGroupTask(ITaskOption taskOption, ITaskAdapter util) {
     super(taskOption, util);
   }
 

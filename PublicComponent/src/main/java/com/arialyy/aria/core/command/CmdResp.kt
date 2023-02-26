@@ -25,6 +25,7 @@ class CmdResp(val code: Int = CODE_DEF) {
     const val CODE_COMPLETE = 1
     const val CODE_INTERRUPT = 999
     const val CODE_DEF = 0
+    const val CODE_TASK_NOT_FOUND = 2
   }
 
   /**

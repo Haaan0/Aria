@@ -18,7 +18,7 @@ package com.arialyy.aria.core.task
 import android.net.Uri
 import com.arialyy.aria.core.inf.BaseEntity
 import com.arialyy.aria.core.inf.IEntity
-import com.arialyy.aria.core.inf.ITaskUtil
+import com.arialyy.aria.core.inf.ITaskAdapter
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 
@@ -32,7 +32,7 @@ object TaskCachePool {
    * key: taskId
    */
   private val entityMap = ConcurrentHashMap<Int, BaseEntity>()
-  private val taskUtilMap = ConcurrentHashMap<Uri, ITaskUtil>()
+  private val taskAdapterMap = ConcurrentHashMap<Uri, ITaskAdapter>()
   private val taskMap = ConcurrentHashMap<Int, ITask>()
 
   fun removeTask(taskId: Int) {
@@ -46,20 +46,34 @@ object TaskCachePool {
 
   fun putTask(task: ITask) {
     taskMap[task.taskId] = task
+    taskAdapterMap[Uri.parse(task.filePath)] = task.adapter
   }
 
   /**
-   * @param filePath task unique identifier, like: savePath, sourceUrl
+   * find task by filePath
    */
-  fun putTaskUtil(filePath: Uri, taskUtil: ITaskUtil) {
-    taskUtilMap[filePath] = taskUtil
+  fun findTaskByPath(filePath: Uri): ITask? {
+    taskMap.values.forEach {
+      if (it.filePath == filePath.toString()) {
+        return it
+      }
+    }
+    return null
   }
+
+//  /**
+//   * @param filePath task unique identifier, like: savePath, sourceUrl
+//   */
+//  fun putTaskUtil(filePath: Uri, taskUtil: ITaskAdapter) {
+//    taskAdapterMap[filePath] = taskUtil
+//    taskUtil.stop()
+//  }
 
   /**
    * @param  filePath unique identifier, like: savePath, sourceUrl
    */
-  fun getTaskUtil(filePath: Uri): ITaskUtil? {
-    return taskUtilMap[filePath]
+  fun getTaskAdapter(filePath: Uri): ITaskAdapter? {
+    return taskAdapterMap[filePath]
   }
 
   fun putEntity(taskId: Int, entity: BaseEntity) {

@@ -18,14 +18,12 @@ package com.arialyy.aria.http.upload
 import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
-import com.arialyy.aria.core.task.AbsTaskUtil
+import com.arialyy.aria.core.task.AbsTaskAdapter
 import com.arialyy.aria.core.task.BlockManager
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.download.HttpBlockThreadInterceptor
-import com.arialyy.aria.http.download.HttpDBlockInterceptor
-import com.arialyy.aria.http.download.HttpDHeaderInterceptor
 import com.arialyy.aria.http.download.TimerInterceptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,7 +33,7 @@ import kotlinx.coroutines.launch
  * @Description
  * @Date 9:21 PM 2023/2/21
  **/
-class HttpUTaskUtil : AbsTaskUtil() {
+class HttpUTaskAdapter : AbsTaskAdapter() {
   private var blockManager: BlockManager? = null
 
   override fun getBlockManager(): IBlockManager {

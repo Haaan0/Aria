@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.task
 
 import com.arialyy.aria.core.inf.IBlockManager
-import com.arialyy.aria.core.inf.ITaskUtil
+import com.arialyy.aria.core.inf.ITaskAdapter
 import com.arialyy.aria.core.listener.IEventListener
 import com.arialyy.aria.core.task.ITaskInterceptor.IChain
 
@@ -25,7 +25,7 @@ import com.arialyy.aria.core.task.ITaskInterceptor.IChain
  * @Description
  * @Date 1:12 PM 2023/1/28
  **/
-abstract class AbsTaskUtil : ITaskUtil {
+abstract class AbsTaskAdapter : ITaskAdapter {
   private lateinit var mTask: ITask
   private lateinit var mEventListener: IEventListener
 

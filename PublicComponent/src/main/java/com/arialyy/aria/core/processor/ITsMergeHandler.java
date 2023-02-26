@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.processor;
 
-import com.arialyy.aria.core.download.M3U8Entity;
+import com.arialyy.aria.core.common.M3U8Entity;
 import com.arialyy.aria.core.inf.IEventHandler;
 import java.util.List;
 

@@ -34,7 +34,7 @@ import java.io.File;
 
 /**
  * 组合任务子任务调度器，用于调度任务的开始、停止、失败、完成等情况
- * 该调度器生命周期和{@link AbsGroupLoaderUtil}生命周期一致
+ * 该调度器生命周期和{@link AbsGroupLoaderAdapter}生命周期一致
  */
 final class SimpleSchedulers implements Handler.Callback {
   private final String TAG = CommonUtil.getClassName(this);
@@ -59,7 +59,7 @@ final class SimpleSchedulers implements Handler.Callback {
       return true;
     }
     String threadName = b.getString(IBlockManager.DATA_THREAD_NAME);
-    AbsSubDLoadUtil loaderUtil = mQueue.getLoaderUtil(threadName);
+    AbsSubDLoadAdapter loaderUtil = mQueue.getLoaderUtil(threadName);
     if (loaderUtil == null) {
       ALog.e(TAG, String.format("子任务loader不存在，state：%s，key：%s", msg.what, threadName));
       return true;
@@ -104,7 +104,7 @@ final class SimpleSchedulers implements Handler.Callback {
    *
    * @param needRetry true 需要重试，false 不需要重试
    */
-  private synchronized void handleFail(final AbsSubDLoadUtil loaderUtil, boolean needRetry) {
+  private synchronized void handleFail(final AbsSubDLoadAdapter loaderUtil, boolean needRetry) {
     Log.d(TAG, String.format("handleFail, size = %s, completeNum = %s, failNum = %s, stopNum = %s",
         mGState.getSubSize(), mGState.getCompleteNum(), mGState.getFailNum(),
         mGState.getSubSize()));
@@ -149,7 +149,7 @@ final class SimpleSchedulers implements Handler.Callback {
    * 1、所有的子任务已经停止，则认为组合任务停止
    * 2、completeNum + failNum + stopNum = subSize，则认为组合任务停止
    */
-  private synchronized void handleStop(AbsSubDLoadUtil loadUtil, long curLocation) {
+  private synchronized void handleStop(AbsSubDLoadAdapter loadUtil, long curLocation) {
     Log.d(TAG, String.format("handleStop, size = %s, completeNum = %s, failNum = %s, stopNum = %s",
         mGState.getSubSize(), mGState.getCompleteNum(), mGState.getFailNum(),
         mGState.getSubSize()));
@@ -177,7 +177,7 @@ final class SimpleSchedulers implements Handler.Callback {
    * GroupRunState#getFailNum()}不为0，则认为组合任务被停止
    * 3、只有有缓存的子任务，则任务组合任务没有完成
    */
-  private synchronized void handleComplete(AbsSubDLoadUtil loader) {
+  private synchronized void handleComplete(AbsSubDLoadAdapter loader) {
     ALog.d(TAG, String.format("子任务【%s】完成", loader.getEntity().getFileName()));
     Log.d(TAG,
         String.format("handleComplete, size = %s, completeNum = %s, failNum = %s, stopNum = %s",
@@ -219,7 +219,7 @@ final class SimpleSchedulers implements Handler.Callback {
     if (mQueue.isStopAll()) {
       return;
     }
-    AbsSubDLoadUtil next = mQueue.getNextTask();
+    AbsSubDLoadAdapter next = mQueue.getNextTask();
     if (next != null) {
       ALog.d(TAG, String.format("启动任务：%s", next.getEntity().getFileName()));
       mQueue.startTask(next);

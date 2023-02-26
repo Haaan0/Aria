@@ -17,7 +17,7 @@ package com.arialyy.aria.http.download;
 
 import android.os.Handler;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.group.AbsSubDLoadUtil;
+import com.arialyy.aria.core.group.AbsSubDLoadAdapter;
 import com.arialyy.aria.core.group.SubRecordHandler;
 import com.arialyy.aria.core.loader.GroupSubThreadStateManager;
 import com.arialyy.aria.core.loader.LoaderStructure;
@@ -28,12 +28,12 @@ import com.arialyy.aria.core.loader.SubLoader;
  * @author lyy
  * Date: 2019-09-28
  */
-final class HttpSubDLoaderUtil extends AbsSubDLoadUtil {
+final class HttpSubDLoaderAdapter extends AbsSubDLoadAdapter {
   /**
    * @param schedulers 调度器
    * @param needGetInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
-  HttpSubDLoaderUtil( Handler schedulers, boolean needGetInfo, String parentKey) {
+  HttpSubDLoaderAdapter( Handler schedulers, boolean needGetInfo, String parentKey) {
     super(schedulers, needGetInfo, parentKey);
   }
 

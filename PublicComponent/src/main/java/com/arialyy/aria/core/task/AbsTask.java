@@ -16,9 +16,8 @@
 package com.arialyy.aria.core.task;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.inf.ITaskAdapter;
 import com.arialyy.aria.core.inf.ITaskOption;
-import com.arialyy.aria.core.inf.ITaskUtil;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ import timber.log.Timber;
 public abstract class AbsTask implements ITask {
   protected ITaskOption mTaskOption;
   private boolean isCancel = false, isStop = false;
-  private ITaskUtil mUtil;
+  private ITaskAdapter mAdapter;
   /**
    * 该任务的调度类型
    */
@@ -40,20 +39,23 @@ public abstract class AbsTask implements ITask {
   private int taskId = -1;
   private final Map<String, Object> mExpand = new HashMap<>();
 
-  protected AbsTask(ITaskOption taskOption, ITaskUtil util) {
+  protected AbsTask(ITaskOption taskOption) {
     mTaskOption = taskOption;
-    mUtil = util;
     taskId = TaskStatePool.INSTANCE.buildTaskId$PublicComponent_debug();
     TaskStatePool.INSTANCE.putTaskState(getTaskId(), mTaskState);
-    util.init(this, taskOption.eventListener);
+  }
+
+  public void setAdapter(ITaskAdapter adapter) {
+    mAdapter = adapter;
+    mAdapter.init(this, mTaskOption.eventListener);
+  }
+
+  @Override public ITaskAdapter getAdapter() {
+    return mAdapter;
   }
 
   @Override public void setState(int state) {
     mTaskState.setState(state);
-  }
-
-  ITaskUtil getTaskUtil() {
-    return mUtil;
   }
 
   @Override public <T extends ITaskOption> T getTaskOption(Class<T> clazz) {
@@ -66,7 +68,6 @@ public abstract class AbsTask implements ITask {
 
   /**
    * 获取剩余时间，单位：s
-   * 如果是m3u8任务，无法获取剩余时间；m2u8任务如果需要获取剩余时间，请设置文件长度{@link AbsEntity#setFileSize(long)}
    */
   public int getTimeLeft() {
     return mTaskState.getTimeLeft();
@@ -152,47 +153,44 @@ public abstract class AbsTask implements ITask {
 
   @Override public void start(int type) {
     mSchedulerType = type;
-    mUtil = getTaskUtil();
-    if (mUtil == null) {
+    if (mAdapter == null) {
       Timber.e("util is  null");
       return;
     }
     if (type == TaskSchedulerType.TYPE_START_AND_RESET_STATE) {
-      if (getTaskUtil().isRunning()) {
+      if (mAdapter.isRunning()) {
         Timber.e("task restart fail");
         return;
       }
-      mUtil.start();
+      mAdapter.start();
       Timber.e("task restart success");
       return;
     }
-    if (getTaskUtil().isRunning()) {
+    if (mAdapter.isRunning()) {
       Timber.d("task is running");
       return;
     }
-    getTaskUtil().start();
+    mAdapter.start();
   }
 
   @Override public void stop(int type) {
-    mUtil = getTaskUtil();
-    if (mUtil == null) {
+    if (mAdapter == null) {
       Timber.e("util is  null");
       return;
     }
     isStop = true;
     mSchedulerType = type;
-    getTaskUtil().stop();
+    mAdapter.stop();
   }
 
   @Override public void cancel(int type) {
-    mUtil = getTaskUtil();
-    if (mUtil == null) {
+    if (mAdapter == null) {
       Timber.e("util is  null");
       return;
     }
     isCancel = true;
     mSchedulerType = type;
-    getTaskUtil().cancel();
+    mAdapter.cancel();
   }
 
   /**
@@ -201,7 +199,7 @@ public abstract class AbsTask implements ITask {
    * @return {@code true} 正在下载
    */
   @Override public boolean isRunning() {
-    return getTaskUtil().isRunning();
+    return mAdapter.isRunning();
   }
 
   /**

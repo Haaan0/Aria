@@ -16,33 +16,35 @@
 
 package com.arialyy.aria.core.command;
 
-import com.arialyy.aria.core.task.AbsTask;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.task.ITask
+import com.arialyy.aria.core.task.ThreadTaskManager2
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Created by lyy on 2016/9/20.
  * 取消命令
  */
-final public class CancelCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
-  /**
-   * removeFile {@code true} 删除已经下载完成的任务，不仅删除下载记录，还会删除已经下载完成的文件，{@code false}
-   * 如果文件已经下载完成，只删除下载记录
-   */
-  public boolean removeFile = false;
+class CancelCmd(task: ITask) : AbsCmd(task) {
 
-  CancelCmd(T entity, int taskType) {
-    super(entity, taskType);
+  override fun executeCmd(): CmdResp {
+    val resp = interceptor()
+    if (resp.isInterrupt()) {
+      Timber.w("interruption occurred, cancel cmd")
+      return resp
+    }
+
+    if (!taskQueue.taskIsRunning(mTask?.taskId ?: -1)) {
+      // remove already file
+
+      return CmdResp(CmdResp.CODE_COMPLETE)
+    }
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      ThreadTaskManager2.stopThreadTask(mTask!!.taskId, true)
+    }
+    return CmdResp(CmdResp.CODE_COMPLETE)
   }
 
-  @Override public void executeCmd() {
-    if (!canExeCmd) return;
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
-    }
-    if (task != null) {
-      mTaskWrapper.setRemoveFile(removeFile);
-      removeTask();
-    }
-  }
 }

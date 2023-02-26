@@ -43,7 +43,7 @@ final class SimpleSubRetryQueue {
 
   }
 
-  void offer(AbsSubDLoadUtil subDLoadUtil) {
+  void offer(AbsSubDLoadAdapter subDLoadUtil) {
     pool.submit(subDLoadUtil.getLoader());
   }
 }

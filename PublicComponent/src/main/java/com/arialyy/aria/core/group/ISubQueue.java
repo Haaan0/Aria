@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.group;
 
 import com.arialyy.aria.core.loader.AbsNormalLoader;
-import com.arialyy.aria.core.inf.ITaskUtil;
+import com.arialyy.aria.core.inf.ITaskAdapter;
 import com.arialyy.aria.core.config.DGroupConfig;
 
 /**
@@ -24,7 +24,7 @@ import com.arialyy.aria.core.config.DGroupConfig;
  *
  * @param <Fileer> {@link AbsNormalLoader}下载器
  */
-interface ISubQueue<Fileer extends ITaskUtil> {
+interface ISubQueue<Fileer extends ITaskAdapter> {
 
   /**
    * 添加任务

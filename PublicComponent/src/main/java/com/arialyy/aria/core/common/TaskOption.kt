@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.command;
+package com.arialyy.aria.core.common
 
-import com.arialyy.aria.core.task.ITask;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import android.net.Uri
+import com.arialyy.aria.core.inf.ITaskOption
 
 /**
- * Created by AriaL on 2017/6/29.
- * 抽象命令工厂
- */
-public abstract class AbsCmdFactory<TASK_ENTITY extends AbsTaskWrapper, CMD extends AbsCmd> {
-
-  /**
-   * @param entity 下载实体
-   * {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link ITask#UPLOAD}
-   */
-  public abstract CMD createCmd(TASK_ENTITY entity, int type, int taskType);
+ * @Author laoyuyu
+ * @Description
+ * @Date 4:16 PM 2023/1/25
+ **/
+open class TaskOption : ITaskOption() {
+  var sourUrl: String? = null
+  var savePathUri: Uri? = null
+  var redirectUrl: String? = null
 }

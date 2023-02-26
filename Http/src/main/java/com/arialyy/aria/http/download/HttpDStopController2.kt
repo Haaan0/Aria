@@ -17,7 +17,11 @@ package com.arialyy.aria.http.download
 
 import android.net.Uri
 import com.arialyy.aria.core.DuaContext
-import com.arialyy.aria.http.HttpUtil
+import com.arialyy.aria.core.command.CancelCmd
+import com.arialyy.aria.core.command.StopCmd
+import com.arialyy.aria.core.common.TaskOption
+import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.util.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +54,14 @@ class HttpDStopController2(val filePath: Uri) {
   fun cancel() {
     DuaContext.duaScope.launch {
       if (checkUri()) {
-        HttpUtil.getDTaskUtil(filePath).cancel()
+        var task = TaskCachePool.findTaskByPath(filePath)
+        if (task == null) {
+          Timber.i("task not exist, create new task")
+          task = DownloadTask(TaskOption())
+          task.adapter = HttpDTaskAdapter()
+        }
+        TaskCachePool.putTask(task)
+        CancelCmd(task).executeCmd()
       }
     }
   }
@@ -58,8 +69,15 @@ class HttpDStopController2(val filePath: Uri) {
   fun stop() {
     DuaContext.duaScope.launch {
       if (checkUri()) {
-        HttpUtil.getDTaskUtil(filePath).stop()
+        TaskCachePool.findTaskByPath(filePath)?.let {
+          StopCmd(it).executeCmd()
+          return@launch
+        }
+
+        Timber.e("not found task, uri: $filePath")
+        return@launch
       }
+      Timber.e("stop fail, invalid uri: $filePath")
     }
   }
 }

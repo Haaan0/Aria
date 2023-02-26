@@ -52,7 +52,7 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
   private boolean isStop = false, isCancel = false;
   private Handler mScheduler;
   private SimpleSubQueue mSubQueue = SimpleSubQueue.newInstance();
-  private Map<String, AbsSubDLoadUtil> mExeLoader = new WeakHashMap<>();
+  private Map<String, AbsSubDLoadAdapter> mExeLoader = new WeakHashMap<>();
   private Map<String, DTaskWrapper> mCache = new WeakHashMap<>();
   private DGTaskWrapper mGTWrapper;
   private GroupRunState mState;
@@ -75,7 +75,7 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
    *
    * @param needGetFileInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
-  protected abstract AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo);
+  protected abstract AbsSubDLoadAdapter createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo);
 
   protected IDGroupListener getListener() {
     return mListener;
@@ -156,7 +156,7 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
     if (!mState.isRunning.get()) {
       startTimer();
     }
-    AbsSubDLoadUtil d = getDownloader(url, false);
+    AbsSubDLoadAdapter d = getDownloader(url, false);
     if (d != null && !d.isRunning()) {
       mSubQueue.startTask(d);
     }
@@ -171,7 +171,7 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
     if (!checkSubTask(url, "停止")) {
       return;
     }
-    AbsSubDLoadUtil d = getDownloader(url, false);
+    AbsSubDLoadAdapter d = getDownloader(url, false);
     if (d != null && d.isRunning()) {
       mSubQueue.stopTask(d);
     }
@@ -203,8 +203,8 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
    *
    * @param url 子任务下载地址
    */
-  private AbsSubDLoadUtil getDownloader(String url, boolean needGetFileInfo) {
-    AbsSubDLoadUtil d = mExeLoader.get(url);
+  private AbsSubDLoadAdapter getDownloader(String url, boolean needGetFileInfo) {
+    AbsSubDLoadAdapter d = mExeLoader.get(url);
     if (d == null) {
       return createSubLoader(mCache.get(url), needGetFileInfo);
     }
@@ -311,7 +311,7 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
   /**
    * 启动子任务下载器
    */
-  protected void startSubLoader(AbsSubDLoadUtil loader) {
+  protected void startSubLoader(AbsSubDLoadAdapter loader) {
     mExeLoader.put(loader.getKey(), loader);
     mSubQueue.startTask(loader);
   }

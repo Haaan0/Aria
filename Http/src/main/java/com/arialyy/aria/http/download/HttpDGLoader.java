@@ -21,13 +21,12 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.group.AbsGroupLoader;
-import com.arialyy.aria.core.group.AbsSubDLoadUtil;
+import com.arialyy.aria.core.group.AbsSubDLoadAdapter;
 import com.arialyy.aria.core.listener.DownloadGroupListener;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.exception.AriaHTTPException;
-import java.io.File;
 
 /**
  * http 组合任务加载器
@@ -45,8 +44,9 @@ final class HttpDGLoader extends AbsGroupLoader {
   }
 
   @Override
-  protected AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
-    HttpSubDLoaderUtil subUtil = new HttpSubDLoaderUtil(getScheduler(), needGetFileInfo, getKey());
+  protected AbsSubDLoadAdapter createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
+    HttpSubDLoaderAdapter
+        subUtil = new HttpSubDLoaderAdapter(getScheduler(), needGetFileInfo, getKey());
     subUtil.setParams(wrapper, null);
     return subUtil;
   }

@@ -21,7 +21,7 @@ import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.inf.IBlockManager;
+import com.arialyy.aria.core.inf.ITaskManager;
 import com.arialyy.aria.core.listener.IDLoadListener;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
@@ -159,7 +159,7 @@ public class NormalLoader<T extends AbsTaskWrapper> extends AbsNormalLoader<T> {
     });
   }
 
-  @Override public void addComponent(IBlockManager threadState) {
+  @Override public void addComponent(ITaskManager threadState) {
     mStateManager = threadState;
   }
 

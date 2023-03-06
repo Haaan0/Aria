@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
-import com.arialyy.aria.core.inf.IBlockManager;
+import com.arialyy.aria.core.inf.ITaskManager;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.task.ThreadTask;
@@ -51,7 +51,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
   private List<IThreadTask> mTask = new ArrayList<>();
   private String parentKey;
   private TaskRecord record;
-  protected IBlockManager mStateManager;
+  protected ITaskManager mStateManager;
 
   public SubLoader(AbsTaskWrapper wrapper, Handler schedulers) {
     this.wrapper = wrapper;
@@ -65,7 +65,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
   /**
    * 发送状态到调度器
    *
-   * @param state {@link IBlockManager}
+   * @param state {@link ITaskManager}
    */
   private void sendNormalState(int state) {
     Message msg = schedulers.obtainMessage();
@@ -73,7 +73,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
     if (b == null) {
       b = new Bundle();
     }
-    b.putString(IBlockManager.DATA_THREAD_NAME, getKey());
+    b.putString(ITaskManager.DATA_THREAD_NAME, getKey());
     msg.what = state;
     msg.setData(b);
     msg.sendToTarget();
@@ -88,9 +88,9 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
     if (b == null) {
       b = new Bundle();
     }
-    b.putString(IBlockManager.DATA_THREAD_NAME, getKey());
-    b.putBoolean(IBlockManager.DATA_RETRY, needRetry);
-    msg.what = IBlockManager.STATE_FAIL;
+    b.putString(ITaskManager.DATA_THREAD_NAME, getKey());
+    b.putBoolean(ITaskManager.DATA_RETRY, needRetry);
+    msg.what = ITaskManager.STATE_FAIL;
     msg.setData(b);
     msg.sendToTarget();
   }
@@ -117,7 +117,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
         && !record.threadRecords.isEmpty()
         && record.threadRecords.get(0).isComplete) {
       ALog.d(TAG, "子任务已完成，key：" + wrapper.getKey());
-      sendNormalState(IBlockManager.STATE_COMPLETE);
+      sendNormalState(ITaskManager.STATE_COMPLETE);
       return;
     }
     List<IThreadTask> task =
@@ -134,14 +134,14 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
       return;
     }
 
-    sendNormalState(IBlockManager.STATE_PRE);
+    sendNormalState(ITaskManager.STATE_PRE);
     mTask.addAll(task);
     try {
       for (IThreadTask iThreadTask : mTask) {
         ThreadTaskManager.getInstance().startThread(parentKey, iThreadTask);
       }
 
-      sendNormalState(IBlockManager.STATE_START);
+      sendNormalState(ITaskManager.STATE_START);
 
       mStateManager.updateCurrentProgress(getWrapper().getEntity().getCurrentProgress());
     } catch (Exception e) {
@@ -254,7 +254,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
     });
   }
 
-  @Override public void addComponent(IBlockManager threadState) {
+  @Override public void addComponent(ITaskManager threadState) {
     mStateManager = threadState;
   }
 

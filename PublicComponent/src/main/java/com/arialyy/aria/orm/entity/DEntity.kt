@@ -41,10 +41,12 @@ data class DEntity(
    * file source url
    */
   val sourceUrl: String,
+
   /**
    * file save path, it's uri
    */
   val savePath: Uri,
+
   /**
    * extended Information
    */

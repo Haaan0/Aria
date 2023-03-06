@@ -21,7 +21,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.inf.IBlockManager;
+import com.arialyy.aria.core.inf.ITaskManager;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 线程任务管理器，用于处理多线程下载时任务的状态回调
  */
-public class GroupSubThreadStateManager implements IBlockManager {
+public class GroupSubThreadStateManager implements ITaskManager {
   private final String TAG = CommonUtil.getClassName(this);
 
   /**
@@ -120,7 +120,7 @@ public class GroupSubThreadStateManager implements IBlockManager {
               }*/
               if (!mergeFile()) {
                 Bundle b=msg.getData();
-                b.putBoolean(IBlockManager.DATA_RETRY, false);
+                b.putBoolean(ITaskManager.DATA_RETRY, false);
                 msg.setData(b);
                 msg.what = STATE_FAIL;
                 sendMessageFromMsg(msg);
@@ -139,7 +139,7 @@ public class GroupSubThreadStateManager implements IBlockManager {
         case STATE_RUNNING:
           Bundle b = msg.getData();
           if (b != null) {
-            long len = b.getLong(IBlockManager.DATA_ADD_LEN, 0);
+            long len = b.getLong(ITaskManager.DATA_ADD_LEN, 0);
             mProgress += len;
           }
           msg.obj=mProgress;
@@ -162,7 +162,7 @@ public class GroupSubThreadStateManager implements IBlockManager {
     public void sendMessageFromMsg(Message msg){
       Message mMsg=mHandler.obtainMessage();
       Bundle b=mMsg.getData();
-      b.putString(IBlockManager.DATA_THREAD_NAME,mKey);
+      b.putString(ITaskManager.DATA_THREAD_NAME,mKey);
       msg.setData(b);
       mMsg.copyFrom(msg);
       mHandler.sendMessage(mMsg);

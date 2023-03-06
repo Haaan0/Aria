@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.manager;
+package com.arialyy.dua.group
 
-import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.listener.AbsEventListener
+import com.arialyy.aria.core.task.DownloadGroupTask
 
 /**
- * Created by Aria.Lao on 2017/11/1.
- */
-interface INormalTEFactory<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskWrapper<ENTITY>> {
+ * @Author laoyuyu
+ * @Description
+ * @Date 9:15 PM 2023/3/6
+ **/
+internal class HttpDGEventListener(task: DownloadGroupTask) : AbsEventListener(task) {
+  override fun onComplete() {
+    TODO("Not yet implemented")
+  }
 
-  /**
-   * 通过key创建任务，只适应于单任务
-   */
-  TASK_ENTITY create(long taskId);
+  override fun handleCancel() {
+    TODO("Not yet implemented")
+  }
 }

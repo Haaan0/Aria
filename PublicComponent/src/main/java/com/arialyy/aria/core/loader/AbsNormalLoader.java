@@ -18,7 +18,7 @@ package com.arialyy.aria.core.loader;
 import android.os.Looper;
 import android.util.Log;
 import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.inf.IBlockManager;
+import com.arialyy.aria.core.inf.ITaskManager;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
@@ -58,7 +58,7 @@ public abstract class AbsNormalLoader<T extends AbsTaskWrapper> implements ILoad
   private boolean isRuning = false;
 
   protected IRecordHandler mRecordHandler;
-  protected IBlockManager mStateManager;
+  protected ITaskManager mStateManager;
   protected IInfoTask mInfoTask;
   protected IThreadTaskBuilder mTTBuilder;
 
@@ -81,7 +81,7 @@ public abstract class AbsNormalLoader<T extends AbsTaskWrapper> implements ILoad
     return mListener;
   }
 
-  protected IBlockManager getStateManager() {
+  protected ITaskManager getStateManager() {
     return mStateManager;
   }
 

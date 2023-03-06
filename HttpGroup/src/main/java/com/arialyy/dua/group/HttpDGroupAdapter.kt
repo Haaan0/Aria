@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.http.upload
+package com.arialyy.dua.group
 
 import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.task.AbsTaskAdapter
-import com.arialyy.aria.core.task.BlockManager
+import com.arialyy.aria.core.task.DownloadGroupTask
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.download.HttpBlockThreadInterceptor
+import com.arialyy.aria.http.download.HttpDCheckInterceptor
 import com.arialyy.aria.http.download.TimerInterceptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,20 +32,21 @@ import kotlinx.coroutines.launch
 /**
  * @Author laoyuyu
  * @Description
- * @Date 9:21 PM 2023/2/21
+ * @Date 21:58 2023/2/20
  **/
-class HttpUTaskAdapter : AbsTaskAdapter() {
-  private var blockManager: BlockManager? = null
+internal class HttpDGroupAdapter : AbsTaskAdapter() {
+
+  init {
+    getTask().getTaskOption(HttpTaskOption::class.java).eventListener =
+      HttpDGEventListener(getTask() as DownloadGroupTask)
+  }
 
   override fun getTaskManager(): ITaskManager {
-    if (blockManager == null) {
-      blockManager = BlockManager(getTask())
-    }
-    return blockManager!!
+    TODO("Not yet implemented")
   }
 
   override fun isRunning(): Boolean {
-    return blockManager?.isRunning ?: false
+    TODO("Not yet implemented")
   }
 
   override fun cancel() {
@@ -63,8 +65,9 @@ class HttpUTaskAdapter : AbsTaskAdapter() {
     }
     DuaContext.duaScope.launch(Dispatchers.IO) {
       Looper.prepare()
+      blockManager?.setLooper()
+      addCoreInterceptor(HttpDCheckInterceptor())
       addCoreInterceptor(TimerInterceptor())
-      addCoreInterceptor(HttpUBlockInterceptor())
       addCoreInterceptor(HttpBlockThreadInterceptor())
       val resp = interceptor()
       if (resp == null || resp.code != TaskResp.CODE_SUCCESS) {

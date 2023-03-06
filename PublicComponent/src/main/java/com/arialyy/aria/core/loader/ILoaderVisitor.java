@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.loader;
 
-import com.arialyy.aria.core.inf.IBlockManager;
+import com.arialyy.aria.core.inf.ITaskManager;
 
 /**
  * 加载器访问者
@@ -35,7 +35,7 @@ public interface ILoaderVisitor {
   /**
    * 线程状态
    */
-  void addComponent(IBlockManager threadState);
+  void addComponent(ITaskManager threadState);
 
   /**
    * 构造线程任务

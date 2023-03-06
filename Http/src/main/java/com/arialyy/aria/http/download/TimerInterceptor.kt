@@ -56,8 +56,8 @@ open class TimerInterceptor : ITaskInterceptor {
         override fun run() {
           // 线程池中是不抛异常的，没有日志，很难定位问题，需要手动try-catch
           try {
-            if (blockManager.isCompleted
-              || blockManager.hasFailedBlock()
+            if (blockManager.isCompleted()
+              || blockManager.hasFailedTask()
               || !isRunning(chain.getTask())
             ) {
               ThreadTaskManager2.stopThreadTask(chain.getTask().taskId)
@@ -66,7 +66,7 @@ open class TimerInterceptor : ITaskInterceptor {
             }
             if (chain.getTask().taskState.curProgress >= 0) {
               chain.getTask().getTaskOption(ITaskOption::class.java).eventListener.onProgress(
-                blockManager.currentProgress
+                blockManager.getCurrentProgress()
               )
               return
             }

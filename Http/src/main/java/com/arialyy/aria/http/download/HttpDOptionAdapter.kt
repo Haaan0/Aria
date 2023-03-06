@@ -13,29 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.task
+package com.arialyy.aria.http.download
 
-import com.arialyy.aria.core.inf.ITaskManager
+import com.arialyy.aria.core.processor.IHttpFileLenAdapter
+import com.arialyy.aria.http.IHttpTaskOptionAdapter
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 11:06 AM 2023/1/27
+ * @Date 2:03 PM 2023/3/6
  **/
-class TaskChain(
-  private val interceptors: List<ITaskInterceptor>,
-  private val index: Int = 0,
-  private val task: ITask,
-  val blockManager: ITaskManager
-) : ITaskInterceptor.IChain {
+class HttpDOptionAdapter : IHttpTaskOptionAdapter {
+  var fileSizeAdapter: IHttpFileLenAdapter? = null
+  var isChunkTask = false
 
-  override fun getTask(): ITask {
-    return task
-  }
+  /**
+   * whether block is supported, true: supported
+   */
+  var isSupportResume = true
 
-  override suspend fun proceed(task: ITask): TaskResp {
-    val next = TaskChain(interceptors, index, task, blockManager)
-    val interceptor = interceptors[index]
-    return interceptor.interceptor(next)
-  }
+  /**
+   * whether resume task is supported
+   * 1. in download task, if file length not obtained, isSupportResume = false
+   * 2. in upload task, if service not supported resume, isSupportResume = false
+   */
+  var isSupportBlock = true
+
 }

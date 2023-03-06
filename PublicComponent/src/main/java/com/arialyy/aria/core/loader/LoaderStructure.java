@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.loader;
 
-import com.arialyy.aria.core.inf.IBlockManager;
+import com.arialyy.aria.core.inf.ITaskManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class LoaderStructure {
    * 将组件加入到集合，必须添加以下集合：
    * 1 {@link IRecordHandler}
    * 2 {@link IInfoTask}
-   * 3 {@link IBlockManager}
+   * 3 {@link ITaskManager}
    * 4 {@link IThreadTaskBuilder}
    *
    * @param component 待添加的组件

@@ -19,6 +19,7 @@ import android.os.Handler
 import android.os.Handler.Callback
 import android.os.Looper
 import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.inf.ITaskOption
 import com.arialyy.aria.core.listener.IEventListener
 import com.arialyy.aria.exception.AriaException
@@ -58,47 +59,47 @@ class BlockManager(task: ITask) : IBlockManager {
 
   private val callback = Callback { msg ->
     when (msg.what) {
-      IBlockManager.STATE_STOP -> {
+      ITaskManager.STATE_STOP -> {
         stoppedNum.getAndIncrement()
-        if (isStopped) {
-          eventListener.onStop(currentProgress)
+        if (isStopped()) {
+          eventListener.onStop(getCurrentProgress())
           quitLooper()
         }
       }
-      IBlockManager.STATE_CANCEL -> {
+      ITaskManager.STATE_CANCEL -> {
         canceledNum.getAndIncrement()
-        if (isCanceled) {
+        if (isCanceled()) {
           eventListener.onCancel()
           quitLooper()
         }
       }
-      IBlockManager.STATE_FAIL -> {
+      ITaskManager.STATE_FAIL -> {
         failedNum.getAndIncrement()
-        if (hasFailedBlock()) {
+        if (hasFailedTask()) {
           val b = msg.data
           eventListener.onFail(
-            b.getBoolean(IBlockManager.DATA_RETRY, false),
-            b.getSerializable(IBlockManager.DATA_ERROR_INFO) as AriaException?
+            b.getBoolean(ITaskManager.DATA_RETRY, false),
+            b.getSerializable(ITaskManager.DATA_ERROR_INFO) as AriaException?
           )
           quitLooper()
         }
       }
-      IBlockManager.STATE_COMPLETE -> {
+      ITaskManager.STATE_COMPLETE -> {
         completedNum.getAndIncrement()
-        if (isCompleted) {
+        if (isCompleted()) {
           Timber.d("isComplete, completeNum = %s", completedNum)
           eventListener.onComplete()
           quitLooper()
         }
       }
-      IBlockManager.STATE_RUNNING -> {
+      ITaskManager.STATE_RUNNING -> {
         val b = msg.data
         if (b != null) {
-          val len = b.getLong(IBlockManager.DATA_ADD_LEN, 0)
+          val len = b.getLong(ITaskManager.DATA_ADD_LEN, 0)
           progress += len
         }
       }
-      IBlockManager.STATE_UPDATE_PROGRESS -> {
+      ITaskManager.STATE_UPDATE_PROGRESS -> {
         progress += msg.obj as Long
       }
     }
@@ -146,7 +147,7 @@ class BlockManager(task: ITask) : IBlockManager {
     this.blockNum = blockNum
   }
 
-  override fun hasFailedBlock(): Boolean {
+  override fun hasFailedTask(): Boolean {
     Timber.d("isFailed, blockBum = ${blockNum}, completedNum = ${completedNum.get()}, ")
     return failedNum.get() != 0
   }

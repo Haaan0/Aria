@@ -15,11 +15,7 @@
  */
 package com.arialyy.aria.http
 
-import android.net.Uri
 import android.text.TextUtils
-import com.arialyy.aria.core.inf.ITaskAdapter
-import com.arialyy.aria.core.task.TaskCachePool
-import com.arialyy.aria.http.download.HttpDTaskAdapter
 import com.arialyy.aria.util.FileUtils
 import com.arialyy.aria.util.Regular
 import timber.log.Timber
@@ -35,16 +31,7 @@ import java.util.zip.InflaterInputStream
  * @Description
  * @Date 12:40 PM 2023/1/22
  **/
-internal object HttpUtil {
-
-  fun getDTaskUtil(filePath: Uri): ITaskAdapter {
-    var util = TaskCachePool.getTaskAdapter(filePath)
-    if (util == null) {
-      util = HttpDTaskAdapter()
-      TaskCachePool.putTaskUtil(filePath, util)
-    }
-    return util
-  }
+object HttpUtil {
 
   /**
    * 拦截window.location.replace数据

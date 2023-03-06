@@ -26,10 +26,7 @@ import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseStartController
 import com.arialyy.aria.http.HttpOption
-import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.HttpUtil
-import com.arialyy.aria.orm.entity.DEntity
-import kotlinx.coroutines.launch
 import java.net.HttpURLConnection
 
 /**
@@ -39,9 +36,11 @@ import java.net.HttpURLConnection
  **/
 class HttpDStartController(target: Any, val url: String) : HttpBaseStartController(target),
   IStartController {
+  private val taskOptionSupport = HttpDOptionAdapter()
 
   init {
     httpTaskOption.sourUrl = url
+    httpTaskOption.taskOptionAdapter = taskOptionSupport
   }
 
   override fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpDStartController {
@@ -60,7 +59,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
    * Maybe the server has special rules, you need set [IHttpFileLenAdapter] to get the file length from [HttpURLConnection.getHeaderFields]
    */
   fun setHttpFileLenAdapter(adapter: IHttpFileLenAdapter): HttpDStartController {
-    httpTaskOption.fileSizeAdapter = adapter
+    taskOptionSupport.fileSizeAdapter = adapter
     return this
   }
 
@@ -86,30 +85,8 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
     }
     val task = DownloadTask(httpTaskOption)
     task.adapter = HttpDTaskAdapter()
-    DuaContext.duaScope.launch {
-      val dEntity = findDEntityBySavePath(httpTaskOption)
-      TaskCachePool.putEntity(task.taskId, dEntity)
-    }
     TaskCachePool.putTask(task)
     return task
-  }
-
-  /**
-   * find DEntity, if that not exist, create and save it
-   */
-  private suspend fun findDEntityBySavePath(option: HttpTaskOption): DEntity {
-    val savePath = option.savePathUri
-    val dao = DuaContext.getServiceManager().getDbService().getDuaDb().getDEntityDao()
-    val de = dao.getDEntityBySavePath(savePath.toString())
-    if (de != null) {
-      return de
-    }
-    val newDe = DEntity(
-      sourceUrl = option.sourUrl!!,
-      savePath = savePath!!,
-    )
-    dao.insert(newDe)
-    return newDe
   }
 
   override fun add(): Int {

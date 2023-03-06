@@ -13,11 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.inf;
+package com.arialyy.dua.group
 
-public interface Suggest {
+import com.arialyy.annotations.TaskEnum
+import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.inf.IComponentLoader
+import com.arialyy.aria.core.inf.IDownloader
 
-  String TASK_CONTROLLER = "after use #add()、#create()、#stop()、#cancel()、#resume()、#save()?";
+/**
+ * @Author laoyuyu
+ * @Description
+ * @Date 7:51 AM 2023/3/6
+ **/
+class HttpDGComponentLoader : IComponentLoader {
+  private val downloader by lazy {
+    HttpDGLoader(DuaContext.getLifeManager().getTargetByLoader(this)!!)
+  }
 
-  String TO_CONTROLLER = "after use #controller()?";
+  override fun <T : IDownloader> download(): T {
+    return downloader as T
+  }
+
+  override fun getTaskEnum(): TaskEnum {
+    return TaskEnum.DOWNLOAD_GROUP
+  }
 }

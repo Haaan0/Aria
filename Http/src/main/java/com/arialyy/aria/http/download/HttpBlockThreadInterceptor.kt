@@ -16,6 +16,8 @@
 package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.task.BlockManager
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.IThreadTask
 import com.arialyy.aria.core.task.TaskChain
@@ -31,9 +33,11 @@ import com.arialyy.aria.orm.entity.BlockRecord
  * @Date 7:11 PM 2023/2/7
  **/
 class HttpBlockThreadInterceptor : ITaskInterceptor {
+  private lateinit var blockManager: IBlockManager
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
-    val unfinishedBlockList = chain.blockManager.unfinishedBlockList
+    blockManager = chain.blockManager as IBlockManager
+    val unfinishedBlockList = blockManager.unfinishedBlockList
     if (unfinishedBlockList.isEmpty()) {
       return TaskResp(TaskResp.CODE_BLOCK_QUEUE_NULL)
     }
@@ -49,13 +53,16 @@ class HttpBlockThreadInterceptor : ITaskInterceptor {
       val threadConfig = ThreadConfig(it, option, DuaContext.getDConfig().maxSpeed)
       threadTaskList.add(
         ThreadTask2(
-          adapter = if (option.isChunkTask) HttpDCTTaskAdapter(threadConfig) else HttpDBTaskAdapter(
+          adapter = if (option.getOptionAdapter(HttpDOptionAdapter::class.java).isChunkTask) HttpDCTTaskAdapter(
+            threadConfig
+          ) else HttpDBTaskAdapter(
             threadConfig
           ),
-          handler = chain.blockManager.handler,
+          handler = blockManager.getHandler(),
           record = it
         )
       )
     }
+    blockManager.start(threadTaskList)
   }
 }

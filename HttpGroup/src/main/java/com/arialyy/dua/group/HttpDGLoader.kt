@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.task;
+package com.arialyy.dua.group
 
-import com.arialyy.aria.core.common.TaskOption;
-import com.arialyy.aria.core.inf.ITaskOption;
-import java.util.Objects;
+import android.net.Uri
+import com.arialyy.annotations.TaskEnum
+import com.arialyy.aria.core.inf.IDownloader
 
 /**
- * Created by AriaL on 2017/6/27.
- * 任务组任务
- */
-public class DownloadGroupTask extends AbsTask {
-
-  public DownloadGroupTask(ITaskOption taskOption) {
-    super(taskOption);
+ * @Author laoyuyu
+ * @Description
+ * @Date 7:53 AM 2023/3/6
+ **/
+class HttpDGLoader(val target: Any) : IDownloader {
+  override fun getTaskEnum(): TaskEnum {
+    return TaskEnum.DOWNLOAD_GROUP
   }
 
-  @Override public int getTaskType() {
-    return DOWNLOAD_GROUP;
-  }
-
-  @Override public String getFilePath() {
-    return Objects.requireNonNull(getTaskOption(TaskOption.class).getSavePathUri()).toString();
+  /**
+   * start, create a task
+   * @param savePath download url
+   */
+  fun load(savePath: Uri): HttpDGStartController {
+    return HttpDGStartController(target, savePath)
   }
 }

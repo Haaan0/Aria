@@ -17,7 +17,6 @@ package com.arialyy.aria.http.download
 
 import android.os.Looper
 import com.arialyy.aria.core.DuaContext
-import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.task.AbsTaskAdapter
 import com.arialyy.aria.core.task.BlockManager
 import com.arialyy.aria.core.task.DownloadTask
@@ -42,7 +41,7 @@ internal class HttpDTaskAdapter : AbsTaskAdapter() {
       HttpDEventListener(getTask() as DownloadTask)
   }
 
-  override fun getBlockManager(): IBlockManager {
+  override fun getTaskManager(): BlockManager {
     if (blockManager == null) {
       blockManager = BlockManager(getTask())
     }
@@ -50,7 +49,7 @@ internal class HttpDTaskAdapter : AbsTaskAdapter() {
   }
 
   override fun isRunning(): Boolean {
-    return blockManager?.isRunning ?: false
+    return getTaskManager().isRunning()
   }
 
   override fun cancel() {
@@ -74,6 +73,7 @@ internal class HttpDTaskAdapter : AbsTaskAdapter() {
     DuaContext.duaScope.launch(Dispatchers.IO) {
       Looper.prepare()
       blockManager?.setLooper()
+      addCoreInterceptor(HttpDCheckInterceptor())
       addCoreInterceptor(TimerInterceptor())
       addCoreInterceptor(HttpDHeaderInterceptor())
       addCoreInterceptor(HttpDBlockInterceptor())

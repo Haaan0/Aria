@@ -53,6 +53,10 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     )
   }
 
+  private fun getOptionAdapter(): HttpDOptionAdapter {
+    return taskOption.getOptionAdapter(HttpDOptionAdapter::class.java)
+  }
+
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     if (Looper.myLooper() == Looper.getMainLooper()) {
       throw IllegalThreadStateException("io operations cannot be in the main thread")
@@ -64,8 +68,8 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
       val fileSize = getFileSize()
       if (fileSize >= 0) {
         task.taskState.fileSize = fileSize
-        taskOption.isSupportResume = fileSize != 0L
-        taskOption.isSupportBlock = taskOption.isSupportResume && fileSize > BlockRecord.BLOCK_SIZE
+        getOptionAdapter().isSupportResume = fileSize != 0L
+        getOptionAdapter().isSupportBlock = getOptionAdapter().isSupportResume && fileSize > BlockRecord.BLOCK_SIZE
         return chain.proceed(task)
       }
     } catch (e: IOException) {
@@ -98,12 +102,9 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
 
     val code = conn.responseCode
     when {
-      code == HttpURLConnection.HTTP_PARTIAL -> return getFileSizeFromHeader(
-        conn.headerFields,
-        taskOption
-      )
+      code == HttpURLConnection.HTTP_PARTIAL -> return getFileSizeFromHeader(conn.headerFields)
       code == HttpURLConnection.HTTP_OK -> {
-        val len = getFileSizeFromHeader(conn.headerFields, taskOption)
+        val len = getFileSizeFromHeader(conn.headerFields)
         if (len > 0) {
           return len
         }
@@ -127,7 +128,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
         return -1
       }
       code == 416 -> {
-        return getFileSizeFromHeader(conn.headerFields, taskOption)
+        return getFileSizeFromHeader(conn.headerFields)
       }
       code in CODE_30X -> {
         Timber.d("handle 30x turn, code: $code")
@@ -152,7 +153,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     if (chunkHead.isNullOrEmpty()) {
       return -1
     }
-    taskOption.isChunkTask = true
+    getOptionAdapter().isChunkTask = true
     return 0
   }
 
@@ -191,10 +192,9 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
    * get file size from header, if user not set [IHttpFileLenAdapter], use [FileLenAdapter]
    */
   private fun getFileSizeFromHeader(
-    header: Map<String, List<String>>,
-    taskOption: HttpTaskOption
+    header: Map<String, List<String>>
   ): Long {
-    var lenAdapter = taskOption.fileSizeAdapter
+    var lenAdapter = getOptionAdapter().fileSizeAdapter
     if (lenAdapter == null) {
       lenAdapter = FileLenAdapter()
     }

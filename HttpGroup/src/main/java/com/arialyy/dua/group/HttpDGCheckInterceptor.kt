@@ -13,23 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.http
+package com.arialyy.dua.group
 
-import com.arialyy.aria.core.common.TaskOption
 import com.arialyy.aria.core.task.ITaskInterceptor
+import com.arialyy.aria.core.task.TaskChain
+import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.util.CheckUtil
+import timber.log.Timber
 
 /**
+ * 1. Check if the save path is valid
+ * 2. Check all sub-task download addresses
  * @Author laoyuyu
  * @Description
- * @Date 12:47 PM 2023/1/22
+ * @Date 8:56 PM 2023/3/6
  **/
-class HttpTaskOption : TaskOption() {
+internal class HttpDGCheckInterceptor : ITaskInterceptor {
 
-  var httpOption: HttpOption? = null
-  var taskInterceptor = mutableListOf<ITaskInterceptor>()
-  lateinit var taskOptionAdapter: IHttpTaskOptionAdapter
+  override suspend fun interceptor(chain: TaskChain): TaskResp {
+    // if (optionAdapter.subUrl.isEmpty()){
+    //   Timber.e("sub-task list is empty")
+    //   return -1
+    // }
+    //
+    // optionAdapter.subUrl.forEach {
+    //   if (!CheckUtil.checkUrl(it)){
+    //     Timber.e("invalid url: $it")
+    //     return -1
+    //   }
+    // }
 
-  fun <T : IHttpTaskOptionAdapter> getOptionAdapter(clazz: Class<T>): T {
-    return taskOptionAdapter as T
   }
 }

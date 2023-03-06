@@ -15,32 +15,13 @@
  */
 package com.arialyy.dua.group
 
-import com.arialyy.aria.core.inf.IBlockManager
-import com.arialyy.aria.core.task.AbsTaskAdapter
+import com.arialyy.aria.http.IHttpTaskOptionAdapter
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 21:58 2023/2/20
+ * @Date 8:14 PM 2023/3/6
  **/
-internal class DGroupAdapter : AbsTaskAdapter() {
-  override fun getBlockManager(): IBlockManager {
-    TODO("Not yet implemented")
-  }
-
-  override fun isRunning(): Boolean {
-    TODO("Not yet implemented")
-  }
-
-  override fun cancel() {
-    TODO("Not yet implemented")
-  }
-
-  override fun stop() {
-    TODO("Not yet implemented")
-  }
-
-  override fun start() {
-    TODO("Not yet implemented")
-  }
+internal class HttpDGOptionAdapter : IHttpTaskOptionAdapter {
+  val subUrl = mutableSetOf<String>()
 }

@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.task
 
-import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.inf.ITaskAdapter
 import com.arialyy.aria.core.listener.IEventListener
 import com.arialyy.aria.core.task.ITaskInterceptor.IChain
@@ -39,7 +39,7 @@ abstract class AbsTaskAdapter : ITaskAdapter {
 
   protected fun getTask() = mTask
 
-  abstract fun getBlockManager(): IBlockManager
+  abstract fun getTaskManager(): ITaskManager
 
   /**
    * add user interceptor
@@ -62,7 +62,7 @@ abstract class AbsTaskAdapter : ITaskAdapter {
     val interceptors: MutableList<ITaskInterceptor> = ArrayList()
     interceptors.addAll(mUserInterceptor)
     interceptors.addAll(mCoreInterceptor)
-    val chain: IChain = TaskChain(interceptors, 0, mTask, getBlockManager())
+    val chain: IChain = TaskChain(interceptors, 0, mTask, getTaskManager())
     return chain.proceed(mTask)
   }
 }

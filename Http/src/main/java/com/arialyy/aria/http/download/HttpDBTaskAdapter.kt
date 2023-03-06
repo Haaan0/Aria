@@ -43,7 +43,7 @@ class HttpDBTaskAdapter(threadConfig: ThreadConfig) : AbsThreadTaskAdapter(threa
     val taskOption = getTaskOption()
     val option = taskOption.httpOption!!
     val conn = getRequest(option).getDConnection(taskOption.sourUrl!!, option)
-    if (!taskOption.isSupportResume) {
+    if (!taskOption.getOptionAdapter(HttpDOptionAdapter::class.java).isSupportResume) {
       Timber.w("this task not support resume, url: %s", taskOption.sourUrl)
     } else {
       conn.setRequestProperty(

@@ -17,6 +17,7 @@ package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.util.BlockUtil
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
@@ -45,7 +46,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     task = chain.getTask()
-    blockManager = chain.blockManager
+    blockManager = chain.blockManager as IBlockManager
     option = task.getTaskOption(HttpTaskOption::class.java)
     if (task.taskState.fileSize < 0) {
       Timber.e("file size < 0")
@@ -60,14 +61,14 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
 
     // if task not support resume, don't save record
     if (task.taskState.fileSize == 0L) {
-      chain.blockManager.setBlockNum(1)
+      blockManager.setBlockNum(1)
       // if block exist, delete the existed block
       removeBlock()
       return chain.proceed(chain.getTask())
     }
     val blockNum = checkRecord()
     task.taskState.taskRecord = taskRecord
-    chain.blockManager.setBlockNum(blockNum)
+    blockManager.setBlockNum(blockNum)
     val result = checkBlock()
     if (result != TaskResp.CODE_SUCCESS) {
       return TaskResp(result)
@@ -126,7 +127,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
    * if block already exist, upload progress
    */
   private suspend fun checkBlock(): Int {
-    val handler = blockManager.handler
+    val handler = blockManager.getHandler()
     val needUpdateBlockRecord = mutableSetOf<BlockRecord>()
     for (br in taskRecord.blockList) {
       val blockF = File(br.blockPath)
@@ -134,7 +135,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
         if (br.curProgress == blockF.length() && !br.isComplete) {
           br.isComplete = true
           needUpdateBlockRecord.add(br)
-          handler.obtainMessage(IBlockManager.STATE_COMPLETE)
+          handler.obtainMessage(ITaskManager.STATE_COMPLETE)
         }
         if (br.curProgress != blockF.length()) {
           br.curProgress = blockF.length()
@@ -142,7 +143,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
           blockManager.putUnfinishedBlock(br)
         }
         // update task progress
-        handler.obtainMessage(IBlockManager.STATE_UPDATE_PROGRESS, br.curProgress)
+        handler.obtainMessage(ITaskManager.STATE_UPDATE_PROGRESS, br.curProgress)
       }
     }
 

@@ -18,7 +18,7 @@ package com.arialyy.aria.core.task
 import android.os.Bundle
 import android.os.Handler
 import com.arialyy.aria.core.DuaContext
-import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.orm.entity.BlockRecord
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -53,13 +53,13 @@ class ThreadTask2(
   override fun cancel() {
     adapter.breakTask()
     isCanceled = true
-    handler.obtainMessage(IBlockManager.STATE_CANCEL)
+    handler.obtainMessage(ITaskManager.STATE_CANCEL)
   }
 
   override fun stop() {
     adapter.breakTask()
     isStopped = true
-    handler.obtainMessage(IBlockManager.STATE_STOP)
+    handler.obtainMessage(ITaskManager.STATE_STOP)
   }
 
   override fun setMaxSpeed(speed: Int) {
@@ -85,9 +85,9 @@ class ThreadTask2(
       return
     }
     val b = Bundle()
-    b.putBoolean(IBlockManager.DATA_RETRY, false)
-    b.putSerializable(IBlockManager.DATA_ERROR_INFO, e)
-    handler.obtainMessage(IBlockManager.STATE_FAIL, b)
+    b.putBoolean(ITaskManager.DATA_RETRY, false)
+    b.putSerializable(ITaskManager.DATA_ERROR_INFO, e)
+    handler.obtainMessage(ITaskManager.STATE_FAIL, b)
   }
 
   override fun onComplete() {
@@ -101,10 +101,10 @@ class ThreadTask2(
     // update progress once a second, we need to check the progress difference.
     val diff = kotlin.math.abs(record.curProgress - blockF.length())
     if (diff != 0L) {
-      handler.obtainMessage(IBlockManager.STATE_RUNNING, diff)
+      handler.obtainMessage(ITaskManager.STATE_RUNNING, diff)
     }
     updateRecord()
-    handler.obtainMessage(IBlockManager.STATE_COMPLETE)
+    handler.obtainMessage(ITaskManager.STATE_COMPLETE)
   }
 
   private fun updateRecord() {
@@ -121,7 +121,7 @@ class ThreadTask2(
     record.curProgress += len
     if (System.currentTimeMillis() - lastUpdateTime > 1000) {
       lastUpdateTime = System.currentTimeMillis()
-      handler.obtainMessage(IBlockManager.STATE_RUNNING, len)
+      handler.obtainMessage(ITaskManager.STATE_RUNNING, len)
     }
   }
 

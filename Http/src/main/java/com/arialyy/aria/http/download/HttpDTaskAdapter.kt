@@ -26,6 +26,7 @@ import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.http.HttpTaskOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * @Author laoyuyu
@@ -53,12 +54,20 @@ internal class HttpDTaskAdapter : AbsTaskAdapter() {
   }
 
   override fun cancel() {
+    if (getTaskManager().isCanceled()) {
+      Timber.w("task already canceled, taskId: ${getTask().taskId}")
+      return
+    }
     DuaContext.duaScope.launch(Dispatchers.IO) {
       ThreadTaskManager2.stopThreadTask(getTask().taskId, true)
     }
   }
 
   override fun stop() {
+    if (getTaskManager().isStopped()) {
+      Timber.w("task already stopped, taskId: ${getTask().taskId}")
+      return
+    }
     DuaContext.duaScope.launch(Dispatchers.IO) {
       ThreadTaskManager2.stopThreadTask(getTask().taskId)
     }

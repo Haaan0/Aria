@@ -28,6 +28,7 @@ import com.arialyy.aria.http.download.HttpDCheckInterceptor
 import com.arialyy.aria.http.download.TimerInterceptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * @Author laoyuyu
@@ -35,6 +36,9 @@ import kotlinx.coroutines.launch
  * @Date 21:58 2023/2/20
  **/
 internal class HttpDGroupAdapter : AbsTaskAdapter() {
+  private val taskManager by lazy {
+    HttpDGTaskManager()
+  }
 
   init {
     getTask().getTaskOption(HttpTaskOption::class.java).eventListener =
@@ -42,19 +46,25 @@ internal class HttpDGroupAdapter : AbsTaskAdapter() {
   }
 
   override fun getTaskManager(): ITaskManager {
-    TODO("Not yet implemented")
+    return taskManager
   }
 
   override fun isRunning(): Boolean {
-    TODO("Not yet implemented")
+    return taskManager.isRunning()
   }
 
   override fun cancel() {
-    TODO("Not yet implemented")
+    if (getTaskManager().isCanceled()) {
+      Timber.w("task already canceled, taskId: ${getTask().taskId}")
+      return
+    }
   }
 
   override fun stop() {
-    TODO("Not yet implemented")
+    if (getTaskManager().isStopped()) {
+      Timber.w("task already stopped, taskId: ${getTask().taskId}")
+      return
+    }
   }
 
   override fun start() {
@@ -65,7 +75,7 @@ internal class HttpDGroupAdapter : AbsTaskAdapter() {
     }
     DuaContext.duaScope.launch(Dispatchers.IO) {
       Looper.prepare()
-      blockManager?.setLooper()
+      taskManager.setLooper()
       addCoreInterceptor(HttpDCheckInterceptor())
       addCoreInterceptor(TimerInterceptor())
       addCoreInterceptor(HttpBlockThreadInterceptor())
@@ -75,7 +85,7 @@ internal class HttpDGroupAdapter : AbsTaskAdapter() {
           false,
           AriaException("start task fail, task interrupt, code: ${resp?.code ?: TaskResp.CODE_INTERRUPT}")
         )
-        blockManager?.stop()
+        taskManager.stop()
         return@launch
       }
       Looper.loop()

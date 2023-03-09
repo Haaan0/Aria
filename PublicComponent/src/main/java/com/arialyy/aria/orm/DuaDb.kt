@@ -30,7 +30,7 @@ import com.arialyy.aria.orm.entity.TaskRecord
 import com.arialyy.aria.orm.entity.UEntity
 
 @Database(
-  entities = [DbEntity::class, UEntity::class, DGEntity::class, MEntity::class, MKeyInfo::class, TaskRecord::class, BlockRecord::class],
+  entities = [UEntity::class, DGEntity::class, MEntity::class, MKeyInfo::class, TaskRecord::class, BlockRecord::class],
   version = 1
 )
 abstract class DuaDb : RoomDatabase() {

@@ -19,7 +19,6 @@ import android.net.Uri
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.command.AddCmd
 import com.arialyy.aria.core.command.StartCmd
-import com.arialyy.aria.core.inf.IStartController
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter
 import com.arialyy.aria.core.task.DownloadTask
 import com.arialyy.aria.core.task.ITaskInterceptor
@@ -34,8 +33,7 @@ import java.net.HttpURLConnection
  * @Description
  * @Date 12:38 PM 2023/1/22
  **/
-class HttpDStartController(target: Any, val url: String) : HttpBaseStartController(target),
-  IStartController {
+class HttpDStartController(target: Any, val url: String) : HttpBaseStartController(target) {
   private val taskOptionSupport = HttpDOptionAdapter()
 
   init {
@@ -89,7 +87,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
     return task
   }
 
-  override fun add(): Int {
+  fun add(): Int {
     if (!HttpUtil.checkHttpDParams(httpTaskOption)) {
       return -1
     }
@@ -98,7 +96,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
     return if (resp.isInterrupt()) -1 else task.taskId
   }
 
-  override fun start(): Int {
+  fun start(): Int {
     if (!HttpUtil.checkHttpDParams(httpTaskOption)) {
       return -1
     }
@@ -107,7 +105,8 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
     return if (resp.isInterrupt()) -1 else task.taskId
   }
 
-  override fun resume(): Int {
+  fun resume(): Int {
+    TaskCachePool.findTaskByPath(url)
     return start()
   }
 }

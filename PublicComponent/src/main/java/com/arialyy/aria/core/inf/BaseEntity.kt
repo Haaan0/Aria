@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.inf
 
+
 /**
  * @Author laoyuyu
  * @Description
@@ -34,4 +35,9 @@ abstract class BaseEntity : IEntity {
    * current progress
    */
   var progress: Long = 0L
+
+  /**
+   * extended Information
+   */
+  var ext: String? = null
 }

@@ -23,5 +23,6 @@ import com.arialyy.aria.http.IHttpTaskOptionAdapter
  * @Date 8:14 PM 2023/3/6
  **/
 internal class HttpDGOptionAdapter : IHttpTaskOptionAdapter {
-  val subUrl = mutableSetOf<String>()
+  val subUrlList = mutableSetOf<String>()
+  val subNameList = mutableListOf<String>()
 }

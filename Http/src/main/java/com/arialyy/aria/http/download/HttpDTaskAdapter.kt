@@ -99,4 +99,29 @@ internal class HttpDTaskAdapter : AbsTaskAdapter() {
       Looper.loop()
     }
   }
+
+  override fun resume() {
+    getTask().getTaskOption(HttpTaskOption::class.java).taskInterceptor.let {
+      if (it.isNotEmpty()) {
+        addInterceptors(it)
+      }
+    }
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      Looper.prepare()
+      blockManager?.setLooper()
+      addCoreInterceptor(TimerInterceptor())
+      addCoreInterceptor(HttpDBlockInterceptor())
+      addCoreInterceptor(HttpBlockThreadInterceptor())
+      val resp = interceptor()
+      if (resp == null || resp.code != TaskResp.CODE_SUCCESS) {
+        getTask().getTaskOption(HttpTaskOption::class.java).eventListener.onFail(
+          false,
+          AriaException("start task fail, task interrupt, code: ${resp?.code ?: TaskResp.CODE_INTERRUPT}")
+        )
+        blockManager?.stop()
+        return@launch
+      }
+      Looper.loop()
+    }
+  }
 }

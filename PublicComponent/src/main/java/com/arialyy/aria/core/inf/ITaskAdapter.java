@@ -49,4 +49,6 @@ public interface ITaskAdapter {
    * 开始
    */
   void start();
+
+  void resume();
 }

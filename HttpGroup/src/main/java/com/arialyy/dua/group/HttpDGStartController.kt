@@ -22,8 +22,10 @@ import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseStartController
 import com.arialyy.aria.http.HttpOption
 import com.arialyy.aria.http.HttpUtil
+import com.arialyy.aria.util.FileUri
 import com.arialyy.aria.util.FileUtils
 import timber.log.Timber
+import java.io.File
 
 /**
  * @Author laoyuyu
@@ -55,7 +57,15 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
    * add sub task download uri
    */
   fun addSubUriResource(subUrlList: List<String>): HttpDGStartController {
-    optionAdapter.subUrl.addAll(subUrlList)
+    optionAdapter.subUrlList.addAll(subUrlList)
+    return this
+  }
+
+  /**
+   * map sub task name, [subTaskNameList].size must be consistent [addSubUriResource].size
+   */
+  fun addSubTaskName(subTaskNameList: List<String>): HttpDGStartController {
+    optionAdapter.subNameList.addAll(subTaskNameList)
     return this
   }
 
@@ -76,6 +86,15 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
   fun start(): Int {
     if (!FileUtils.uriEffective(savePath)) {
       Timber.e("invalid savePath: $savePath")
+      return -1
+    }
+    val dir = File(FileUri.getPathByUri(savePath)!!)
+    if (dir.exists()) {
+      Timber.e("invalid savePath, the path existed: $savePath")
+      return -1
+    }
+    if (optionAdapter.subNameList.isNotEmpty() && optionAdapter.subNameList.size != optionAdapter.subUrlList.size) {
+      Timber.e("subNameList.size must be consistent subUrlList.size")
       return -1
     }
     return createTask().taskId

@@ -15,10 +15,18 @@
  */
 package com.arialyy.dua.group
 
+import android.net.Uri
 import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.http.HttpTaskOption
+import com.arialyy.aria.orm.entity.DEntity
+import com.arialyy.aria.orm.entity.DGEntity
+import com.arialyy.aria.util.FileUri
+import timber.log.Timber
+import java.io.File
 
 /**
  * @Author laoyuyu
@@ -31,10 +39,55 @@ internal class HttpDGSubTaskInterceptor : ITaskInterceptor {
     DuaContext.getServiceManager().getDbService().getDuaDb().getDGEntityDao()
   }
 
+  private lateinit var task: ITask
+  private lateinit var option: HttpTaskOption
+  private lateinit var dgOption: HttpDGOptionAdapter
+
   override suspend fun interceptor(chain: TaskChain): TaskResp {
+    task = chain.getTask()
+    option = task.getTaskOption(HttpTaskOption::class.java)
+    dgOption = option.getOptionAdapter(HttpDGOptionAdapter::class.java)
+    if (!checkRecord()) {
+      return TaskResp(TaskResp.CODE_INTERRUPT)
+    }
+
+
   }
 
-  private suspend fun checkRecord() {
-    // dgDao.
+  /**
+   * check dg task record, if dfEntiry exist, return false
+   * otherwise, save new record
+   */
+  private suspend fun checkRecord(): Boolean {
+    val entity = dgDao.getDGEntityByPath(option.savePathUri.toString())
+    if (entity != null) {
+      Timber.e("task already exist, filePath: ${option.savePathUri}")
+      return false
+    }
+    // create sub task record
+    val dgEntity = DGEntity(
+      savePath = option.savePathUri!!,
+      urls = dgOption.subUrlList.toList(),
+      subNameList = dgOption.subNameList
+    )
+
+    val subTask = mutableListOf<DEntity>()
+    val dir = File(FileUri.getPathByUri(option.savePathUri)!!)
+    dgOption.subUrlList.forEachIndexed { index, it ->
+      val subFile = File(
+        dir.path,
+        if (dgOption.subNameList.isNotEmpty()) dgOption.subNameList[index] else "dgTask${index}"
+      )
+      subTask.add(
+        DEntity(
+          sourceUrl = it,
+          savePath = Uri.parse(subFile.toString()),
+        )
+      )
+    }
+    dgEntity.subList.addAll(subTask)
+
+    dgDao.insert(dgEntity)
+    return true
   }
 }

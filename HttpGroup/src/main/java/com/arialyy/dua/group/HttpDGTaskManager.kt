@@ -48,7 +48,7 @@ internal class HttpDGTaskManager : ITaskManager {
   }
 
   fun start(taskOption: HttpTaskOption) {
-    taskOption.getOptionAdapter(HttpDGOptionAdapter::class.java).subUrl
+    taskOption.getOptionAdapter(HttpDGOptionAdapter::class.java).subUrlList
   }
 
   override fun setLooper() {

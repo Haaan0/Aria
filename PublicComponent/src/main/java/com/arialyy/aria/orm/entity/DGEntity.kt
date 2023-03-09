@@ -21,6 +21,8 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.arialyy.aria.core.inf.BaseEntity
+import kotlinx.parcelize.Parcelize
 
 /**
  * @Author laoyuyu
@@ -29,6 +31,7 @@ import androidx.room.TypeConverters
  **/
 @Entity(indices = [Index(value = ["savePath"])])
 @TypeConverters(DGUrlConverter::class, FilePathConverter::class)
+@Parcelize
 data class DGEntity(
   @PrimaryKey(autoGenerate = true) val dgId: Int = 0,
 
@@ -47,15 +50,9 @@ data class DGEntity(
    */
   val urls: List<String>,
 
-  /**
-   * extended Information
-   */
-  var ext: String? = null,
+  val subNameList: List<String>?
 
-  val createTime: Long,
-
-  val updateTime: Long
-) {
+) : BaseEntity() {
   @Ignore
-  internal var subList: MutableList<DEntity> = mutableListOf()
+  var subList: MutableList<DEntity> = mutableListOf()
 }

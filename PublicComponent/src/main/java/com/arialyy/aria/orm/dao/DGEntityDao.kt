@@ -38,6 +38,10 @@ interface DGEntityDao {
   suspend fun getDGEntityList(): List<DGSubRelation>
 
   @Transaction
+  @Query("SELECT * FROM DGEntity WHERE :path=savePath")
+  suspend fun getDGEntityByPath(path: String): DGSubRelation?
+
+  @Transaction
   @Query("SELECT * FROM DGEntity WHERE :gid=gid")
   suspend fun getDGEntityByGid(gid: Int): DGSubRelation
 
@@ -66,7 +70,7 @@ interface DGEntityDao {
     "please use ",
     ReplaceWith("insert(dgEntity)", "com.arialyy.aria.orm.dao.DGEntityDao.insert")
   )
-  suspend fun insertDg(dgEntity: DGEntity)
+  suspend fun insertDg(dgEntity: DGEntity): Int
 
   @Transaction
   suspend fun delete(dgEntity: DGEntity) {
@@ -74,8 +78,12 @@ interface DGEntityDao {
     deleteDg(dgEntity)
   }
 
+  @Transaction
   suspend fun insert(dgEntity: DGEntity) {
-    insertDg(dgEntity)
+    val gid = insertDg(dgEntity)
+    dgEntity.subList.forEach {
+      it.parentId = gid
+    }
     insertSubList(dgEntity.subList)
   }
 }

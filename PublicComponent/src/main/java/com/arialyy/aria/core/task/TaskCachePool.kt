@@ -50,6 +50,15 @@ object TaskCachePool {
   }
 
   /**
+   * find task by url
+   */
+  fun findTaskByUrl(url:String):ITask?{
+    taskMap.values.forEach {
+      if (it.getTaskOption().)
+    }
+  }
+
+  /**
    * find task by filePath
    */
   fun findTaskByPath(filePath: Uri): ITask? {

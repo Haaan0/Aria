@@ -33,29 +33,28 @@ object TaskCachePool {
    */
   private val entityMap = ConcurrentHashMap<Int, BaseEntity>()
   private val taskAdapterMap = ConcurrentHashMap<Uri, ITaskAdapter>()
-  private val taskMap = ConcurrentHashMap<Int, ITask>()
 
-  fun removeTask(taskId: Int) {
-    taskMap.remove(taskId)
+  /**
+   * task cache map; key: url
+   */
+  private val taskMap = ConcurrentHashMap<String, ITask>()
+
+  fun removeTask(url: String) {
+    taskMap.remove(url)
   }
 
   /**
    * if task is completed, stopped, canceled, return null
    */
-  fun getTask(taskId: Int) = taskMap[taskId]
+  fun getTaskByUrl(url: String) = taskMap[url]
 
-  fun putTask(task: ITask) {
-    taskMap[task.taskId] = task
-    taskAdapterMap[Uri.parse(task.filePath)] = task.adapter
+  fun getTaskById(taskId: Int): ITask? {
+    return taskMap.values.find { it.taskId == taskId }
   }
 
-  /**
-   * find task by url
-   */
-  fun findTaskByUrl(url:String):ITask?{
-    taskMap.values.forEach {
-      if (it.getTaskOption().)
-    }
+  fun putTask(task: ITask) {
+    taskMap[task.url] = task
+    taskAdapterMap[Uri.parse(task.filePath)] = task.adapter
   }
 
   /**

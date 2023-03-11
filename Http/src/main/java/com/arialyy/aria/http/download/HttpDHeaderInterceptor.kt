@@ -63,13 +63,18 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     }
     Timber.i("step 1. get file info")
     task = chain.getTask()
+    if (task.taskState.fileSize > 0L) {
+      Timber.d("not required repeat get file size: ${task.taskState.fileSize}")
+      return chain.proceed(task)
+    }
     taskOption = task.getTaskOption(HttpTaskOption::class.java)
     try {
       val fileSize = getFileSize()
       if (fileSize >= 0) {
         task.taskState.fileSize = fileSize
         getOptionAdapter().isSupportResume = fileSize != 0L
-        getOptionAdapter().isSupportBlock = getOptionAdapter().isSupportResume && fileSize > BlockRecord.BLOCK_SIZE
+        getOptionAdapter().isSupportBlock =
+          getOptionAdapter().isSupportResume && fileSize > BlockRecord.BLOCK_SIZE
         return chain.proceed(task)
       }
     } catch (e: IOException) {

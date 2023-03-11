@@ -34,6 +34,10 @@ final public class StartCmd extends AbsCmd {
       Timber.w("interruption occurred, cancel cmd");
       return resp;
     }
+    if (mTask.isRunning()) {
+      Timber.w("task is running");
+      return resp;
+    }
     getTaskQueue().startTask(mTask);
     return resp;
   }

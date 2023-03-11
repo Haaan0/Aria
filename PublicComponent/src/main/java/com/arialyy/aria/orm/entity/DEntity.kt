@@ -47,9 +47,7 @@ data class DEntity(
    */
   val savePath: Uri,
 
-  val isSub: Boolean = false,
-
-  val fileSize: Long = 0,
+  val isSub: Boolean = false
 ) : BaseEntity() {
 
   override fun update() {

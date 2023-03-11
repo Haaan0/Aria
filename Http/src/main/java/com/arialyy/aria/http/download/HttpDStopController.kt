@@ -16,8 +16,13 @@
 package com.arialyy.aria.http.download
 
 import android.net.Uri
+import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.command.CancelCmd
 import com.arialyy.aria.core.command.StopCmd
 import com.arialyy.aria.core.task.TaskCachePool
+import com.arialyy.aria.util.FileUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
@@ -28,16 +33,16 @@ import timber.log.Timber
 class HttpDStopController(val taskId: Int) {
 
   fun cancel() {
-    val task = TaskCachePool.getTask(taskId)
+    val task = TaskCachePool.getTaskById(taskId)
     if (task == null) {
       Timber.e("task not found, taskId: $taskId")
       return
     }
-    HttpDStopController2(Uri.parse(task.filePath)).cancel()
+    CancelCmd(task).executeCmd()
   }
 
   fun stop() {
-    val task = TaskCachePool.getTask(taskId)
+    val task = TaskCachePool.getTaskById(taskId)
     if (task == null) {
       Timber.e("task not found, taskId: $taskId")
       return
@@ -46,7 +51,7 @@ class HttpDStopController(val taskId: Int) {
   }
 
   fun resume() {
-    val task = TaskCachePool.getTask(taskId)
+    val task = TaskCachePool.getTaskById(taskId)
     if (task == null) {
       Timber.e("task not found, taskId: $taskId")
       return

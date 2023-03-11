@@ -18,14 +18,15 @@ package com.arialyy.aria.http.download
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.inf.ITaskManager
-import com.arialyy.aria.util.BlockUtil
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
+import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.orm.entity.BlockRecord
 import com.arialyy.aria.orm.entity.TaskRecord
+import com.arialyy.aria.util.BlockUtil
 import com.arialyy.aria.util.FileUri
 import com.arialyy.aria.util.FileUtils
 import kotlinx.coroutines.Dispatchers

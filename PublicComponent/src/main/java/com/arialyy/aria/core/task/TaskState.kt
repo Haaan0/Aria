@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.task
 
 import com.arialyy.aria.core.config.Configuration
+import com.arialyy.aria.core.inf.BaseEntity
 import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.orm.entity.BlockRecord
 import com.arialyy.aria.orm.entity.TaskRecord
@@ -29,6 +30,12 @@ import com.arialyy.aria.util.CommonUtil
 class TaskState {
 
   lateinit var taskRecord: TaskRecord
+
+  var entity: BaseEntity? = null
+    set(value) {
+      fileSize = value?.fileSize ?: 0
+      field = value
+    }
 
   /**
    * need to try again?，default: false

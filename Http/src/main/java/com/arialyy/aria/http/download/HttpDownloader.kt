@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.http.download
 
-import android.net.Uri
 import com.arialyy.annotations.TaskEnum
 import com.arialyy.annotations.TaskEnum.DOWNLOAD
 import com.arialyy.aria.core.inf.IDownloader
@@ -45,14 +44,6 @@ class HttpDownloader(val target: Any) : IDownloader {
    */
   fun load(taskId: Int): HttpDStopController {
     return HttpDStopController(taskId)
-  }
-
-  /**
-   * stop, cancel a task
-   * @param filePath filePath
-   */
-  fun load(filePath: Uri): HttpDStopController2 {
-    return HttpDStopController2(filePath)
   }
 
 }

@@ -22,7 +22,6 @@ import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.orm.entity.DEntity
-import timber.log.Timber
 
 /**
  * @Author laoyuyu
@@ -34,12 +33,12 @@ class HttpDCheckInterceptor : ITaskInterceptor {
   /**
    * find DEntity, if that not exist, create and save it
    */
-  private suspend fun findDEntityBySavePath(option: HttpTaskOption): DEntity? {
+  private suspend fun findDEntityBySavePath(option: HttpTaskOption): DEntity {
     val savePath = option.savePathUri
     val dao = DuaContext.getServiceManager().getDbService().getDuaDb().getDEntityDao()
     val de = dao.getDEntityBySavePath(savePath.toString())
     if (de != null) {
-      return null
+      return de
     }
     val newDe = DEntity(
       sourceUrl = option.sourUrl!!,
@@ -52,11 +51,8 @@ class HttpDCheckInterceptor : ITaskInterceptor {
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     val option = chain.getTask().getTaskOption(HttpTaskOption::class.java)
     val dEntity = findDEntityBySavePath(option)
-    if (dEntity == null) {
-      Timber.e("file already exists, ${option.savePathUri}")
-      return TaskResp(TaskResp.CODE_INTERRUPT)
-    }
+    chain.getTask().taskState.entity = dEntity
     TaskCachePool.putEntity(chain.getTask().taskId, dEntity)
-    return TaskResp(TaskResp.CODE_SUCCESS)
+    return chain.proceed(chain.getTask())
   }
 }

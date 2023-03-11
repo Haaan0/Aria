@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.core.inf
 
-
 /**
  * @Author laoyuyu
  * @Description
@@ -40,4 +39,6 @@ abstract class BaseEntity : IEntity {
    * extended Information
    */
   var ext: String? = null
+
+  val fileSize: Long = 0
 }

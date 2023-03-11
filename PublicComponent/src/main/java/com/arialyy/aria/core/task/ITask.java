@@ -119,6 +119,8 @@ public interface ITask {
 
   int getTaskId();
 
+  String getUrl();
+
   /**
    * @return task unique identifier, like: savePath
    */

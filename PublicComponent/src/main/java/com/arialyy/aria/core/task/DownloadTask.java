@@ -16,7 +16,6 @@
 
 package com.arialyy.aria.core.task;
 
-import android.net.Uri;
 import com.arialyy.aria.core.common.TaskOption;
 import java.util.Objects;
 
@@ -30,19 +29,15 @@ public class DownloadTask extends AbsTask {
     super(taskOption);
   }
 
-  public Uri getSavePath() {
-    return getTaskOption(TaskOption.class).getSavePathUri();
-  }
-
-  public String getSourceUrl() {
-    return getTaskOption(TaskOption.class).getSourUrl();
-  }
-
   /**
    * 获取当前下载任务的下载地址
    */
   @Override public int getTaskType() {
     return ITask.DOWNLOAD;
+  }
+
+  @Override public String getUrl() {
+    return getTaskOption(TaskOption.class).getSourUrl();
   }
 
   @Override public String getFilePath() {

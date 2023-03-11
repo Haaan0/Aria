@@ -36,7 +36,7 @@ class HttpDCheckInterceptor : ITaskInterceptor {
   private suspend fun findDEntityBySavePath(option: HttpTaskOption): DEntity {
     val savePath = option.savePathUri
     val dao = DuaContext.getServiceManager().getDbService().getDuaDb().getDEntityDao()
-    val de = dao.getDEntityBySavePath(savePath.toString())
+    val de = dao.queryDEntityBySavePath(savePath.toString())
     if (de != null) {
       return de
     }

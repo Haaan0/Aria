@@ -13,40 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.arialyy.aria.util
 
-package com.arialyy.aria.core.inf;
-
-import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.core.task.ITask;
-import org.jetbrains.annotations.NotNull;
+import java.security.MessageDigest
 
 /**
- * Created by lyy on 2016/10/31.
- * 任务功能接口
- */
-public interface ITaskAdapter {
+ * @Author laoyuyu
+ * @Description
+ * @Date 21:38 2023/3/11
+ **/
+object DuaUtil {
+  fun getMD5Hash(str: String): String {
+    val md = MessageDigest.getInstance("MD5")
+    val messageDigest = md.digest(str.toByteArray())
+    val no = messageDigest.toBigInteger() // 使用 Kotlin 扩展函数将字节数组转换为 BigInteger
+    var hashText = no.toString(16)
+    while (hashText.length < 32) {
+      hashText = "0$hashText"
+    }
+    return hashText
+  }
 
-  void init(@NotNull ITask task, @NotNull IEventListener listener);
-
-  /**
-   * 任务是否正在执行
-   *
-   * @return {@code true} 任务正在执行
-   */
-  boolean isRunning();
-
-  /**
-   * 取消
-   */
-  void cancel();
-
-  /**
-   * 停止
-   */
-  void stop();
-
-  /**
-   * 开始
-   */
-  void start();
 }

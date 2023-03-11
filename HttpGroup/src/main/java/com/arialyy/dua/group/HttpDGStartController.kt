@@ -16,16 +16,15 @@
 package com.arialyy.dua.group
 
 import android.net.Uri
+import com.arialyy.aria.core.command.StartCmd
 import com.arialyy.aria.core.task.DownloadGroupTask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseStartController
 import com.arialyy.aria.http.HttpOption
 import com.arialyy.aria.http.HttpUtil
-import com.arialyy.aria.util.FileUri
 import com.arialyy.aria.util.FileUtils
 import timber.log.Timber
-import java.io.File
 
 /**
  * @Author laoyuyu
@@ -69,9 +68,13 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
     return this
   }
 
-  private fun createTask(): DownloadGroupTask {
+  private fun getTask(createNewTask: Boolean = true): DownloadGroupTask {
     if (HttpUtil.checkHttpDParams(httpTaskOption)) {
       throw IllegalArgumentException("invalid params")
+    }
+    val temp = TaskCachePool.getTaskByKey(savePath.toString())
+    if (temp != null) {
+      return temp as DownloadGroupTask
     }
     val task = DownloadGroupTask(httpTaskOption)
     task.adapter = HttpDGroupAdapter()
@@ -88,15 +91,9 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
       Timber.e("invalid savePath: $savePath")
       return -1
     }
-    val dir = File(FileUri.getPathByUri(savePath)!!)
-    if (dir.exists()) {
-      Timber.e("invalid savePath, the path existed: $savePath")
-      return -1
-    }
-    if (optionAdapter.subNameList.isNotEmpty() && optionAdapter.subNameList.size != optionAdapter.subUrlList.size) {
-      Timber.e("subNameList.size must be consistent subUrlList.size")
-      return -1
-    }
-    return createTask().taskId
+
+    val task = getTask()
+    val resp = StartCmd(task).executeCmd()
+    return if (resp.isInterrupt()) -1 else task.taskId
   }
 }

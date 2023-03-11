@@ -39,4 +39,6 @@ class HttpDOptionAdapter : IHttpTaskOptionAdapter {
    */
   var isSupportBlock = true
 
+  var fileName: String? = null
+
 }

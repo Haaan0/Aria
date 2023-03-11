@@ -22,9 +22,11 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.BaseEntity
+import com.arialyy.aria.util.FileUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import java.io.File
 
 /**
  * Download Entity
@@ -44,11 +46,22 @@ data class DEntity(
 
   /**
    * file save path, it's uri
+   * eg: /mnt/Sdcard/Download/
    */
-  val savePath: Uri,
+  private val savePath: Uri,
+
+  var fileName: String = "",
 
   val isSub: Boolean = false
 ) : BaseEntity() {
+  private var dirFile: File? = null
+
+  fun getFilePath(): String {
+    if (dirFile == null) {
+      dirFile = File(FileUri.getPathByUri(savePath)!!)
+    }
+    return File(dirFile, fileName).path
+  }
 
   override fun update() {
     updateTime = System.currentTimeMillis()

@@ -33,6 +33,14 @@ public class DownloadGroupTask extends AbsTask {
     return DOWNLOAD_GROUP;
   }
 
+  /**
+   * @return Always return null
+   */
+  @Deprecated
+  @Override public String getUrl() {
+    return "";
+  }
+
   @Override public String getFilePath() {
     return Objects.requireNonNull(getTaskOption(TaskOption.class).getSavePathUri()).toString();
   }

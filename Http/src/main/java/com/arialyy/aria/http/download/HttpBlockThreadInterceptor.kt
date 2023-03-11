@@ -17,7 +17,6 @@ package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
-import com.arialyy.aria.core.task.BlockManager
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.IThreadTask
 import com.arialyy.aria.core.task.TaskChain
@@ -39,7 +38,7 @@ class HttpBlockThreadInterceptor : ITaskInterceptor {
     blockManager = chain.blockManager as IBlockManager
     val unfinishedBlockList = blockManager.unfinishedBlockList
     if (unfinishedBlockList.isEmpty()) {
-      return TaskResp(TaskResp.CODE_BLOCK_QUEUE_NULL)
+      return TaskResp(TaskResp.CODE_INTERRUPT)
     }
     createThreadTask(unfinishedBlockList, chain)
     return TaskResp(TaskResp.CODE_SUCCESS)

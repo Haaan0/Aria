@@ -37,11 +37,11 @@ import java.net.HttpURLConnection
  * @Date 12:38 PM 2023/1/22
  **/
 class HttpDStartController(target: Any, val url: String) : HttpBaseStartController(target) {
-  private val taskOptionSupport = HttpDOptionAdapter()
+  private val taskOptionAdapter = HttpDOptionAdapter()
 
   init {
     httpTaskOption.sourUrl = url
-    httpTaskOption.taskOptionAdapter = taskOptionSupport
+    httpTaskOption.taskOptionAdapter = taskOptionAdapter
   }
 
   override fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpDStartController {
@@ -60,7 +60,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
    * Maybe the server has special rules, you need set [IHttpFileLenAdapter] to get the file length from [HttpURLConnection.getHeaderFields]
    */
   fun setHttpFileLenAdapter(adapter: IHttpFileLenAdapter): HttpDStartController {
-    taskOptionSupport.fileSizeAdapter = adapter
+    taskOptionAdapter.fileSizeAdapter = adapter
     return this
   }
 
@@ -73,7 +73,19 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
   }
 
   /**
-   * set file save path, eg: /mnt/sdcard/Downloads/test.zip
+   * set file name
+   */
+  fun setFileName(fileName: String): HttpDStartController {
+    taskOptionAdapter.fileName = fileName
+    return this
+  }
+
+  /**
+   * set file save path, if you don't set the [setFileName],
+   * it will automatically try to get the file name, and if it fails,
+   * the md5 code of the url will be used
+   * eg: /mnt/sdcard/Downloads/
+   *
    */
   fun setSavePath(savePath: Uri): HttpDStartController {
     httpTaskOption.savePathUri = savePath
@@ -84,7 +96,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
     if (HttpUtil.checkHttpDParams(httpTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
-    val tempTask = TaskCachePool.getTaskByUrl(url)
+    val tempTask = TaskCachePool.getTaskByKey(url)
     if (tempTask != null) {
       return tempTask as DownloadTask
     }

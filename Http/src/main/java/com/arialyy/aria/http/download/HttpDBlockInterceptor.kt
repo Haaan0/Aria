@@ -20,7 +20,6 @@ import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
-import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.http.HttpTaskOption
@@ -51,13 +50,13 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
     option = task.getTaskOption(HttpTaskOption::class.java)
     if (task.taskState.fileSize < 0) {
       Timber.e("file size < 0")
-      return TaskResp(TaskResp.CODE_GET_FILE_INFO_FAIL)
+      return TaskResp(TaskResp.CODE_INTERRUPT)
     }
 
     val savePath = FileUri.getPathByUri(task.getTaskOption(HttpTaskOption::class.java).savePathUri)
     if (savePath.isNullOrEmpty()) {
       Timber.e("saveUri is null")
-      return TaskResp(TaskResp.CODE_SAVE_URI_NULL)
+      return TaskResp(TaskResp.CODE_INTERRUPT)
     }
 
     // if task not support resume, don't save record
@@ -95,7 +94,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
    */
   private suspend fun checkRecord(): Int {
     val recordDao = DuaContext.getServiceManager().getDbService().getDuaDb().getRecordDao()
-    val recordWrapper = recordDao.getTaskRecordByKey(task.filePath)
+    val recordWrapper = recordDao.queryTaskRecordByKey(task.filePath)
 
     if (recordWrapper == null) {
       Timber.i("record not found, create record")

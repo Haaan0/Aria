@@ -35,19 +35,19 @@ interface DGEntityDao {
 
   @Transaction
   @Query("SELECT * FROM DGEntity")
-  suspend fun getDGEntityList(): List<DGSubRelation>
+  suspend fun queryDGEntityList(): List<DGSubRelation>
 
   @Transaction
   @Query("SELECT * FROM DGEntity WHERE :path=savePath")
-  suspend fun getDGEntityByPath(path: String): DGSubRelation?
+  suspend fun queryDGEntityByPath(path: String): DGSubRelation?
 
   @Transaction
   @Query("SELECT * FROM DGEntity WHERE :gid=gid")
-  suspend fun getDGEntityByGid(gid: Int): DGSubRelation
+  suspend fun queryDGEntityByGid(gid: Int): DGSubRelation
 
   @Transaction
   @Query("SELECT * FROM DGEntity WHERE :gid=gid")
-  suspend fun getDGList(): List<DGSubRelation>
+  suspend fun queryDGList(): List<DGSubRelation>
 
   @Insert
   suspend fun insertSubList(subList: List<DEntity>)

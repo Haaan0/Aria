@@ -95,6 +95,10 @@ object HttpUtil {
       Timber.e("invalid uri, ${option.savePathUri}")
       return false
     }
+    if (!FileUtils.uriIsDir(option.savePathUri!!)){
+      Timber.e("invalid uri, that path not a dir")
+      return false
+    }
     return true
   }
 }

@@ -56,7 +56,7 @@ class HttpDStopController(val taskId: Int) {
       Timber.e("task not found, taskId: $taskId")
       return
     }
-    val util = TaskCachePool.getTaskAdapter(Uri.parse(task.filePath))
+    val util = task.adapter
     if (util == null) {
       Timber.e("resume fail, please restart task, taskId: $taskId")
       return

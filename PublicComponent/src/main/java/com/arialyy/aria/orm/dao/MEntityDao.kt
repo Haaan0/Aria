@@ -32,7 +32,7 @@ import com.arialyy.aria.orm.entity.MKeyInfo
 interface MEntityDao {
 
   @Query("SELECT * FROM MEntity WHERE :savePath=savePath")
-  suspend fun getMEntityByPath(savePath: String): MEntity
+  suspend fun queryMEntityByPath(savePath: String): MEntity
 
   @Update
   suspend fun update(entity: MEntity)

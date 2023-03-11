@@ -33,13 +33,13 @@ interface UEntityDao {
 
   @Transaction
   @Query("SELECT * FROM DEntity")
-  suspend fun getUEntityList(): List<UEntity>
+  suspend fun queryUEntityList(): List<UEntity>
 
   @Query("SELECT * FROM DEntity WHERE :uId=uId")
-  suspend fun getUEntityById(uId: String): UEntity
+  suspend fun queryUEntityById(uId: String): UEntity
 
   @Query("SELECT * FROM UEntity WHERE :filePath=filePath")
-  suspend fun getUEntityBySource(filePath: String): UEntity
+  suspend fun queryUEntityBySource(filePath: String): UEntity
 
   @Insert
   suspend fun insert(uEntity: UEntity)

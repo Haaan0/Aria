@@ -20,8 +20,13 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import com.arialyy.aria.core.DuaContext
 import timber.log.Timber
+import java.math.BigInteger
 
 internal const val AUTHORITY = ".andoFileProvider"
+
+fun ByteArray.toBigInteger(): BigInteger {
+  return BigInteger(1, this)
+}
 
 /**
  * @return 传入的Uri是否已具备访问权限 (Whether the incoming Uri has access permission)

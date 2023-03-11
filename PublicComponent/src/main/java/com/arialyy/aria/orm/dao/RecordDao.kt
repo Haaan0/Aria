@@ -35,7 +35,7 @@ interface RecordDao {
 
   @Transaction
   @Query("SELECT * FROM TaskRecord WHERE :key=taskKey")
-  suspend fun getTaskRecordByKey(key: String): RecordRelation?
+  suspend fun queryTaskRecordByKey(key: String): RecordRelation?
 
   @Insert
   @Deprecated(

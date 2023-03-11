@@ -76,9 +76,10 @@ internal class HttpDGroupAdapter : AbsTaskAdapter() {
     DuaContext.duaScope.launch(Dispatchers.IO) {
       Looper.prepare()
       taskManager.setLooper()
-      addCoreInterceptor(HttpDCheckInterceptor())
+      addCoreInterceptor(HttpDGCheckInterceptor())
       addCoreInterceptor(TimerInterceptor())
-      addCoreInterceptor(HttpBlockThreadInterceptor())
+      addCoreInterceptor()
+
       val resp = interceptor()
       if (resp == null || resp.code != TaskResp.CODE_SUCCESS) {
         getTask().getTaskOption(HttpTaskOption::class.java).eventListener.onFail(

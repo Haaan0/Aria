@@ -10,9 +10,6 @@ class TaskResp(val code: Int = CODE_DEF) {
     const val CODE_SUCCESS = 1
     const val CODE_INTERRUPT = 999
     const val CODE_DEF = 0
-    const val CODE_SAVE_URI_NULL = 3
-    const val CODE_GET_FILE_INFO_FAIL = 2
-    const val CODE_BLOCK_QUEUE_NULL = 4
   }
 
   var fileSize: Long = 0

@@ -35,6 +35,28 @@ object FileUtils {
     )
 
   /**
+   * Check if uri is a folder
+   * @return true it's folder
+   */
+  fun uriIsDir(uri: Uri): Boolean {
+    val path = FileUri.getPathByUri(uri)
+    if (path.isNullOrBlank()) {
+      throw IllegalArgumentException("invalid uri: ${uri}")
+    }
+    return File(path).isDirectory
+  }
+
+  /**
+   * get file name from url
+   */
+  fun getFileNameFromUrl(url: String?): String? {
+    if (url == null) return null
+    val fn = getFileNameFromPath(url) ?: return null
+    if (!fn.contains(".")) return null
+    return fn
+  }
+
+  /**
    * 创建文件 当文件不存在的时候就创建一个文件。 如果文件存在，先删除原文件，然后重新创建一个新文件
    *
    * @return `true` 创建成功、`false` 创建失败

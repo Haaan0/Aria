@@ -29,6 +29,8 @@ import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.HttpUtil
 import com.arialyy.aria.http.request.IRequest
 import com.arialyy.aria.orm.entity.BlockRecord
+import com.arialyy.aria.orm.entity.DEntity
+import com.arialyy.aria.util.DuaUtil
 import com.arialyy.aria.util.FileUtils
 import timber.log.Timber
 import java.io.BufferedReader
@@ -45,6 +47,7 @@ import java.util.UUID
 internal class HttpDHeaderInterceptor : ITaskInterceptor {
   private lateinit var task: ITask
   private lateinit var taskOption: HttpTaskOption
+  private var disposition: String? = null
 
   companion object {
     private val CODE_30X = listOf(
@@ -75,6 +78,12 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
         getOptionAdapter().isSupportResume = fileSize != 0L
         getOptionAdapter().isSupportBlock =
           getOptionAdapter().isSupportResume && fileSize > BlockRecord.BLOCK_SIZE
+        val fileName =
+          getFileName(if (taskOption.redirectUrl.isNullOrEmpty()) taskOption.sourUrl!! else taskOption.redirectUrl!!)
+        (task.taskState.entity as DEntity?)?.let {
+          it.fileName = fileName
+          it.update()
+        }
         return chain.proceed(task)
       }
     } catch (e: IOException) {
@@ -83,7 +92,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
           chain.getTask().getTaskOption(HttpTaskOption::class.java).sourUrl
         }"
       )
-      return TaskResp(TaskResp.CODE_GET_FILE_INFO_FAIL)
+      return TaskResp(TaskResp.CODE_INTERRUPT)
     }
     Timber.e("can't get fileSize")
     return TaskResp(TaskResp.CODE_INTERRUPT)
@@ -102,10 +111,51 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     return handleConnect(conn)
   }
 
+  /**
+   * get file name
+   * if already set file name, use it.
+   * if no file name set, will try to get the file name
+   */
+  private fun getFileName(url: String): String {
+    if (getOptionAdapter().fileName?.isNotEmpty() == true) {
+      return getOptionAdapter().fileName!!
+    }
+    // step1, get file name from header
+    if (!disposition.isNullOrEmpty()) {
+      val tempName = getFileNameFromContentDisposition(disposition!!)
+      if (!tempName.isNullOrEmpty()) {
+        Timber.d("get file name from disposition")
+        return tempName
+      }
+    }
+
+    // step2. get file name from url
+    val fileName = FileUtils.getFileNameFromUrl(url)
+    if (!fileName.isNullOrEmpty()) {
+      Timber.d("get file name from url")
+      return fileName
+    }
+
+    // step3. get file name from md5
+    val md5Name = DuaUtil.getMD5Hash(url)
+    Timber.d("use the md5 code of the url to get the file name, $md5Name")
+    return md5Name
+  }
+
+  /**
+   * [RFC6266](https://httpwg.org/specs/rfc6266.html#rfc.section.4)
+   */
+  private fun getFileNameFromContentDisposition(contentDisposition: String): String? {
+    val regex = Regex("filename=\"(.+?)\"")
+    val matchResult = regex.find(contentDisposition)
+    return matchResult?.groupValues?.getOrNull(1)
+  }
+
   @Throws(IOException::class)
   private fun handleConnect(conn: HttpURLConnection): Long {
 
     val code = conn.responseCode
+    disposition = conn.getHeaderField("Content-Disposition")
     when {
       code == HttpURLConnection.HTTP_PARTIAL -> return getFileSizeFromHeader(conn.headerFields)
       code == HttpURLConnection.HTTP_OK -> {

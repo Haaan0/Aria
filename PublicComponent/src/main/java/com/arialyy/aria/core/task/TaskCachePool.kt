@@ -18,7 +18,6 @@ package com.arialyy.aria.core.task
 import android.net.Uri
 import com.arialyy.aria.core.inf.BaseEntity
 import com.arialyy.aria.core.inf.IEntity
-import com.arialyy.aria.core.inf.ITaskAdapter
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 
@@ -32,29 +31,38 @@ object TaskCachePool {
    * key: taskId
    */
   private val entityMap = ConcurrentHashMap<Int, BaseEntity>()
-  private val taskAdapterMap = ConcurrentHashMap<Uri, ITaskAdapter>()
 
   /**
-   * task cache map; key: url
+   * task cache map; key: if task is [DownloadGroupTask], it's filePath else it's service url
    */
   private val taskMap = ConcurrentHashMap<String, ITask>()
 
-  fun removeTask(url: String) {
-    taskMap.remove(url)
+  /**
+   * @param key if task is [DownloadGroupTask], it's filePath else it's service url
+   */
+  fun removeTask(key: String) {
+    taskMap.remove(key)
   }
 
   /**
    * if task is completed, stopped, canceled, return null
+   * @param key if task is [DownloadGroupTask], it's filePath else it's service url
    */
-  fun getTaskByUrl(url: String) = taskMap[url]
+  fun getTaskByKey(key: String) = taskMap[key]
 
   fun getTaskById(taskId: Int): ITask? {
     return taskMap.values.find { it.taskId == taskId }
   }
 
   fun putTask(task: ITask) {
-    taskMap[task.url] = task
-    taskAdapterMap[Uri.parse(task.filePath)] = task.adapter
+    when (task) {
+      is DownloadTask -> {
+        taskMap[task.url] = task
+      }
+      is DownloadGroupTask -> {
+        taskMap[task.filePath] = task
+      }
+    }
   }
 
   /**
@@ -67,21 +75,6 @@ object TaskCachePool {
       }
     }
     return null
-  }
-
-//  /**
-//   * @param filePath task unique identifier, like: savePath, sourceUrl
-//   */
-//  fun putTaskUtil(filePath: Uri, taskUtil: ITaskAdapter) {
-//    taskAdapterMap[filePath] = taskUtil
-//    taskUtil.stop()
-//  }
-
-  /**
-   * @param  filePath unique identifier, like: savePath, sourceUrl
-   */
-  fun getTaskAdapter(filePath: Uri): ITaskAdapter? {
-    return taskAdapterMap[filePath]
   }
 
   fun putEntity(taskId: Int, entity: BaseEntity) {

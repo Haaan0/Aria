@@ -28,7 +28,7 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
@@ -178,32 +178,32 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
     mStop.setEnabled(!state);
   }
 
-  @Download.onPre public void onPre(DownloadTask task) {
+  @Download.onPre public void onPre(SingleDownloadTask task) {
     mAdapter.updateState(task.getDownloadEntity());
   }
 
-  @Download.onTaskPre public void onTaskPre(DownloadTask task) {
+  @Download.onTaskPre public void onTaskPre(SingleDownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       mSize.setText(task.getConvertFileSize());
     }
     mAdapter.updateState(task.getDownloadEntity());
   }
 
-  @Download.onTaskStart public void onTaskStart(DownloadTask task) {
+  @Download.onTaskStart public void onTaskStart(SingleDownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       setBtState(false);
     }
     mAdapter.updateState(task.getDownloadEntity());
   }
 
-  @Download.onTaskResume public void onTaskResume(DownloadTask task) {
+  @Download.onTaskResume public void onTaskResume(SingleDownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       setBtState(false);
     }
     mAdapter.updateState(task.getDownloadEntity());
   }
 
-  @Download.onTaskStop public void onTaskStop(DownloadTask task) {
+  @Download.onTaskStop public void onTaskStop(SingleDownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       setBtState(true);
       mStart.setText("恢复");
@@ -212,7 +212,7 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
     mAdapter.updateState(task.getDownloadEntity());
   }
 
-  @Download.onTaskCancel public void onTaskCancel(DownloadTask task) {
+  @Download.onTaskCancel public void onTaskCancel(SingleDownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       setBtState(true);
       mStart.setText("开始");
@@ -221,7 +221,7 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
     mAdapter.updateState(task.getDownloadEntity());
   }
 
-  @Download.onTaskFail public void onTaskFail(DownloadTask task) {
+  @Download.onTaskFail public void onTaskFail(SingleDownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       setBtState(true);
     } else {
@@ -229,7 +229,7 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
     }
   }
 
-  @Download.onTaskComplete public void onTaskComplete(DownloadTask task) {
+  @Download.onTaskComplete public void onTaskComplete(SingleDownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       setBtState(true);
       mStart.setText("重新开始");
@@ -239,7 +239,7 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
     mAdapter.updateState(task.getDownloadEntity());
   }
 
-  @Download.onTaskRunning public void onTaskRunning(DownloadTask task) {
+  @Download.onTaskRunning public void onTaskRunning(SingleDownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       mPb.setProgress(task.getPercent());
       mSpeed.setText(task.getConvertSpeed());

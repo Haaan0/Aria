@@ -31,11 +31,7 @@ class TaskState {
 
   lateinit var taskRecord: TaskRecord
 
-  var entity: BaseEntity? = null
-    set(value) {
-      fileSize = value?.fileSize ?: 0
-      field = value
-    }
+  private lateinit var _entity: BaseEntity
 
   /**
    * need to try again?，default: false
@@ -83,6 +79,15 @@ class TaskState {
   var timeLeft: Int = Int.Companion.MAX_VALUE
 
   val blockSize = BlockRecord.BLOCK_SIZE
+
+  fun setEntity(entity: BaseEntity) {
+    fileSize = entity.fileSize
+    _entity = entity
+  }
+
+  fun <T : BaseEntity> getEntity(clazz: Class<T>): T {
+    return _entity as T
+  }
 
   fun getPercent() = ((curProgress * 100) / fileSize).toInt()
 

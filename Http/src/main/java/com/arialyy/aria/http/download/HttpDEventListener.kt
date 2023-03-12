@@ -19,7 +19,7 @@ import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.core.listener.AbsEventListener
 import com.arialyy.aria.core.listener.ISchedulers
-import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.SingleDownloadTask
 import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.orm.entity.DEntity
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
-class HttpDEventListener(task: DownloadTask) : AbsEventListener(task) {
+class HttpDEventListener(task: SingleDownloadTask) : AbsEventListener(task) {
 
   /**
    * merge block file, if merge fail call [onFail]

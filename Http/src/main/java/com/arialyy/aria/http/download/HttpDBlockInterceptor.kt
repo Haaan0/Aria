@@ -24,10 +24,11 @@ import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.orm.entity.BlockRecord
+import com.arialyy.aria.orm.entity.DEntity
 import com.arialyy.aria.orm.entity.TaskRecord
 import com.arialyy.aria.util.BlockUtil
-import com.arialyy.aria.util.FileUri
 import com.arialyy.aria.util.FileUtils
+import com.arialyy.aria.util.uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -53,17 +54,11 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
       return TaskResp(TaskResp.CODE_INTERRUPT)
     }
 
-    val savePath = FileUri.getPathByUri(task.getTaskOption(HttpTaskOption::class.java).savePathUri)
-    if (savePath.isNullOrEmpty()) {
-      Timber.e("saveUri is null")
-      return TaskResp(TaskResp.CODE_INTERRUPT)
-    }
-
     // if task not support resume, don't save record
     if (task.taskState.fileSize == 0L) {
       blockManager.setBlockNum(1)
       // if block exist, delete the existed block
-      removeBlock()
+      removeBlock(0)
       return chain.proceed(chain.getTask())
     }
     val blockNum = checkRecord()
@@ -77,12 +72,13 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
     return chain.proceed(chain.getTask())
   }
 
-  private fun removeBlock() {
-    val saveUri = task.getTaskOption(HttpTaskOption::class.java).savePathUri
+  private fun removeBlock(blockId: Int) {
+    val saveUri = task.taskState.getEntity(DEntity::class.java).getFilePath().uri()
     if (!FileUtils.uriEffective(saveUri)) {
+      Timber.d("invalid uri: ${saveUri}")
       return
     }
-    val blockF = File(BlockUtil.getBlockPathFormUri(saveUri!!, 0))
+    val blockF = File(BlockUtil.getBlockPathFormUri(saveUri, blockId))
     if (blockF.exists()) {
       blockF.delete()
     }
@@ -101,8 +97,8 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
       val blockNumInfo = BlockUtil.getBlockNum(task.taskState.fileSize)
       val taskRecord = TaskRecord(
         taskKey = task.filePath,
-        filePath = option.savePathUri!!,
-        taskType = ITask.DOWNLOAD,
+        filePath = task.filePath.uri(),
+        taskType = ITask.SINGLE_DOWNLOAD,
         fileLen = task.taskState.fileSize,
         blockNum = blockNumInfo.first,
         blockSize = task.taskState.blockSize
@@ -110,7 +106,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
 
       taskRecord.blockList.addAll(
         BlockUtil.createBlockRecord(
-          task.getTaskOption(HttpTaskOption::class.java).savePathUri!!,
+          task.taskState.getEntity(DEntity::class.java).getFilePath(),
           task.taskState.fileSize
         )
       )

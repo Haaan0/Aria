@@ -19,7 +19,7 @@ import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.task.AbsTaskAdapter
-import com.arialyy.aria.core.task.BlockManager
+import com.arialyy.aria.core.task.DBlockManager
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.http.HttpTaskOption
@@ -34,11 +34,11 @@ import kotlinx.coroutines.launch
  * @Date 9:21 PM 2023/2/21
  **/
 class HttpUTaskAdapter : AbsTaskAdapter() {
-  private var blockManager: BlockManager? = null
+  private var blockManager: DBlockManager? = null
 
-  override fun getTaskManager(): ITaskManager {
+  override fun getBlockManager(): ITaskManager {
     if (blockManager == null) {
-      blockManager = BlockManager(getTask())
+      blockManager = DBlockManager(getTask())
     }
     return blockManager!!
   }

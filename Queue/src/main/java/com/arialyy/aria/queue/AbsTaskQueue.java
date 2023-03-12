@@ -133,7 +133,7 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
         task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
       }
     }
-    ThreadTaskManager2.INSTANCE.removeAllThreadTask();
+    ThreadTaskManager2.INSTANCE.stopAllThreadTask();
     getCachePool().clear();
   }
 

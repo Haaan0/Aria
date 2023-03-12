@@ -27,7 +27,7 @@ import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.core.AbsPopupWindow;
 import com.arialyy.simple.R;
@@ -116,21 +116,21 @@ public class DownloadPopupWindow extends AbsPopupWindow implements View.OnClickL
 
   }
 
-  @Download.onTaskPre public void onTaskPre(DownloadTask task) {
+  @Download.onTaskPre public void onTaskPre(SingleDownloadTask task) {
     mSize.setText(CommonUtil.formatFileSize(task.getFileSize()));
   }
 
-  @Download.onTaskStop public void onTaskStop(DownloadTask task) {
+  @Download.onTaskStop public void onTaskStop(SingleDownloadTask task) {
     mSpeed.setText("0.0kb/s");
     mStart.setText(getContext().getString(R.string.resume));
   }
 
-  @Download.onTaskCancel public void onTaskCancel(DownloadTask task) {
+  @Download.onTaskCancel public void onTaskCancel(SingleDownloadTask task) {
     mPb.setProgress(0);
     mSpeed.setText("0.0kb/s");
   }
 
-  @Download.onTaskRunning public void onTaskRunning(DownloadTask task) {
+  @Download.onTaskRunning public void onTaskRunning(SingleDownloadTask task) {
     long current = task.getCurrentProgress();
     long len = task.getFileSize();
     if (len == 0) {

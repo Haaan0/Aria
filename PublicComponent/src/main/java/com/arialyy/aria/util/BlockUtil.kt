@@ -36,10 +36,9 @@ object BlockUtil {
   /**
    * create block record
    */
-  fun createBlockRecord(fileSaveUri: Uri, fileSize: Long): List<BlockRecord> {
-    val filePath = FileUri.getPathByUri(fileSaveUri) ?: "/"
-    val fileName = FileUtils.getFileNameFromPath(filePath)
-    val dirPath = FileUtils.getFilePathFromFullPath(filePath)
+  fun createBlockRecord(filePath: File, fileSize: Long): List<BlockRecord> {
+    val fileName = filePath.name
+    val dirPath = filePath.parent
 
     val blockNumInfo = getBlockNum(fileSize)
     val lastIndex = blockNumInfo.first - 1

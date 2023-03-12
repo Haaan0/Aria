@@ -28,7 +28,7 @@ import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.task.DownloadGroupTask;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.simple.R;
@@ -86,34 +86,34 @@ public class MultiTaskListActivity extends BaseActivity<ActivityMultiBinding> {
     }
   }
 
-  @Download.onWait void taskWait(DownloadTask task) {
+  @Download.onWait void taskWait(SingleDownloadTask task) {
     Log.d(TAG, "wait ==> " + task.getDownloadEntity().getFileName());
   }
 
-  @Download.onTaskStart void taskStart(DownloadTask task) {
+  @Download.onTaskStart void taskStart(SingleDownloadTask task) {
     mAdapter.updateBtState(task.getKey(), false);
   }
 
-  @Download.onTaskResume void taskResume(DownloadTask task) {
+  @Download.onTaskResume void taskResume(SingleDownloadTask task) {
     mAdapter.updateBtState(task.getKey(), false);
   }
 
-  @Download.onTaskStop void taskStop(DownloadTask task) {
+  @Download.onTaskStop void taskStop(SingleDownloadTask task) {
     mAdapter.updateBtState(task.getKey(), true);
   }
 
-  @Download.onTaskCancel void taskCancel(DownloadTask task) {
+  @Download.onTaskCancel void taskCancel(SingleDownloadTask task) {
     mAdapter.updateBtState(task.getKey(), true);
   }
 
-  @Download.onTaskFail void taskFail(DownloadTask task) {
+  @Download.onTaskFail void taskFail(SingleDownloadTask task) {
     if (task == null || task.getEntity() == null){
       return;
     }
     mAdapter.updateBtState(task.getKey(), true);
   }
 
-  @Download.onTaskComplete void taskComplete(DownloadTask task) {
+  @Download.onTaskComplete void taskComplete(SingleDownloadTask task) {
     Log.d(TAG, FileUtil.getFileMD5(new File(task.getFilePath())));
   }
 

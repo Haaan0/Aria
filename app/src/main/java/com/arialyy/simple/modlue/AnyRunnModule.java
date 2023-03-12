@@ -22,7 +22,7 @@ import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.simple.util.AppUtil;
@@ -43,39 +43,39 @@ public class AnyRunnModule {
     mContext = context;
   }
 
-  @Download.onWait void onWait(DownloadTask task) {
+  @Download.onWait void onWait(SingleDownloadTask task) {
     Log.d(TAG, "wait ==> " + task.getDownloadEntity().getFileName());
   }
 
-  @Download.onPre protected void onPre(DownloadTask task) {
+  @Download.onPre protected void onPre(SingleDownloadTask task) {
     Log.d(TAG, "onPre");
   }
 
-  @Download.onTaskStart void taskStart(DownloadTask task) {
+  @Download.onTaskStart void taskStart(SingleDownloadTask task) {
     Log.d(TAG, "onPreStart");
   }
 
-  @Download.onTaskRunning protected void running(DownloadTask task) {
+  @Download.onTaskRunning protected void running(SingleDownloadTask task) {
     Log.d(TAG, "running；Percent = " + task.getPercent());
   }
 
-  @Download.onTaskResume void taskResume(DownloadTask task) {
+  @Download.onTaskResume void taskResume(SingleDownloadTask task) {
     Log.d(TAG, "resume");
   }
 
-  @Download.onTaskStop void taskStop(DownloadTask task) {
+  @Download.onTaskStop void taskStop(SingleDownloadTask task) {
     Log.d(TAG, "stop");
   }
 
-  @Download.onTaskCancel void taskCancel(DownloadTask task) {
+  @Download.onTaskCancel void taskCancel(SingleDownloadTask task) {
     Log.d(TAG, "cancel");
   }
 
-  @Download.onTaskFail void taskFail(DownloadTask task) {
+  @Download.onTaskFail void taskFail(SingleDownloadTask task) {
     Log.d(TAG, "fail");
   }
 
-  @Download.onTaskComplete void taskComplete(DownloadTask task) {
+  @Download.onTaskComplete void taskComplete(SingleDownloadTask task) {
     L.d(TAG, "path ==> " + task.getDownloadEntity().getFilePath());
     L.d(TAG, "md5Code ==> " + CommonUtil.getFileMD5(new File(task.getFilePath())));
   }

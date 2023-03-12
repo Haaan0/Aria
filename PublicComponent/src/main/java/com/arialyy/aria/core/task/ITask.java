@@ -27,7 +27,7 @@ public interface ITask {
   /**
    * 普通下载任务
    */
-  int DOWNLOAD = 1;
+  int SINGLE_DOWNLOAD = 1;
   /**
    * 上传任务
    */
@@ -35,7 +35,7 @@ public interface ITask {
   /**
    * 组合任务
    */
-  int DOWNLOAD_GROUP = 3;
+  int HTTP_GROUP = 3;
   /**
    * 组合任务的子任务
    */
@@ -58,7 +58,7 @@ public interface ITask {
   /**
    * 获取任务类型
    *
-   * @return {@link #DOWNLOAD}、{@link #UPLOAD}、{@link #DOWNLOAD_GROUP}
+   * @return {@link #SINGLE_DOWNLOAD}、{@link #UPLOAD}、{@link #HTTP_GROUP}
    */
   int getTaskType();
 

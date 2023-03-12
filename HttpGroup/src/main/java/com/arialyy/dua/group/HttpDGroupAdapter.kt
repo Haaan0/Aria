@@ -17,14 +17,12 @@ package com.arialyy.dua.group
 
 import android.os.Looper
 import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.task.AbsTaskAdapter
-import com.arialyy.aria.core.task.DownloadGroupTask
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.http.HttpTaskOption
-import com.arialyy.aria.http.download.HttpBlockThreadInterceptor
-import com.arialyy.aria.http.download.HttpDCheckInterceptor
 import com.arialyy.aria.http.download.TimerInterceptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,10 +40,10 @@ internal class HttpDGroupAdapter : AbsTaskAdapter() {
 
   init {
     getTask().getTaskOption(HttpTaskOption::class.java).eventListener =
-      HttpDGEventListener(getTask() as DownloadGroupTask)
+      HttpDGEventListener(getTask() as HttpGroupTask)
   }
 
-  override fun getTaskManager(): ITaskManager {
+  override fun getBlockManager(): IBlockManager {
     return taskManager
   }
 
@@ -54,14 +52,14 @@ internal class HttpDGroupAdapter : AbsTaskAdapter() {
   }
 
   override fun cancel() {
-    if (getTaskManager().isCanceled()) {
+    if (getBlockManager().isCanceled()) {
       Timber.w("task already canceled, taskId: ${getTask().taskId}")
       return
     }
   }
 
   override fun stop() {
-    if (getTaskManager().isStopped()) {
+    if (getBlockManager().isStopped()) {
       Timber.w("task already stopped, taskId: ${getTask().taskId}")
       return
     }
@@ -78,7 +76,7 @@ internal class HttpDGroupAdapter : AbsTaskAdapter() {
       taskManager.setLooper()
       addCoreInterceptor(HttpDGCheckInterceptor())
       addCoreInterceptor(TimerInterceptor())
-      addCoreInterceptor()
+      addCoreInterceptor(HttpDGSubTaskInterceptor())
 
       val resp = interceptor()
       if (resp == null || resp.code != TaskResp.CODE_SUCCESS) {

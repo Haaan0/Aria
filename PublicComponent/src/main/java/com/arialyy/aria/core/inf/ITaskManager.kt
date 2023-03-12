@@ -44,6 +44,8 @@ interface ITaskManager {
 
   fun stop()
 
+  fun cancel()
+
   /**
    * 任务是否已经完成
    *
@@ -63,11 +65,6 @@ interface ITaskManager {
   fun isCanceled(): Boolean
 
   fun isRunning(): Boolean
-
-  /**
-   * 创建handler 回调
-   */
-  fun getHandler(): Handler
 
   /**
    * 是否有失败的快

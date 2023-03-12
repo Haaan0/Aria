@@ -56,11 +56,11 @@ data class DEntity(
 ) : BaseEntity() {
   private var dirFile: File? = null
 
-  fun getFilePath(): String {
+  fun getFilePath(): File {
     if (dirFile == null) {
       dirFile = File(FileUri.getPathByUri(savePath)!!)
     }
-    return File(dirFile, fileName).path
+    return File(dirFile, fileName)
   }
 
   override fun update() {

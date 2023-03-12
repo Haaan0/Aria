@@ -28,7 +28,7 @@ import com.arialyy.aria.http.HttpOption
 class HttpUStartController(target: Any, val filePath: Uri) : HttpBaseStartController(target) {
 
   init {
-    httpTaskOption.savePathUri = filePath
+    httpTaskOption.savePathDir = filePath
   }
 
   override fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpUStartController {

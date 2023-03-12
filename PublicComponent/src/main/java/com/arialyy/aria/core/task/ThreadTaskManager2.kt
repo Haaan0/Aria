@@ -15,13 +15,18 @@
  */
 package com.arialyy.aria.core.task
 
+import com.arialyy.aria.core.inf.ITaskManager
+import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit.SECONDS
-import java.util.concurrent.locks.ReentrantLock
 
 object ThreadTaskManager2 {
-  private val mThreadTasks: ConcurrentHashMap<Int, MutableSet<IThreadTask>> = ConcurrentHashMap()
-  private val LOCK = ReentrantLock()
+  private val taskManagerMap: ConcurrentHashMap<Int, ITaskManager> = ConcurrentHashMap()
+
+  fun getThreadManager(taskId: Int) = taskManagerMap[taskId]
+
+  fun putThreadManager(taskId: Int, taskManager: ITaskManager) {
+    taskManagerMap[taskId] = taskManager
+  }
 
   /**
    * 任务是否在执行
@@ -29,7 +34,7 @@ object ThreadTaskManager2 {
    * @return `true` 任务正在运行
    */
   fun taskIsRunning(taskId: Int): Boolean {
-    return mThreadTasks[taskId] != null
+    return taskManagerMap[taskId]?.isRunning() == true
   }
 
   /**
@@ -37,46 +42,30 @@ object ThreadTaskManager2 {
    * @param isRemoveTask if true, remove task and block
    */
   fun stopThreadTask(taskId: Int, isRemoveTask: Boolean = false) {
-    try {
-      LOCK.tryLock(2, SECONDS)
-      val threadTaskList: MutableSet<IThreadTask>? = mThreadTasks[taskId]
-      threadTaskList?.forEach {
-        if (isRemoveTask) {
-          it.cancel()
-          return@forEach
-        }
-        it.stop()
-      }
-      mThreadTasks.remove(taskId)
-
-    } catch (e: Exception) {
-      e.printStackTrace()
-    } finally {
-      LOCK.unlock()
+    val taskManager = taskManagerMap[taskId]
+    if (taskManager == null) {
+      Timber.d("task already stop, taskId: $taskId")
+      return
     }
+    if (isRemoveTask) {
+      taskManager.cancel()
+    } else {
+      taskManager.stop()
+    }
+    taskManagerMap.remove(taskId)
   }
 
   /**
    * 删除所有线程任务
    */
-  fun removeAllThreadTask() {
-    if (mThreadTasks.isEmpty()) {
+  fun stopAllThreadTask() {
+    if (taskManagerMap.isEmpty()) {
       return
     }
-    try {
-      LOCK.tryLock(2, SECONDS)
-      for (threads in mThreadTasks.values) {
-        for (tt in threads) {
-          tt.stop()
-        }
-        threads.clear()
-      }
-      mThreadTasks.clear()
-    } catch (e: InterruptedException) {
-      e.printStackTrace()
-    } finally {
-      LOCK.unlock()
+    taskManagerMap.forEach {
+      it.value.cancel()
     }
+    taskManagerMap.clear()
   }
 
 }

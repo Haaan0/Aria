@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.http.download
 
+import android.net.Uri
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
@@ -33,16 +34,16 @@ class HttpDCheckInterceptor : ITaskInterceptor {
   /**
    * find DEntity, if that not exist, create and save it
    */
-  private suspend fun findDEntityBySavePath(option: HttpTaskOption): DEntity {
-    val savePath = option.savePathUri
+  private suspend fun findDEntityByUrl(option: HttpTaskOption): DEntity {
     val dao = DuaContext.getServiceManager().getDbService().getDuaDb().getDEntityDao()
-    val de = dao.queryDEntityBySavePath(savePath.toString())
+    val de = dao.queryDEntityByUrl(option.sourUrl ?: "")
     if (de != null) {
       return de
     }
+    // Set the file save path only after getting the file name
     val newDe = DEntity(
       sourceUrl = option.sourUrl!!,
-      savePath = savePath!!,
+      savePath = Uri.EMPTY,
     )
     dao.insert(newDe)
     return newDe
@@ -50,8 +51,8 @@ class HttpDCheckInterceptor : ITaskInterceptor {
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     val option = chain.getTask().getTaskOption(HttpTaskOption::class.java)
-    val dEntity = findDEntityBySavePath(option)
-    chain.getTask().taskState.entity = dEntity
+    val dEntity = findDEntityByUrl(option)
+    chain.getTask().taskState.setEntity(dEntity)
     TaskCachePool.putEntity(chain.getTask().taskId, dEntity)
     return chain.proceed(chain.getTask())
   }

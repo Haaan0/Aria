@@ -16,13 +16,13 @@
 package com.arialyy.aria.schedulers;
 
 import com.arialyy.aria.core.task.DownloadGroupTask;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.task.UploadTask;
 
 /**
  * Created by Aria.Lao on 2017/6/7.
- * 普通任务事件{@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}回调类
+ * 普通任务事件{@link SingleDownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}回调类
  */
 public class AptNormalTaskListener<TASK extends ITask> implements NormalTaskListenerInterface<TASK>, ISchedulerListener {
 

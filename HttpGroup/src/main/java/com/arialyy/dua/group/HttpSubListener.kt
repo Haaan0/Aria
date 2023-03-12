@@ -15,19 +15,44 @@
  */
 package com.arialyy.dua.group
 
-import com.arialyy.aria.core.listener.AbsEventListener
+import com.arialyy.aria.core.listener.IEventListener
+import com.arialyy.aria.exception.AriaException
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 9:15 PM 2023/3/6
+ * @Date 10:13 2023/3/12
  **/
-internal class HttpDGEventListener(task: HttpGroupTask) : AbsEventListener(task) {
+internal class HttpSubListener : IEventListener {
+  override fun onPre() {
+    TODO("Not yet implemented")
+  }
+
+  override fun onStart(startLocation: Long) {
+    TODO("Not yet implemented")
+  }
+
+  override fun onResume(resumeLocation: Long) {
+    TODO("Not yet implemented")
+  }
+
+  override fun onProgress(currentLocation: Long) {
+    TODO("Not yet implemented")
+  }
+
+  override fun onStop(stopLocation: Long) {
+    TODO("Not yet implemented")
+  }
+
   override fun onComplete() {
     TODO("Not yet implemented")
   }
 
-  override fun handleCancel() {
+  override fun onCancel() {
+    TODO("Not yet implemented")
+  }
+
+  override fun onFail(needRetry: Boolean, e: AriaException?) {
     TODO("Not yet implemented")
   }
 }

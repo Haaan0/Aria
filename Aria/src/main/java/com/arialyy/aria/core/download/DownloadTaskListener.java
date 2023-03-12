@@ -16,11 +16,11 @@
 package com.arialyy.aria.core.download;
 
 import com.arialyy.aria.core.scheduler.NormalTaskListenerInterface;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 
 /**
  * @author ChenFei(chenfei0928@gmail.com)
  * Date: 2020-07-07 14:12
  */
-public interface DownloadTaskListener extends NormalTaskListenerInterface<DownloadTask> {
+public interface DownloadTaskListener extends NormalTaskListenerInterface<SingleDownloadTask> {
 }

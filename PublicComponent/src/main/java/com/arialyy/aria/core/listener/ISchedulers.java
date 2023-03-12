@@ -31,7 +31,7 @@ public interface ISchedulers extends Handler.Callback, IService {
 
   String ARIA_TASK_INFO_ACTION = "ARIA_TASK_INFO_ACTION";
   /**
-   * 广播接收器中通过TASK_TYPE字段获取任务类型 {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link
+   * 广播接收器中通过TASK_TYPE字段获取任务类型 {@link ITask#SINGLE_DOWNLOAD}、{@link ITask#HTTP_GROUP}、{@link
    * ITask#UPLOAD}、{@link ITask#DOWNLOAD_GROUP_SUB}
    */
   String TASK_TYPE = "ARIA_TASK_TYPE";

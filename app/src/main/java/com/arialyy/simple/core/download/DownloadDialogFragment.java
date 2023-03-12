@@ -9,7 +9,7 @@ import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseDialog;
@@ -58,14 +58,14 @@ import com.arialyy.simple.util.AppUtil;
     Aria.download(this).unRegister();
   }
 
-  @Download.onPre(DOWNLOAD_URL) protected void onPre(DownloadTask task) {
+  @Download.onPre(DOWNLOAD_URL) protected void onPre(SingleDownloadTask task) {
   }
 
-  @Download.onTaskStart(DOWNLOAD_URL) void taskStart(DownloadTask task) {
+  @Download.onTaskStart(DOWNLOAD_URL) void taskStart(SingleDownloadTask task) {
     getBinding().setFileSize(task.getConvertFileSize());
   }
 
-  @Download.onTaskRunning(DOWNLOAD_URL) protected void running(DownloadTask task) {
+  @Download.onTaskRunning(DOWNLOAD_URL) protected void running(SingleDownloadTask task) {
     long len = task.getFileSize();
     if (len == 0) {
       getBinding().setProgress(0);
@@ -75,24 +75,24 @@ import com.arialyy.simple.util.AppUtil;
     getBinding().setSpeed(task.getConvertSpeed());
   }
 
-  @Download.onTaskResume(DOWNLOAD_URL) void taskResume(DownloadTask task) {
+  @Download.onTaskResume(DOWNLOAD_URL) void taskResume(SingleDownloadTask task) {
   }
 
-  @Download.onTaskStop(DOWNLOAD_URL) void taskStop(DownloadTask task) {
+  @Download.onTaskStop(DOWNLOAD_URL) void taskStop(SingleDownloadTask task) {
     getBinding().setSpeed("");
   }
 
-  @Download.onTaskCancel(DOWNLOAD_URL) void taskCancel(DownloadTask task) {
+  @Download.onTaskCancel(DOWNLOAD_URL) void taskCancel(SingleDownloadTask task) {
     getBinding().setProgress(0);
     Toast.makeText(getContext(), "取消下载", Toast.LENGTH_SHORT).show();
     getBinding().setSpeed("");
   }
 
-  @Download.onTaskFail(DOWNLOAD_URL) void taskFail(DownloadTask task) {
+  @Download.onTaskFail(DOWNLOAD_URL) void taskFail(SingleDownloadTask task) {
     Toast.makeText(getContext(), "下载失败", Toast.LENGTH_SHORT).show();
   }
 
-  @Download.onTaskComplete(DOWNLOAD_URL) void taskComplete(DownloadTask task) {
+  @Download.onTaskComplete(DOWNLOAD_URL) void taskComplete(SingleDownloadTask task) {
     getBinding().setProgress(100);
     Toast.makeText(getContext(), "下载完成", Toast.LENGTH_SHORT).show();
     getBinding().setSpeed("");

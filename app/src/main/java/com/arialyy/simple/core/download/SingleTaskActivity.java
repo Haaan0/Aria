@@ -36,7 +36,7 @@ import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.T;
@@ -184,7 +184,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onWait
-  public void onWait(DownloadTask task) {
+  public void onWait(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       Log.d(TAG, "wait ==> " + task.getDownloadEntity().getFileName());
       getBinding().pl.setInfo(task.getEntity());
@@ -192,7 +192,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onPre
-  public void onPre(DownloadTask task) {
+  public void onPre(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().pl.setInfo(task.getEntity());
     }
@@ -203,7 +203,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   //}
 
   @Download.onTaskStart
-  public void onTaskStart(DownloadTask task) {
+  public void onTaskStart(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().pl.setInfo(task.getEntity());
       ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getTaskState());
@@ -211,7 +211,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskRunning
-  public void onTaskRunning(DownloadTask task) {
+  public void onTaskRunning(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       //ALog.d(TAG, "isRunning" + "; state = " + task.getEntity().getState());
       getBinding().pl.setInfo(task.getEntity());
@@ -223,7 +223,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   //}
 
   @Download.onTaskResume
-  public void onTaskResume(DownloadTask task) {
+  public void onTaskResume(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "resume");
       getBinding().pl.setInfo(task.getEntity());
@@ -231,7 +231,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskStop
-  public void onTaskStop(DownloadTask task) {
+  public void onTaskStop(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "stop");
       getBinding().pl.setInfo(task.getEntity());
@@ -239,7 +239,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskCancel
-  public void onTaskCancel(DownloadTask task) {
+  public void onTaskCancel(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       mTaskId = -1;
       Log.d(TAG, "cancel");
@@ -248,7 +248,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskFail
-  public void onTaskFail(DownloadTask task, Exception e) {
+  public void onTaskFail(SingleDownloadTask task, Exception e) {
     ALog.d(TAG, "下载失败");
     Toast.makeText(SingleTaskActivity.this, getString(R.string.download_fail), Toast.LENGTH_SHORT)
         .show();
@@ -258,7 +258,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskComplete
-  public void onTaskComplete(DownloadTask task) {
+  public void onTaskComplete(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       Toast.makeText(SingleTaskActivity.this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();

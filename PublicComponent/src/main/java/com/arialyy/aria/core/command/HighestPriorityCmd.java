@@ -17,7 +17,7 @@ package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.queue.DTaskQueue;
 import com.arialyy.aria.util.ALog;
@@ -46,9 +46,9 @@ final class HighestPriorityCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T>
       ALog.e(TAG, "启动任务失败，网络未连接");
       return;
     }
-    DownloadTask task = (DownloadTask) getTask();
+    SingleDownloadTask task = (SingleDownloadTask) getTask();
     if (task == null) {
-      task = (DownloadTask) createTask();
+      task = (SingleDownloadTask) createTask();
     }
     if (task != null) {
       ((DTaskQueue) mQueue).setTaskHighestPriority(task);

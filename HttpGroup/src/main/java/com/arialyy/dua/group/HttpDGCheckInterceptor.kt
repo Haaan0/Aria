@@ -51,7 +51,7 @@ internal class HttpDGCheckInterceptor : ITaskInterceptor {
     taskOption = task.getTaskOption(HttpTaskOption::class.java)
     optionAdapter = taskOption.getOptionAdapter(HttpDGOptionAdapter::class.java)
 
-    if (checkParams(taskOption.savePathUri)) {
+    if (checkParams(taskOption.savePathDir)) {
       return TaskResp(TaskResp.CODE_INTERRUPT)
     }
 
@@ -65,7 +65,7 @@ internal class HttpDGCheckInterceptor : ITaskInterceptor {
    * @return false interrupt task
    */
   private suspend fun checkRecord(): Boolean {
-    val savePath = taskOption.savePathUri
+    val savePath = taskOption.savePathDir
     val dgE = dgDao.queryDGEntityByPath(savePath.toString())
     if (dgE == null) {
       createNewEntity()
@@ -93,13 +93,13 @@ internal class HttpDGCheckInterceptor : ITaskInterceptor {
     Timber.d("create new task")
     // create sub task record
     val dgEntity = DGEntity(
-      savePath = taskOption.savePathUri!!,
+      savePath = taskOption.savePathDir!!,
       urls = optionAdapter.subUrlList.toList(),
       subNameList = optionAdapter.subNameList
     )
 
     val subTask = mutableListOf<DEntity>()
-    val dir = File(FileUri.getPathByUri(taskOption.savePathUri)!!)
+    val dir = File(FileUri.getPathByUri(taskOption.savePathDir)!!)
     optionAdapter.subUrlList.forEachIndexed { index, it ->
       val subName = if (optionAdapter.subNameList.isNotEmpty()) {
         optionAdapter.subNameList[index]
@@ -119,6 +119,7 @@ internal class HttpDGCheckInterceptor : ITaskInterceptor {
       )
     }
     dgEntity.subList.addAll(subTask)
+    task.taskState.setEntity(dgEntity)
 
     dgDao.insert(dgEntity)
     return true

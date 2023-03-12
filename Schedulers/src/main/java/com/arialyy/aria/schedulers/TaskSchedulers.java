@@ -29,7 +29,7 @@ import com.arialyy.aria.core.inf.ITaskQueue;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.DownloadGroupTask;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.task.TaskCachePool;
 import com.arialyy.aria.core.task.UploadTask;
@@ -76,10 +76,10 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    * @param taskType 任务类型
    */
   ITaskQueue<ITask> getQueue(int taskType) {
-    if (taskType == ITask.DOWNLOAD) {
+    if (taskType == ITask.SINGLE_DOWNLOAD) {
       return DuaContext.INSTANCE.getServiceManager().getDownloadQueue();
     }
-    if (taskType == ITask.DOWNLOAD_GROUP) {
+    if (taskType == ITask.HTTP_GROUP) {
       return DuaContext.INSTANCE.getServiceManager().getDownloadGroupQueue();
     }
     if (taskType == ITask.UPLOAD) {
@@ -366,11 +366,11 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         }
         NormalTaskListenerInterface<TASK> listener = null;
         if (mObservers.get(key) != null) {
-          if (taskType == ITask.DOWNLOAD) {
+          if (taskType == ITask.SINGLE_DOWNLOAD) {
             listener = (NormalTaskListenerInterface<TASK>) listeners.get(TaskEnum.DOWNLOAD);
-          } else if (taskType == ITask.DOWNLOAD_GROUP) {
+          } else if (taskType == ITask.HTTP_GROUP) {
             listener = (NormalTaskListenerInterface<TASK>) listeners.get(TaskEnum.DOWNLOAD_GROUP);
-          } else if (taskType == ITask.DOWNLOAD_GROUP) {
+          } else if (taskType == ITask.HTTP_GROUP) {
             listener = (NormalTaskListenerInterface<TASK>) listeners.get(TaskEnum.UPLOAD);
           }
         }
@@ -397,7 +397,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         }
         NormalTaskListenerInterface<TASK> listener = null;
         if (mObservers.get(key) != null) {
-          if (task instanceof DownloadTask) {
+          if (task instanceof SingleDownloadTask) {
             listener = (NormalTaskListenerInterface<TASK>) listeners.get(TaskEnum.DOWNLOAD);
           } else if (task instanceof DownloadGroupTask) {
             listener = (NormalTaskListenerInterface<TASK>) listeners.get(TaskEnum.DOWNLOAD_GROUP);
@@ -470,7 +470,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
       return;
     }
     int type = task.getTaskType();
-    if (type == ITask.DOWNLOAD || type == ITask.DOWNLOAD_GROUP) {
+    if (type == ITask.SINGLE_DOWNLOAD || type == ITask.HTTP_GROUP) {
       mAriaConfig.getAPP().sendBroadcast(createData(task));
     } else if (type == ITask.UPLOAD) {
       mAriaConfig.getAPP().sendBroadcast(createData(task));

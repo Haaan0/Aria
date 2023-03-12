@@ -22,7 +22,7 @@ import com.arialyy.aria.core.command.CancelCmd
 import com.arialyy.aria.core.command.StartCmd
 import com.arialyy.aria.core.command.StopCmd
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter
-import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.SingleDownloadTask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseStartController
@@ -88,22 +88,22 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
    *
    */
   fun setSavePath(savePath: Uri): HttpDStartController {
-    httpTaskOption.savePathUri = savePath
+    httpTaskOption.savePathDir = savePath
     return this
   }
 
-  private fun getTask(createNewTask: Boolean = true): DownloadTask? {
+  private fun getTask(createNewTask: Boolean = true): SingleDownloadTask? {
     if (HttpUtil.checkHttpDParams(httpTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
     val tempTask = TaskCachePool.getTaskByKey(url)
     if (tempTask != null) {
-      return tempTask as DownloadTask
+      return tempTask as SingleDownloadTask
     }
     if (!createNewTask) {
       return null
     }
-    val task = DownloadTask(httpTaskOption)
+    val task = SingleDownloadTask(httpTaskOption)
     task.adapter = HttpDTaskAdapter()
     TaskCachePool.putTask(task)
     return task

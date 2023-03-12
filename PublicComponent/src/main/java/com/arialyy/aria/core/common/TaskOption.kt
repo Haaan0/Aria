@@ -25,6 +25,10 @@ import com.arialyy.aria.core.inf.ITaskOption
  **/
 open class TaskOption : ITaskOption() {
   var sourUrl: String? = null
-  var savePathUri: Uri? = null
+
+  /**
+   * The folder where the file is located
+   */
+  var savePathDir: Uri? = null
   var redirectUrl: String? = null
 }

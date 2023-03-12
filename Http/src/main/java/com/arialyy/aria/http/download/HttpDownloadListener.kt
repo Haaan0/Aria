@@ -16,12 +16,12 @@
 package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.listener.ITaskStatusListener
-import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.SingleDownloadTask
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 12:24 PM 2023/1/22
  **/
-class HttpDownloadListener : ITaskStatusListener<DownloadTask> {
+class HttpDownloadListener : ITaskStatusListener<SingleDownloadTask> {
 }

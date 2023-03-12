@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.task
 
-import com.arialyy.aria.core.inf.ITaskManager
+import com.arialyy.aria.core.inf.IBlockManager
 
 /**
  * @Author laoyuyu
@@ -26,7 +26,7 @@ class TaskChain(
   private val interceptors: List<ITaskInterceptor>,
   private val index: Int = 0,
   private val task: ITask,
-  val blockManager: ITaskManager
+  val blockManager: IBlockManager
 ) : ITaskInterceptor.IChain {
 
   override fun getTask(): ITask {

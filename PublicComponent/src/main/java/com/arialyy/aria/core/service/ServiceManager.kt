@@ -20,10 +20,7 @@ import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.ITaskQueue
 import com.arialyy.aria.core.listener.ISchedulers
-import com.arialyy.aria.core.task.DownloadGroupTask
-import com.arialyy.aria.core.task.DownloadTask
 import com.arialyy.aria.core.task.ITask
-import com.arialyy.aria.core.task.UploadTask
 import com.arialyy.aria.exception.AriaException
 import timber.log.Timber
 

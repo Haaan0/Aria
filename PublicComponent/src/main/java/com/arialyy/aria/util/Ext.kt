@@ -20,9 +20,18 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import com.arialyy.aria.core.DuaContext
 import timber.log.Timber
+import java.io.File
 import java.math.BigInteger
 
 internal const val AUTHORITY = ".andoFileProvider"
+
+fun File.uri(): Uri {
+  return Uri.parse(path)
+}
+
+fun String.uri():Uri{
+  return Uri.parse(this)
+}
 
 fun ByteArray.toBigInteger(): BigInteger {
   return BigInteger(1, this)

@@ -484,7 +484,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void stopAllTask() {
     EventMsgUtil.getDefault().post(NormalCmdFactory.getInstance()
         .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
-            ITask.DOWNLOAD));
+            ITask.SINGLE_DOWNLOAD));
   }
 
   /**
@@ -495,7 +495,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void resumeAllTask() {
     EventMsgUtil.getDefault().post(NormalCmdFactory.getInstance()
         .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_RESUME_ALL,
-            ITask.DOWNLOAD));
+            ITask.SINGLE_DOWNLOAD));
   }
 
   /**
@@ -508,7 +508,7 @@ public class DownloadReceiver extends AbsReceiver {
     final AriaManager ariaManager = AriaManager.getInstance();
     CancelAllCmd cancelCmd =
         (CancelAllCmd) CmdHelper.createNormalCmd(new DTaskWrapper(null),
-            NormalCmdFactory.TASK_CANCEL_ALL, ITask.DOWNLOAD);
+            NormalCmdFactory.TASK_CANCEL_ALL, ITask.SINGLE_DOWNLOAD);
     cancelCmd.removeFile = removeFile;
     EventMsgUtil.getDefault().post(cancelCmd);
 

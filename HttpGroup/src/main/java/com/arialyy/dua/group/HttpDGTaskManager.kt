@@ -62,6 +62,10 @@ internal class HttpDGTaskManager : ITaskManager {
   override fun stop() {
   }
 
+  override fun cancel() {
+
+  }
+
   override fun isCompleted(): Boolean {
     TODO("Not yet implemented")
   }
@@ -82,7 +86,7 @@ internal class HttpDGTaskManager : ITaskManager {
     TODO("Not yet implemented")
   }
 
-  override fun getHandler(): Handler {
+  fun getHandler(): Handler {
     return handler
   }
 

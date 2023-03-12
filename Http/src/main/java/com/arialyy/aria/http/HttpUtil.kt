@@ -87,15 +87,15 @@ object HttpUtil {
       Timber.e("invalid url, ${option.sourUrl}")
       return false
     }
-    if (option.savePathUri == null) {
+    if (option.savePathDir == null) {
       Timber.e("save path is null")
       return false
     }
-    if (!FileUtils.uriEffective(option.savePathUri)) {
-      Timber.e("invalid uri, ${option.savePathUri}")
+    if (!FileUtils.uriEffective(option.savePathDir)) {
+      Timber.e("invalid uri, ${option.savePathDir}")
       return false
     }
-    if (!FileUtils.uriIsDir(option.savePathUri!!)){
+    if (!FileUtils.uriIsDir(option.savePathDir!!)){
       Timber.e("invalid uri, that path not a dir")
       return false
     }

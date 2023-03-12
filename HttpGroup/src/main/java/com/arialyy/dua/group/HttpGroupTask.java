@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.task;
+package com.arialyy.dua.group;
 
 import com.arialyy.aria.core.common.TaskOption;
 import com.arialyy.aria.core.inf.ITaskOption;
+import com.arialyy.aria.core.task.AbsTask;
 import java.util.Objects;
 
 /**
  * Created by AriaL on 2017/6/27.
  * 任务组任务
  */
-public class DownloadGroupTask extends AbsTask {
+public class HttpGroupTask extends AbsTask {
 
-  public DownloadGroupTask(ITaskOption taskOption) {
+  public HttpGroupTask(ITaskOption taskOption) {
     super(taskOption);
   }
 
   @Override public int getTaskType() {
-    return DOWNLOAD_GROUP;
+    return HTTP_GROUP;
   }
 
   /**
@@ -42,6 +43,6 @@ public class DownloadGroupTask extends AbsTask {
   }
 
   @Override public String getFilePath() {
-    return Objects.requireNonNull(getTaskOption(TaskOption.class).getSavePathUri()).toString();
+    return Objects.requireNonNull(getTaskOption(TaskOption.class).getSavePathDir()).toString();
   }
 }

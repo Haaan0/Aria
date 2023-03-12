@@ -132,9 +132,9 @@ public abstract class FeatureController {
   int checkTaskType() {
     int taskType = 0;
     if (mTaskWrapper instanceof DTaskWrapper) {
-      taskType = ITask.DOWNLOAD;
+      taskType = ITask.SINGLE_DOWNLOAD;
     } else if (mTaskWrapper instanceof DGTaskWrapper) {
-      taskType = ITask.DOWNLOAD_GROUP;
+      taskType = ITask.HTTP_GROUP;
     } else if (mTaskWrapper instanceof UTaskWrapper) {
       taskType = ITask.UPLOAD;
     }

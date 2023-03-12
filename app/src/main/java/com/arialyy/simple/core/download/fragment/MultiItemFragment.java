@@ -23,7 +23,7 @@ import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.frame.core.AbsFragment;
 import com.arialyy.simple.R;
 import com.arialyy.simple.databinding.FragmentDownloadBinding;
@@ -81,28 +81,28 @@ public class MultiItemFragment extends AbsFragment<FragmentDownloadBinding> {
     });
   }
 
-  @Download.onTaskPre public void onTaskPre(DownloadTask task) {
+  @Download.onTaskPre public void onTaskPre(SingleDownloadTask task) {
     if (!task.getKey().equals(DOWNLOAD_URL)){
       return;
     }
     getBinding().pl.setInfo(task.getEntity());
   }
 
-  @Download.onTaskStop public void onTaskStop(DownloadTask task) {
+  @Download.onTaskStop public void onTaskStop(SingleDownloadTask task) {
     if (!task.getKey().equals(DOWNLOAD_URL)){
       return;
     }
     getBinding().pl.setInfo(task.getEntity());
   }
 
-  @Download.onTaskCancel public void onTaskCancel(DownloadTask task) {
+  @Download.onTaskCancel public void onTaskCancel(SingleDownloadTask task) {
     if (!task.getKey().equals(DOWNLOAD_URL)){
       return;
     }
     getBinding().pl.setInfo(task.getEntity());
   }
 
-  @Download.onTaskRunning public void onTaskRunning(DownloadTask task) {
+  @Download.onTaskRunning public void onTaskRunning(SingleDownloadTask task) {
     if (!task.getKey().equals(DOWNLOAD_URL)){
       return;
     }

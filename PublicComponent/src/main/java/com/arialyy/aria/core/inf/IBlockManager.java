@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.inf;
 
+import android.os.Handler;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.orm.entity.BlockRecord;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 /**
  * 线程任务状态
  */
-public interface IBlockManager extends ITaskManager {
+public interface IBlockManager {
 
   void start(List<IThreadTask> threadTaskList);
 
@@ -32,5 +33,8 @@ public interface IBlockManager extends ITaskManager {
 
   List<BlockRecord> getUnfinishedBlockList();
 
-
+  /**
+   * 创建handler 回调
+   */
+  Handler getHandler();
 }

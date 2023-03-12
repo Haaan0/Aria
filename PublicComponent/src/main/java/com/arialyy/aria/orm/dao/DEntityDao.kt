@@ -42,7 +42,7 @@ interface DEntityDao {
   suspend fun queryDEntityById(did: String): DEntity?
 
   @Query("SELECT * FROM DEntity WHERE :sourceUrl=sourceUrl")
-  suspend fun queryDEntityBySource(sourceUrl: String): DEntity?
+  suspend fun queryDEntityByUrl(sourceUrl: String): DEntity?
 
   @Insert
   suspend fun insert(dEntity: DEntity)

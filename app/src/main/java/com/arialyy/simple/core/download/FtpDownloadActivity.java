@@ -27,7 +27,7 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.simple.R;
@@ -100,7 +100,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onWait
-  void onWait(DownloadTask task) {
+  void onWait(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       Log.d(TAG, "wait ==> " + task.getDownloadEntity().getFileName());
       getBinding().pl.setInfo(task.getEntity());
@@ -108,14 +108,14 @@ public class FtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onPre
-  protected void onPre(DownloadTask task) {
+  protected void onPre(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskStart
-  void taskStart(DownloadTask task) {
+  void taskStart(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().pl.setInfo(task.getEntity());
       ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getTaskState());
@@ -123,7 +123,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskRunning
-  protected void running(DownloadTask task) {
+  protected void running(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "isRunning" + "; state = " + task.getEntity().getState());
       getBinding().pl.setInfo(task.getEntity());
@@ -131,7 +131,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskResume
-  void taskResume(DownloadTask task) {
+  void taskResume(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "resume");
       getBinding().pl.setInfo(task.getEntity());
@@ -139,7 +139,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskStop
-  void taskStop(DownloadTask task) {
+  void taskStop(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "stop");
       getBinding().pl.setInfo(task.getEntity());
@@ -147,7 +147,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskCancel
-  void taskCancel(DownloadTask task) {
+  void taskCancel(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       mTaskId = -1;
       Log.d(TAG, "cancel");
@@ -156,7 +156,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskFail
-  void taskFail(DownloadTask task, Exception e) {
+  void taskFail(SingleDownloadTask task, Exception e) {
     ALog.d(TAG, "下载失败");
     Toast.makeText(this, getString(R.string.download_fail), Toast.LENGTH_SHORT)
         .show();
@@ -166,7 +166,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   @Download.onTaskComplete
-  void taskComplete(DownloadTask task) {
+  void taskComplete(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       Toast.makeText(this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();

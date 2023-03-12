@@ -28,7 +28,7 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.task.DownloadGroupTask;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
@@ -76,30 +76,30 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
     return true;
   }
 
-  @Download.onPre void onPre(DownloadTask task) {
+  @Download.onPre void onPre(SingleDownloadTask task) {
     mAdapter.updateState(task.getEntity());
     Log.d(TAG, task.getTaskName() + ", " + task.getTaskState());
   }
 
-  @Download.onWait void onWait(DownloadTask task) {
+  @Download.onWait void onWait(SingleDownloadTask task) {
     mAdapter.updateState(task.getEntity());
   }
 
-  @Download.onTaskStart void taskStart(DownloadTask task) {
+  @Download.onTaskStart void taskStart(SingleDownloadTask task) {
     Log.d(TAG, task.getTaskName() + ", " + task.getTaskState());
     mAdapter.updateState(task.getEntity());
   }
 
-  @Download.onTaskResume void taskResume(DownloadTask task) {
+  @Download.onTaskResume void taskResume(SingleDownloadTask task) {
     Log.d(TAG, task.getTaskName() + ", " + task.getTaskState());
     mAdapter.updateState(task.getEntity());
   }
 
-  @Download.onTaskStop void taskStop(DownloadTask task) {
+  @Download.onTaskStop void taskStop(SingleDownloadTask task) {
     mAdapter.updateState(task.getEntity());
   }
 
-  @Download.onTaskCancel void taskCancel(DownloadTask task) {
+  @Download.onTaskCancel void taskCancel(SingleDownloadTask task) {
     mAdapter.updateState(task.getEntity());
     List<DownloadEntity> tasks = Aria.download(this).getAllNotCompleteTask();
     if (tasks != null){
@@ -107,18 +107,18 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
     }
   }
 
-  @Download.onTaskFail void taskFail(DownloadTask task) {
+  @Download.onTaskFail void taskFail(SingleDownloadTask task) {
     if (task == null || task.getEntity() == null){
       return;
     }
     mAdapter.updateState(task.getEntity());
   }
 
-  @Download.onTaskComplete void taskComplete(DownloadTask task) {
+  @Download.onTaskComplete void taskComplete(SingleDownloadTask task) {
     mAdapter.updateState(task.getEntity());
   }
 
-  @Download.onTaskRunning void taskRunning(DownloadTask task) {
+  @Download.onTaskRunning void taskRunning(SingleDownloadTask task) {
     mAdapter.setProgress(task.getEntity());
   }
 

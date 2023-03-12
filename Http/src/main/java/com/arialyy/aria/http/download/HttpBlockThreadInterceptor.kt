@@ -57,7 +57,7 @@ class HttpBlockThreadInterceptor : ITaskInterceptor {
           ) else HttpDBTaskAdapter(
             threadConfig
           ),
-          handler = blockManager.getHandler(),
+          handler = blockManager.handler,
           record = it
         )
       )

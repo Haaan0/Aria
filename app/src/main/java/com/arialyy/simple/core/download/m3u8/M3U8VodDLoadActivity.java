@@ -38,7 +38,7 @@ import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.T;
@@ -210,14 +210,14 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   }
 
   @Download.onWait
-  void onWait(DownloadTask task) {
+  void onWait(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       Log.d(TAG, "wait ==> " + task.getDownloadEntity().getFileName());
     }
   }
 
   @Download.onPre
-  protected void onPre(DownloadTask task) {
+  protected void onPre(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "pre");
       getBinding().pl.setInfo(task.getEntity());
@@ -225,7 +225,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   }
 
   @Download.onTaskStart
-  void taskStart(DownloadTask task) {
+  void taskStart(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getTaskState());
       getBinding().seekBar.setMax(task.getEntity().getM3U8Entity().getPeerNum());
@@ -234,7 +234,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   }
 
   @Download.onTaskRunning
-  protected void running(DownloadTask task) {
+  protected void running(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG,
           "m3u8 void running, p = " + task.getPercent() + ", speed  = " + task.getConvertSpeed());
@@ -243,7 +243,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   }
 
   @Download.onTaskResume
-  void taskResume(DownloadTask task) {
+  void taskResume(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "m3u8 vod resume");
       getBinding().pl.setInfo(task.getEntity());
@@ -251,7 +251,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   }
 
   @Download.onTaskStop
-  void taskStop(DownloadTask task) {
+  void taskStop(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "stop");
       getBinding().pl.setInfo(task.getEntity());
@@ -259,7 +259,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   }
 
   @Download.onTaskCancel
-  void taskCancel(DownloadTask task) {
+  void taskCancel(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       Log.d(TAG, "cancel");
       getBinding().pl.setInfo(task.getEntity());
@@ -267,7 +267,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   }
 
   @Download.onTaskFail
-  void taskFail(DownloadTask task, Exception e) {
+  void taskFail(SingleDownloadTask task, Exception e) {
     if (task != null && task.getKey().equals(mUrl)) {
       Toast.makeText(M3U8VodDLoadActivity.this, getString(R.string.download_fail),
           Toast.LENGTH_SHORT)
@@ -278,7 +278,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   }
 
   @Download.onTaskComplete
-  void taskComplete(DownloadTask task) {
+  void taskComplete(SingleDownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       Toast.makeText(M3U8VodDLoadActivity.this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();

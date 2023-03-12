@@ -25,7 +25,7 @@ public class CmdHelper {
   /**
    * 创建任务命令
    *
-   * @param taskType {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link ITask#UPLOAD}
+   * @param taskType {@link ITask#SINGLE_DOWNLOAD}、{@link ITask#HTTP_GROUP}、{@link ITask#UPLOAD}
    */
   public static <T extends AbsTaskWrapper> AbsNormalCmd createNormalCmd(T entity, int cmd,
       int taskType) {

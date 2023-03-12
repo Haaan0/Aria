@@ -22,7 +22,7 @@ import android.widget.Toast
 import com.arialyy.annotations.Download
 import com.arialyy.aria.core.Aria
 import com.arialyy.aria.core.download.target.HttpNormalTarget
-import com.arialyy.aria.core.task.DownloadTask
+import com.arialyy.aria.core.task.SingleDownloadTask
 import com.arialyy.aria.inf.IEntity
 import com.arialyy.simple.R
 import com.arialyy.simple.base.BaseActivity
@@ -71,7 +71,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleBinding>() {
    * 注解方法不能添加internal修饰符，否则会出现e: [kapt] An exception occurred: java.lang.IllegalArgumentException: peerIndex 1 for '$a' not in range (received 0 arguments)错误
    */
   @Download.onTaskRunning
-  fun running(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun running(task: SingleDownloadTask) {
     Log.d(TAG, task.percent.toString())
     val len = task.fileSize
     if (len == 0L) {
@@ -83,40 +83,40 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleBinding>() {
   }
 
   @Download.onWait
-  fun onWait(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun onWait(task: SingleDownloadTask) {
     if (task.key == DOWNLOAD_URL) {
       Log.d(TAG, "wait ==> " + task.downloadEntity.fileName)
     }
   }
 
   @Download.onPre
-  fun onPre(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun onPre(task: SingleDownloadTask) {
     if (task.key == DOWNLOAD_URL) {
       mStart.text = "停止"
     }
   }
 
   @Download.onTaskStart
-  fun taskStart(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskStart(task: SingleDownloadTask) {
     if (task.key == DOWNLOAD_URL) {
       binding.fileSize = task.convertFileSize
     }
   }
 
   @Download.onTaskComplete
-  fun complete(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun complete(task: SingleDownloadTask) {
     Log.d(TAG, "完成")
   }
 
   @Download.onTaskResume
-  fun taskResume(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskResume(task: SingleDownloadTask) {
     if (task.key == DOWNLOAD_URL) {
       mStart.text = "停止"
     }
   }
 
   @Download.onTaskStop
-  fun taskStop(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskStop(task: SingleDownloadTask) {
     if (task.key == DOWNLOAD_URL) {
       mStart.text = "恢复"
       binding.speed = ""
@@ -124,7 +124,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleBinding>() {
   }
 
   @Download.onTaskCancel
-  fun taskCancel(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskCancel(task: SingleDownloadTask) {
     if (task.key == DOWNLOAD_URL) {
       binding.progress = 0
       Toast.makeText(this@KotlinDownloadActivity, "取消下载", Toast.LENGTH_SHORT)
@@ -136,7 +136,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleBinding>() {
   }
 
   @Download.onTaskFail
-  fun taskFail(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskFail(task: SingleDownloadTask) {
     if (task.key == DOWNLOAD_URL) {
       Toast.makeText(this@KotlinDownloadActivity, "下载失败", Toast.LENGTH_SHORT)
           .show()

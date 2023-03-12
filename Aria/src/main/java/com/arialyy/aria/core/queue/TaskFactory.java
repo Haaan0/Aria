@@ -19,7 +19,7 @@ package com.arialyy.aria.core.queue;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.task.DownloadGroupTask;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.listener.ISchedulers;
@@ -54,7 +54,7 @@ class TaskFactory {
    * @param schedulers 对应的任务调度器
    * @param <TASK_ENTITY> {@link DTaskWrapper}、{@link UTaskWrapper}、{@link
    * DGTaskWrapper}
-   * @return {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
+   * @return {@link SingleDownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
    */
   <TASK_ENTITY extends AbsTaskWrapper, SCHEDULER extends ISchedulers> ITask createTask(
       TASK_ENTITY entity, SCHEDULER schedulers) {
@@ -96,8 +96,8 @@ class TaskFactory {
    * @param entity 下载任务实体{@link DTaskWrapper}
    * @param schedulers {@link ISchedulers}
    */
-  private DownloadTask createDownloadTask(DTaskWrapper entity, ISchedulers schedulers) {
-    DownloadTask.Builder builder = new DownloadTask.Builder(entity);
+  private SingleDownloadTask createDownloadTask(DTaskWrapper entity, ISchedulers schedulers) {
+    SingleDownloadTask.Builder builder = new SingleDownloadTask.Builder(entity);
     builder.setOutHandler(schedulers);
     return builder.build();
   }

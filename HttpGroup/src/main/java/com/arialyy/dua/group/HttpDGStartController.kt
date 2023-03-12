@@ -17,7 +17,6 @@ package com.arialyy.dua.group
 
 import android.net.Uri
 import com.arialyy.aria.core.command.StartCmd
-import com.arialyy.aria.core.task.DownloadGroupTask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseStartController
@@ -37,7 +36,7 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
 
   init {
     httpTaskOption.taskOptionAdapter = optionAdapter
-    httpTaskOption.savePathUri = savePath
+    httpTaskOption.savePathDir = savePath
   }
 
   override fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpDGStartController {
@@ -68,15 +67,15 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
     return this
   }
 
-  private fun getTask(createNewTask: Boolean = true): DownloadGroupTask {
+  private fun getTask(createNewTask: Boolean = true): HttpGroupTask {
     if (HttpUtil.checkHttpDParams(httpTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
     val temp = TaskCachePool.getTaskByKey(savePath.toString())
     if (temp != null) {
-      return temp as DownloadGroupTask
+      return temp as HttpGroupTask
     }
-    val task = DownloadGroupTask(httpTaskOption)
+    val task = HttpGroupTask(httpTaskOption)
     task.adapter = HttpDGroupAdapter()
     TaskCachePool.putTask(task)
     return task

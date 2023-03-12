@@ -33,7 +33,7 @@ data class TaskRecord(
    */
   val filePath: Uri,
   /**
-   * [ITask.DOWNLOAD] ...
+   * [ITask.SINGLE_DOWNLOAD] ...
    */
   val taskType: Int,
   val fileLen: Long,

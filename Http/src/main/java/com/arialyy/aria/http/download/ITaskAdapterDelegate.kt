@@ -13,34 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.arialyy.aria.http.download
 
-package com.arialyy.aria.core.task;
-
-import com.arialyy.aria.core.common.TaskOption;
-import java.util.Objects;
+import com.arialyy.aria.core.inf.IBlockManager
 
 /**
- * Created by lyy on 2016/8/11.
- * 下载任务类
- */
-public class DownloadTask extends AbsTask {
-
-  public DownloadTask(TaskOption taskOption) {
-    super(taskOption);
-  }
+ * @Author laoyuyu
+ * @Description
+ * @Date 11:37 2023/3/12
+ **/
+internal interface ITaskAdapterDelegate {
+  /**
+   * 任务是否正在执行
+   *
+   * @return `true` 任务正在执行
+   */
+  fun isRunning(): Boolean
 
   /**
-   * 获取当前下载任务的下载地址
+   * 取消
    */
-  @Override public int getTaskType() {
-    return ITask.DOWNLOAD;
-  }
+  fun cancel()
 
-  @Override public String getUrl() {
-    return getTaskOption(TaskOption.class).getSourUrl();
-  }
+  /**
+   * 停止
+   */
+  fun stop()
 
-  @Override public String getFilePath() {
-    return Objects.requireNonNull(getTaskOption(TaskOption.class).getSavePathUri()).toString();
-  }
+  /**
+   * 开始
+   */
+  fun start()
+
+  fun setBlockManager(blockManager: IBlockManager)
+
+  fun getBlockManager(): IBlockManager
 }

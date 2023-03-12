@@ -32,6 +32,7 @@ import com.arialyy.aria.core.Aria
 import com.arialyy.aria.core.download.DownloadEntity
 import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.core.listener.ISchedulers
+import com.arialyy.aria.core.task.SingleDownloadTask
 import com.arialyy.aria.util.ALog
 import com.arialyy.aria.util.CommonUtil
 import com.arialyy.frame.util.show.T
@@ -178,28 +179,28 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   }
 
   @Download.onWait
-  fun onWait(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun onWait(task: SingleDownloadTask) {
     if (task.key == mUrl) {
       Log.d(TAG, "wait ==> " + task.downloadEntity.fileName)
     }
   }
 
   @Download.onPre
-  fun onPre(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun onPre(task: SingleDownloadTask) {
     if (task.key == mUrl) {
       binding.stateStr = getString(R.string.stop)
     }
   }
 
   @Download.onTaskStart
-  fun taskStart(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskStart(task: SingleDownloadTask) {
     if (task.key == mUrl) {
       binding.fileSize = task.convertFileSize
     }
   }
 
   @Download.onTaskRunning
-  fun running(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun running(task: SingleDownloadTask) {
     if (task.key == mUrl) {
       //Log.d(TAG, task.getKey());
       val len = task.fileSize
@@ -213,14 +214,14 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   }
 
   @Download.onTaskResume
-  fun taskResume(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskResume(task: SingleDownloadTask) {
     if (task.key == mUrl) {
       binding.stateStr = getString(R.string.stop)
     }
   }
 
   @Download.onTaskStop
-  fun taskStop(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskStop(task: SingleDownloadTask) {
     if (task.key == mUrl) {
       binding.stateStr = getString(R.string.resume)
       binding.speed = ""
@@ -228,7 +229,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   }
 
   @Download.onTaskCancel
-  fun taskCancel(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskCancel(task: SingleDownloadTask) {
     if (task.key == mUrl) {
       binding.progress = 0
       binding.stateStr = getString(R.string.start)
@@ -242,7 +243,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
    */
   @Download.onTaskFail
   fun taskFail(
-    task: com.arialyy.aria.core.task.DownloadTask,
+    task: SingleDownloadTask,
     e: Exception
   ) {
     if (task.key == mUrl) {
@@ -253,7 +254,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   }
 
   @Download.onTaskComplete
-  fun taskComplete(task: com.arialyy.aria.core.task.DownloadTask) {
+  fun taskComplete(task: SingleDownloadTask) {
 
     if (task.key == mUrl) {
       binding.progress = 100

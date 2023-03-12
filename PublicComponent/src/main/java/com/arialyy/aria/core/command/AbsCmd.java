@@ -76,7 +76,7 @@ public abstract class AbsCmd implements ICmd {
     }
     ITaskQueue<?> itq = null;
     switch (mTask.getTaskType()) {
-      case ITask.DOWNLOAD: {
+      case ITask.SINGLE_DOWNLOAD: {
         itq = DuaContext.INSTANCE.getServiceManager().getDownloadQueue();
         break;
       }

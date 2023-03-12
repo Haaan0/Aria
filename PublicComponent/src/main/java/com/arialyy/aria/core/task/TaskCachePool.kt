@@ -56,10 +56,10 @@ object TaskCachePool {
 
   fun putTask(task: ITask) {
     when (task) {
-      is DownloadTask -> {
+      is SingleDownloadTask -> {
         taskMap[task.url] = task
       }
-      is DownloadGroupTask -> {
+      is com.arialyy.dua.group.DownloadGroupTask -> {
         taskMap[task.filePath] = task
       }
     }

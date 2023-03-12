@@ -80,7 +80,7 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
           getOptionAdapter().isSupportResume && fileSize > BlockRecord.BLOCK_SIZE
         val fileName =
           getFileName(if (taskOption.redirectUrl.isNullOrEmpty()) taskOption.sourUrl!! else taskOption.redirectUrl!!)
-        (task.taskState.entity as DEntity?)?.let {
+        task.taskState.getEntity(DEntity::class.java).let {
           it.fileName = fileName
           it.update()
         }

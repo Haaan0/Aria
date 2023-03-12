@@ -16,11 +16,11 @@
 package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.inf.ITaskOption
-import com.arialyy.aria.core.task.ThreadTaskManager2
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.core.task.ThreadTaskManager2
 import timber.log.Timber
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -51,13 +51,17 @@ open class TimerInterceptor : ITaskInterceptor {
     closeTimer()
     try {
       mTimer = ScheduledThreadPoolExecutor(1)
-      val blockManager = chain.blockManager
+      val threadManager = ThreadTaskManager2.getThreadManager(chain.getTask().taskId)
+      if (threadManager == null) {
+        Timber.e("thread manager is null, start timer fail")
+        return false
+      }
       mTimer.scheduleWithFixedDelay(object : Runnable {
         override fun run() {
           // 线程池中是不抛异常的，没有日志，很难定位问题，需要手动try-catch
           try {
-            if (blockManager.isCompleted()
-              || blockManager.hasFailedTask()
+            if (threadManager.isCompleted()
+              || threadManager.hasFailedTask()
               || !isRunning(chain.getTask())
             ) {
               ThreadTaskManager2.stopThreadTask(chain.getTask().taskId)
@@ -66,7 +70,7 @@ open class TimerInterceptor : ITaskInterceptor {
             }
             if (chain.getTask().taskState.curProgress >= 0) {
               chain.getTask().getTaskOption(ITaskOption::class.java).eventListener.onProgress(
-                blockManager.getCurrentProgress()
+                threadManager.getCurrentProgress()
               )
               return
             }

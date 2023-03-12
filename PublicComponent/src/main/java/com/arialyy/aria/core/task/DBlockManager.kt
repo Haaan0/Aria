@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
 
-class BlockManager(task: ITask) : IBlockManager {
+class DBlockManager(val task: ITask) : IBlockManager, ITaskManager {
   private val unfinishedBlock = mutableListOf<BlockRecord>()
   private val canceledNum = AtomicInteger(0) // 已经取消的线程的数
   private val stoppedNum = AtomicInteger(0) // 已经停止的线程数
@@ -49,6 +49,7 @@ class BlockManager(task: ITask) : IBlockManager {
     LinkedBlockingQueue(),
   )
   private val dispatcher = threadPool.asCoroutineDispatcher()
+  private val threadTaskList = mutableListOf<IThreadTask>()
 
   private var progress: Long = 0 //当前总进度
   private lateinit var looper: Looper
@@ -113,6 +114,8 @@ class BlockManager(task: ITask) : IBlockManager {
     looper.quit()
     handler.removeCallbacksAndMessages(null)
     scope.cancel()
+    threadTaskList.clear()
+    unfinishedBlock.clear()
   }
 
   override fun putUnfinishedBlock(record: BlockRecord) {
@@ -132,6 +135,8 @@ class BlockManager(task: ITask) : IBlockManager {
   }
 
   override fun start(threadTaskList: List<IThreadTask>) {
+    this.threadTaskList.clear()
+    this.threadTaskList.addAll(threadTaskList)
     threadTaskList.forEach { tt ->
       scope.launch(dispatcher) {
         tt.run()
@@ -140,7 +145,15 @@ class BlockManager(task: ITask) : IBlockManager {
   }
 
   override fun stop() {
-    quitLooper()
+    threadTaskList.forEach {
+      it.stop()
+    }
+  }
+
+  override fun cancel() {
+    threadTaskList.forEach {
+      it.cancel()
+    }
   }
 
   override fun setBlockNum(blockNum: Int) {

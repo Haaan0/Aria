@@ -13,21 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.dua.group
+package com.arialyy.aria.http.download
 
-import com.arialyy.aria.core.listener.AbsEventListener
+import com.arialyy.aria.core.inf.IBlockManager
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 9:15 PM 2023/3/6
+ * @Date 11:35 2023/3/12
  **/
-internal class HttpDGEventListener(task: HttpGroupTask) : AbsEventListener(task) {
-  override fun onComplete() {
+internal class SubTaskDelegate(val adapter: HttpDTaskAdapter) : ITaskAdapterDelegate {
+  private lateinit var blockManager: IBlockManager
+
+  override fun isRunning(): Boolean {
     TODO("Not yet implemented")
   }
 
-  override fun handleCancel() {
+  override fun cancel() {
     TODO("Not yet implemented")
+  }
+
+  override fun stop() {
+    TODO("Not yet implemented")
+  }
+
+  override fun start() {
+    TODO("Not yet implemented")
+  }
+
+  override fun setBlockManager(blockManager: IBlockManager) {
+    this.blockManager = blockManager
+  }
+
+  override fun getBlockManager(): IBlockManager {
+    return blockManager
   }
 }

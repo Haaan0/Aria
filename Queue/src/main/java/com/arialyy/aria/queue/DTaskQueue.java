@@ -19,13 +19,13 @@ package com.arialyy.aria.queue;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import com.arialyy.aria.core.AriaConfig;
-import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
 
 /**
  * Created by lyy on 2016/8/17.
  * 下载任务队列
  */
-public class DTaskQueue extends AbsTaskQueue<DownloadTask> {
+public class DTaskQueue extends AbsTaskQueue<SingleDownloadTask> {
   private static volatile DTaskQueue INSTANCE = null;
 
   public static DTaskQueue getInstance() {

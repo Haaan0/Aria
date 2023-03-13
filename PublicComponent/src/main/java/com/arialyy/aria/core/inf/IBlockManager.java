@@ -16,22 +16,15 @@
 package com.arialyy.aria.core.inf;
 
 import android.os.Handler;
-import com.arialyy.aria.core.task.IThreadTask;
-import com.arialyy.aria.orm.entity.BlockRecord;
-import java.util.List;
 
 /**
  * 线程任务状态
  */
 public interface IBlockManager {
 
-  void start(List<IThreadTask> threadTaskList);
+  void start();
 
   void setBlockNum(int blockNum);
-
-  void putUnfinishedBlock(BlockRecord record);
-
-  List<BlockRecord> getUnfinishedBlockList();
 
   /**
    * 创建handler 回调

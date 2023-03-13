@@ -16,8 +16,6 @@
 
 package com.arialyy.aria.core.inf
 
-import android.os.Handler
-
 /**
  * @Author laoyuyu
  * @Description

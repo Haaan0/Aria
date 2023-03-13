@@ -18,9 +18,9 @@ package com.arialyy.dua.group
 import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
-import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.task.AbsTaskAdapter
 import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.core.task.ThreadTaskManager2
 import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.download.TimerInterceptor
@@ -35,12 +35,14 @@ import timber.log.Timber
  **/
 internal class HttpDGroupAdapter : AbsTaskAdapter() {
   private val taskManager by lazy {
-    HttpDGTaskManager()
+    val manager = HttpDGTaskManager(getTask())
+    ThreadTaskManager2.putTaskManager(getTask().taskId, manager)
+    manager
   }
 
   init {
     getTask().getTaskOption(HttpTaskOption::class.java).eventListener =
-      HttpDGEventListener(getTask() as HttpGroupTask)
+      HttpDGEventListener(getTask() as HttpDGroupTask)
   }
 
   override fun getBlockManager(): IBlockManager {
@@ -48,20 +50,26 @@ internal class HttpDGroupAdapter : AbsTaskAdapter() {
   }
 
   override fun isRunning(): Boolean {
-    return taskManager.isRunning()
+    return ThreadTaskManager2.getTaskManager(getTask().taskId)?.isRunning() == true
   }
 
   override fun cancel() {
-    if (getBlockManager().isCanceled()) {
-      Timber.w("task already canceled, taskId: ${getTask().taskId}")
-      return
+    ThreadTaskManager2.getTaskManager(getTask().taskId)?.let {
+      if (it.isCanceled()) {
+        Timber.w("task already canceled, taskId: ${getTask().taskId}")
+        return
+      }
+      it.cancel()
     }
   }
 
   override fun stop() {
-    if (getBlockManager().isStopped()) {
-      Timber.w("task already stopped, taskId: ${getTask().taskId}")
-      return
+    ThreadTaskManager2.getTaskManager(getTask().taskId)?.let {
+      if (it.isStopped()) {
+        Timber.w("task already stopped, taskId: ${getTask().taskId}")
+        return
+      }
+      it.stop()
     }
   }
 

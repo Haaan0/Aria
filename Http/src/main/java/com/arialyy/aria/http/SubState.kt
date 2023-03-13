@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.dua.group
-
-import com.arialyy.aria.core.listener.AbsEventListener
+package com.arialyy.aria.http
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 9:15 PM 2023/3/6
+ * @Date 21:14 PM 2023/3/13
  **/
-internal class HttpDGEventListener(task: HttpDGroupTask) : AbsEventListener(task) {
-  override fun onComplete() {
-    TODO("Not yet implemented")
-  }
-
-  override fun handleCancel() {
-    TODO("Not yet implemented")
-  }
-}
+data class SubState(
+  val subId: Int
+)

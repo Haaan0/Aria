@@ -17,6 +17,7 @@ package com.arialyy.aria.http
 
 import com.arialyy.aria.core.common.TaskOption
 import com.arialyy.aria.core.task.ITaskInterceptor
+import com.arialyy.aria.orm.entity.BlockRecord
 
 /**
  * @Author laoyuyu

@@ -15,7 +15,17 @@
  */
 package com.arialyy.aria.http.download
 
+import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.inf.ITaskManager
+import com.arialyy.aria.core.task.TaskResp
+import com.arialyy.aria.core.task.ThreadTaskManager2
+import com.arialyy.aria.exception.AriaException
+import com.arialyy.aria.http.HttpTaskOption
+import com.arialyy.aria.http.SubState
+import com.arialyy.aria.orm.entity.DEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * @Author laoyuyu
@@ -26,19 +36,44 @@ internal class SubTaskDelegate(val adapter: HttpDTaskAdapter) : ITaskAdapterDele
   private lateinit var blockManager: IBlockManager
 
   override fun isRunning(): Boolean {
-    TODO("Not yet implemented")
+    return ThreadTaskManager2.taskIsRunning(adapter.getTask().taskId)
   }
 
   override fun cancel() {
-    TODO("Not yet implemented")
+    sendMsg(ITaskManager.STATE_CANCEL)
   }
 
   override fun stop() {
-    TODO("Not yet implemented")
+    sendMsg(ITaskManager.STATE_STOP)
   }
 
   override fun start() {
-    TODO("Not yet implemented")
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      adapter.addCoreInterceptor(HttpDCheckInterceptor())
+      adapter.addCoreInterceptor(TimerInterceptor())
+      adapter.addCoreInterceptor(HttpDHeaderInterceptor())
+      adapter.addCoreInterceptor(HttpDBlockInterceptor())
+      adapter.addCoreInterceptor(HttpBlockThreadInterceptor())
+      val resp = adapter.interceptor()
+      if (resp == null || resp.code != TaskResp.CODE_SUCCESS) {
+        adapter.getTask().getTaskOption(HttpTaskOption::class.java).eventListener.onFail(
+          false,
+          AriaException("start task fail, task interrupt, code: ${resp?.code ?: TaskResp.CODE_INTERRUPT}")
+        )
+        sendMsg(ITaskManager.STATE_STOP)
+        return@launch
+      }
+    }
+  }
+
+  /**
+   * @param state [ITaskManager]
+   */
+  private fun sendMsg(state: Int) {
+    blockManager.handler.obtainMessage(
+      state,
+      SubState(adapter.getTask().taskState.getEntity(DEntity::class.java).did)
+    ).sendToTarget()
   }
 
   override fun setBlockManager(blockManager: IBlockManager) {

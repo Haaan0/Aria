@@ -17,15 +17,15 @@ package com.arialyy.dua.group
 
 import android.os.Handler
 import android.os.Looper
+import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.inf.ITaskManager
-import com.arialyy.aria.http.HttpTaskOption
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 7:43 PM 2023/3/7
  **/
-internal class HttpDGTaskManager : ITaskManager {
+internal class HttpDGTaskManager(val task: HttpDGroupTask) : ITaskManager, IBlockManager {
   private lateinit var looper: Looper
   private lateinit var handler: Handler
 
@@ -47,16 +47,18 @@ internal class HttpDGTaskManager : ITaskManager {
     false
   }
 
-  fun start(taskOption: HttpTaskOption) {
-    taskOption.getOptionAdapter(HttpDGOptionAdapter::class.java).subUrlList
-  }
-
   override fun setLooper() {
     if (Looper.myLooper() == Looper.getMainLooper()) {
       throw IllegalThreadStateException("io operations cannot be in the main thread")
     }
     looper = Looper.myLooper()!!
     handler = Handler(looper, callback)
+  }
+
+  override fun start() {
+    task.incompleteTaskList.forEach {
+
+    }
   }
 
   override fun stop() {
@@ -86,9 +88,11 @@ internal class HttpDGTaskManager : ITaskManager {
     TODO("Not yet implemented")
   }
 
-  fun getHandler(): Handler {
-    return handler
+  override fun setBlockNum(blockNum: Int) {
+    TODO("Not yet implemented")
   }
+
+  override fun getHandler(): Handler = handler
 
   override fun hasFailedTask(): Boolean {
     TODO("Not yet implemented")

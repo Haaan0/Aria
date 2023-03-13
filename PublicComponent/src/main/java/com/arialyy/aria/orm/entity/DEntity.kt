@@ -56,6 +56,15 @@ data class DEntity(
 ) : BaseEntity() {
   private var dirFile: File? = null
 
+  /**
+   * 1. file exist
+   * 2. correct file length
+   */
+  fun fileIsComplete(): Boolean {
+    val f = getFilePath()
+    return f.exists() && f.length() == fileSize
+  }
+
   fun getFilePath(): File {
     if (dirFile == null) {
       dirFile = File(FileUri.getPathByUri(savePath)!!)

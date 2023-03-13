@@ -18,16 +18,49 @@ package com.arialyy.dua.group;
 import com.arialyy.aria.core.common.TaskOption;
 import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.task.AbsTask;
+import com.arialyy.aria.core.task.SingleDownloadTask;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Created by AriaL on 2017/6/27.
  * 任务组任务
  */
-public class HttpGroupTask extends AbsTask {
+public class HttpDGroupTask extends AbsTask {
 
-  public HttpGroupTask(ITaskOption taskOption) {
+  private List<SingleDownloadTask> incompleteTaskList = new ArrayList<>();
+
+  private List<SingleDownloadTask> subTaskList = new ArrayList<>();
+
+  public HttpDGroupTask(ITaskOption taskOption) {
     super(taskOption);
+  }
+
+  void setIncompleteTaskList(List<SingleDownloadTask> list) {
+    incompleteTaskList.clear();
+    incompleteTaskList.addAll(list);
+  }
+
+  void addIncompleteTaskList(SingleDownloadTask task) {
+    incompleteTaskList.add(task);
+  }
+
+  List<SingleDownloadTask> getIncompleteTaskList() {
+    return incompleteTaskList;
+  }
+
+  void setSubTaskList(List<SingleDownloadTask> list) {
+    this.subTaskList.clear();
+    this.subTaskList.addAll(list);
+  }
+
+  void addSubTask(SingleDownloadTask task) {
+    this.subTaskList.add(task);
+  }
+
+  public List<SingleDownloadTask> getSubTaskList() {
+    return subTaskList;
   }
 
   @Override public int getTaskType() {

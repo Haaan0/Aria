@@ -23,33 +23,29 @@ import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.inf.ITaskOption
 import com.arialyy.aria.core.listener.IEventListener
 import com.arialyy.aria.exception.AriaException
-import com.arialyy.aria.orm.entity.BlockRecord
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
 
-class DBlockManager(val task: ITask) : IBlockManager, ITaskManager {
-  private val unfinishedBlock = mutableListOf<BlockRecord>()
+abstract class DBlockManager(val task: ITask) : IBlockManager, ITaskManager {
   private val canceledNum = AtomicInteger(0) // 已经取消的线程的数
   private val stoppedNum = AtomicInteger(0) // 已经停止的线程数
   private val failedNum = AtomicInteger(0) // 失败的线程数
   private val completedNum = AtomicInteger(0) // 完成的线程数
   private val threadNum = task.getTaskOption(ITaskOption::class.java).threadNum
-  private val scope = MainScope()
+  protected val scope = MainScope()
   private val threadPool = ThreadPoolExecutor(
     threadNum, threadNum,
     0L, MILLISECONDS,
     LinkedBlockingQueue(),
   )
-  private val dispatcher = threadPool.asCoroutineDispatcher()
-  private val threadTaskList = mutableListOf<IThreadTask>()
+  protected val dispatcher = threadPool.asCoroutineDispatcher()
 
   private var progress: Long = 0 //当前总进度
   private lateinit var looper: Looper
@@ -110,20 +106,10 @@ class DBlockManager(val task: ITask) : IBlockManager, ITaskManager {
   /**
    * 退出looper循环
    */
-  private fun quitLooper() {
+  protected open fun quitLooper() {
     looper.quit()
     handler.removeCallbacksAndMessages(null)
     scope.cancel()
-    threadTaskList.clear()
-    unfinishedBlock.clear()
-  }
-
-  override fun putUnfinishedBlock(record: BlockRecord) {
-    unfinishedBlock.add(record)
-  }
-
-  override fun getUnfinishedBlockList(): List<BlockRecord> {
-    return unfinishedBlock
   }
 
   override fun setLooper() {
@@ -132,28 +118,6 @@ class DBlockManager(val task: ITask) : IBlockManager, ITaskManager {
     }
     looper = Looper.myLooper()!!
     handler = Handler(looper, callback)
-  }
-
-  override fun start(threadTaskList: List<IThreadTask>) {
-    this.threadTaskList.clear()
-    this.threadTaskList.addAll(threadTaskList)
-    threadTaskList.forEach { tt ->
-      scope.launch(dispatcher) {
-        tt.run()
-      }
-    }
-  }
-
-  override fun stop() {
-    threadTaskList.forEach {
-      it.stop()
-    }
-  }
-
-  override fun cancel() {
-    threadTaskList.forEach {
-      it.cancel()
-    }
   }
 
   override fun setBlockNum(blockNum: Int) {

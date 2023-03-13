@@ -67,15 +67,15 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
     return this
   }
 
-  private fun getTask(createNewTask: Boolean = true): HttpGroupTask {
+  private fun getTask(createNewTask: Boolean = true): HttpDGroupTask {
     if (HttpUtil.checkHttpDParams(httpTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
     val temp = TaskCachePool.getTaskByKey(savePath.toString())
     if (temp != null) {
-      return temp as HttpGroupTask
+      return temp as HttpDGroupTask
     }
-    val task = HttpGroupTask(httpTaskOption)
+    val task = HttpDGroupTask(httpTaskOption)
     task.adapter = HttpDGroupAdapter()
     TaskCachePool.putTask(task)
     return task

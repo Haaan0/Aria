@@ -41,4 +41,6 @@ abstract class BaseEntity : IEntity {
   var ext: String? = null
 
   val fileSize: Long = 0
+
+  var isComplete: Boolean = false
 }

@@ -18,7 +18,6 @@ package com.arialyy.aria.http.download
 import android.os.Looper
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBlockManager
-import com.arialyy.aria.core.task.DBlockManager
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.core.task.ThreadTaskManager2
 import com.arialyy.aria.exception.AriaException
@@ -33,10 +32,10 @@ import timber.log.Timber
  * @Date 11:32 2023/3/12
  **/
 internal class SingleTaskDelegate(val adapter: HttpDTaskAdapter) : ITaskAdapterDelegate {
-  private val blockManager = DBlockManager(adapter.getTask())
+  private val blockManager = HttpDBlockManager(adapter.getTask())
 
   init {
-    ThreadTaskManager2.putThreadManager(adapter.getTask().taskId, blockManager)
+    ThreadTaskManager2.putTaskManager(adapter.getTask().taskId, blockManager)
   }
 
   override fun isRunning(): Boolean {

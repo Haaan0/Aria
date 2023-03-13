@@ -22,9 +22,9 @@ import java.util.concurrent.ConcurrentHashMap
 object ThreadTaskManager2 {
   private val taskManagerMap: ConcurrentHashMap<Int, ITaskManager> = ConcurrentHashMap()
 
-  fun getThreadManager(taskId: Int) = taskManagerMap[taskId]
+  fun getTaskManager(taskId: Int) = taskManagerMap[taskId]
 
-  fun putThreadManager(taskId: Int, taskManager: ITaskManager) {
+  fun putTaskManager(taskId: Int, taskManager: ITaskManager) {
     taskManagerMap[taskId] = taskManager
   }
 

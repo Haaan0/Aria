@@ -16,14 +16,19 @@
 package com.arialyy.dua.group
 
 import com.arialyy.aria.core.common.TaskOption
+import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.SingleDownloadTask
 import com.arialyy.aria.core.task.TaskChain
 import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.http.HttpTaskOption
+import com.arialyy.aria.http.SubState
 import com.arialyy.aria.http.download.HttpDTaskAdapter
+import com.arialyy.aria.orm.entity.DEntity
 import com.arialyy.aria.orm.entity.DGEntity
+import timber.log.Timber
 
 /**
  * Subtasks do not support chunking
@@ -33,27 +38,32 @@ import com.arialyy.aria.orm.entity.DGEntity
  **/
 internal class HttpDGSubTaskInterceptor : ITaskInterceptor {
   private lateinit var task: ITask
-  private lateinit var optionAdapter: HttpDGOptionAdapter
   private lateinit var taskOption: HttpTaskOption
+  private lateinit var blockManager: IBlockManager
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     task = chain.getTask()
+    blockManager = chain.blockManager
     taskOption = task.getTaskOption(HttpTaskOption::class.java)
-    optionAdapter = taskOption.getOptionAdapter(HttpDGOptionAdapter::class.java)
-    val subList = createSubTask(chain)
-
-
+    createSubTask(chain)
+    blockManager.start()
     return TaskResp(TaskResp.CODE_SUCCESS)
   }
 
-  private fun startSubTask(subList: List<SingleDownloadTask>) {
-    subList.forEach {
-
+  /**
+   * 1. file exist
+   * 2. correct file length
+   * 3. send complete msg
+   */
+  private fun checkTaskIsComplete(entity: DEntity): Boolean {
+    if (entity.fileIsComplete()) {
+      blockManager.handler.obtainMessage(ITaskManager.STATE_COMPLETE, SubState(entity.did))
+      return true
     }
+    return false
   }
 
-  private fun createSubTask(chain: TaskChain): List<SingleDownloadTask> {
-    val subTaskList = mutableListOf<SingleDownloadTask>()
+  private fun createSubTask(chain: TaskChain) {
     task.taskState.getEntity(DGEntity::class.java).subList.forEach {
       val tp = TaskOption()
       tp.sourUrl = it.sourceUrl
@@ -63,11 +73,13 @@ internal class HttpDGSubTaskInterceptor : ITaskInterceptor {
       val subTask = SingleDownloadTask(tp)
       val subAdapter = HttpDTaskAdapter(true)
       subAdapter.setBlockManager(HttpSubBlockManager(chain.blockManager.handler))
-
       subTask.adapter = subAdapter
-      subTaskList.add(subTask)
+      if (it.isComplete && checkTaskIsComplete(it)) {
+        (chain.getTask() as HttpDGroupTask).addIncompleteTaskList(subTask)
+        Timber.d("task already complete, sourUrl: ${it.sourceUrl}")
+      }
+      (chain.getTask() as HttpDGroupTask).addSubTask(subTask)
     }
-    return subTaskList
   }
 
 }

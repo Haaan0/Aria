@@ -51,7 +51,7 @@ open class TimerInterceptor : ITaskInterceptor {
     closeTimer()
     try {
       mTimer = ScheduledThreadPoolExecutor(1)
-      val threadManager = ThreadTaskManager2.getThreadManager(chain.getTask().taskId)
+      val threadManager = ThreadTaskManager2.getTaskManager(chain.getTask().taskId)
       if (threadManager == null) {
         Timber.e("thread manager is null, start timer fail")
         return false

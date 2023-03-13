@@ -41,14 +41,14 @@ import java.io.File
  */
 internal class HttpDBlockInterceptor : ITaskInterceptor {
   private lateinit var task: ITask
-  private lateinit var option: HttpTaskOption
+  private lateinit var taskOption: HttpTaskOption
   private lateinit var blockManager: IBlockManager
   private lateinit var taskRecord: TaskRecord
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     task = chain.getTask()
-    blockManager = chain.blockManager as IBlockManager
-    option = task.getTaskOption(HttpTaskOption::class.java)
+    blockManager = chain.blockManager
+    taskOption = task.getTaskOption(HttpTaskOption::class.java)
     if (task.taskState.fileSize < 0) {
       Timber.e("file size < 0")
       return TaskResp(TaskResp.CODE_INTERRUPT)
@@ -123,7 +123,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
    * if block already exist, upload progress
    */
   private suspend fun checkBlock(): Int {
-    val handler = blockManager.getHandler()
+    val handler = blockManager.handler
     val needUpdateBlockRecord = mutableSetOf<BlockRecord>()
     for (br in taskRecord.blockList) {
       val blockF = File(br.blockPath)
@@ -136,7 +136,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
         if (br.curProgress != blockF.length()) {
           br.curProgress = blockF.length()
           needUpdateBlockRecord.add(br)
-          blockManager.putUnfinishedBlock(br)
+          taskOption.getOptionAdapter(HttpDOptionAdapter::class.java).putUnfinishedBlock(br)
         }
         // update task progress
         handler.obtainMessage(ITaskManager.STATE_UPDATE_PROGRESS, br.curProgress)

@@ -25,4 +25,5 @@ import com.arialyy.aria.http.IHttpTaskOptionAdapter
 internal class HttpDGOptionAdapter : IHttpTaskOptionAdapter {
   val subUrlList = mutableSetOf<String>()
   val subNameList = mutableListOf<String>()
+
 }

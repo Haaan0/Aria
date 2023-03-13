@@ -21,7 +21,10 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.BaseEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -55,4 +58,11 @@ data class DGEntity(
 ) : BaseEntity() {
   @Ignore
   var subList: MutableList<DEntity> = mutableListOf()
+  override fun update() {
+    updateTime = System.currentTimeMillis()
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      DuaContext.getServiceManager().getDbService().getDuaDb().getDGEntityDao()
+        .update(this@DGEntity)
+    }
+  }
 }

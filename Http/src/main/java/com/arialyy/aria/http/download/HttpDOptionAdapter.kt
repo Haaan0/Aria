@@ -16,7 +16,9 @@
 package com.arialyy.aria.http.download
 
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter
+import com.arialyy.aria.core.task.IThreadTask
 import com.arialyy.aria.http.IHttpTaskOptionAdapter
+import com.arialyy.aria.orm.entity.BlockRecord
 
 /**
  * @Author laoyuyu
@@ -40,5 +42,20 @@ class HttpDOptionAdapter : IHttpTaskOptionAdapter {
   var isSupportBlock = true
 
   var fileName: String? = null
+
+  private val unfinishedBlock = mutableListOf<BlockRecord>()
+  var threadList = mutableListOf<IThreadTask>()
+    set(value) {
+      field.clear()
+      field.addAll(value)
+    }
+
+  fun putUnfinishedBlock(record: BlockRecord) {
+    unfinishedBlock.add(record)
+  }
+
+  fun getUnfinishedBlockList(): List<BlockRecord> {
+    return unfinishedBlock
+  }
 
 }

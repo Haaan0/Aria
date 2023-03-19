@@ -47,7 +47,7 @@ public abstract class AbsTask implements ITask {
 
   public void setAdapter(ITaskAdapter adapter) {
     mAdapter = adapter;
-    mAdapter.init(this, mTaskOption.eventListener);
+    mAdapter.init(this);
   }
 
   @Override public ITaskAdapter getAdapter() {

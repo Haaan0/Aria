@@ -15,14 +15,9 @@
  */
 package com.arialyy.aria.http.download
 
-import android.net.Uri
-import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.command.CancelCmd
 import com.arialyy.aria.core.command.StopCmd
 import com.arialyy.aria.core.task.TaskCachePool
-import com.arialyy.aria.util.FileUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**

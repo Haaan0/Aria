@@ -16,37 +16,84 @@
 package com.arialyy.dua.group
 
 import android.os.Handler
+import android.os.Looper
 import com.arialyy.aria.core.inf.IBlockManager
-import com.arialyy.aria.core.task.IThreadTask
-import com.arialyy.aria.orm.entity.BlockRecord
+import com.arialyy.aria.core.inf.ITaskManager
+import com.arialyy.aria.core.task.ITask
+import com.arialyy.aria.http.HttpTaskOption
+import com.arialyy.aria.http.download.HttpDOptionAdapter
+import timber.log.Timber
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 10:04 2023/3/12
  **/
-class HttpSubBlockManager(val handler: Handler) : IBlockManager {
-  private val unfinishedBlock = mutableListOf<BlockRecord>()
-  private var blockNum: Int = 1
+internal class HttpSubBlockManager(private val task: ITask, private val groupHandler: Handler) :
+  IBlockManager {
+  private lateinit var looper: Looper
+  private lateinit var handler: Handler
 
-  override fun putUnfinishedBlock(record: BlockRecord) {
-    unfinishedBlock.add(record)
-  }
+  private var isStop = false
+  private var isCancel = false
 
-  override fun getUnfinishedBlockList(): List<BlockRecord> {
-    return unfinishedBlock
+  /**
+   * Pass the message to the group task after the subtask is stopped
+   */
+  private val callback = Handler.Callback { msg ->
+    when (msg.what) {
+      ITaskManager.STATE_STOP -> {
+        isStop = true
+      }
+      ITaskManager.STATE_CANCEL -> {
+        isCancel = true
+      }
+      ITaskManager.STATE_FAIL -> {
+      }
+      ITaskManager.STATE_COMPLETE -> {
+      }
+      ITaskManager.STATE_RUNNING -> {
+      }
+      ITaskManager.STATE_UPDATE_PROGRESS -> {
+      }
+    }
+    false
   }
 
   override fun getHandler() = handler
 
-  override fun start(threadTaskList: List<IThreadTask>) {
-    threadTaskList.forEach { tt ->
-      tt.run()
+  /**
+   * 1.Shared thread pool for subtasks [HttpDGTaskManager.dispatcher]
+   * 2.Subtasks support only single block downloads
+   */
+  override fun start() {
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+      throw IllegalThreadStateException("io operations cannot be in the main thread")
     }
+    looper = Looper.myLooper()!!
+    handler = Handler(looper, callback)
+    // Synchronized sequential execution of all block
+    task.getTaskOption(HttpTaskOption::class.java)
+      .getOptionAdapter(HttpDOptionAdapter::class.java).threadList.forEach { tt ->
+        if (isStop) {
+          Timber.d("task stopped")
+          return
+        }
+        if (isCancel) {
+          Timber.d("task canceled")
+          return
+        }
+        tt.run()
+      }
+  }
+
+  private fun quitLooper() {
+    looper.quit()
+    handler.removeCallbacksAndMessages(null)
   }
 
   override fun setBlockNum(blockNum: Int) {
-    this.blockNum = blockNum
+    Timber.i("Subtasks do not support chunked downloads")
   }
 
 }

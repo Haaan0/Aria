@@ -72,7 +72,7 @@ internal class HttpDGSubTaskInterceptor : ITaskInterceptor {
       tp.eventListener = HttpSubListener()
       val subTask = SingleDownloadTask(tp)
       val subAdapter = HttpDTaskAdapter(true)
-      subAdapter.setBlockManager(HttpSubBlockManager(chain.blockManager.handler))
+      subAdapter.setBlockManager(HttpSubBlockManager(subTask, chain.blockManager.handler))
       subTask.adapter = subAdapter
       if (it.isComplete && checkTaskIsComplete(it)) {
         (chain.getTask() as HttpDGroupTask).addIncompleteTaskList(subTask)

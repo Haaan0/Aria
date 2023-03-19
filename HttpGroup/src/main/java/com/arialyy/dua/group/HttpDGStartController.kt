@@ -52,6 +52,23 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
   }
 
   /**
+   * Number of subtasks executed simultaneously
+   * @param num max 16
+   */
+  fun setSubTaskNum(num: Int): HttpDGStartController {
+    if (num < 1) {
+      Timber.e("Quantity less than 1")
+      return this
+    }
+    if (num > 16) {
+      Timber.e("Quantity greater than 16")
+      return this
+    }
+    optionAdapter.subTaskNum = num
+    return this
+  }
+
+  /**
    * add sub task download uri
    */
   fun addSubUriResource(subUrlList: List<String>): HttpDGStartController {

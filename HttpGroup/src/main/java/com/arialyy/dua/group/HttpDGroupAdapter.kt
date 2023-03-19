@@ -35,7 +35,7 @@ import timber.log.Timber
  **/
 internal class HttpDGroupAdapter : AbsTaskAdapter() {
   private val taskManager by lazy {
-    val manager = HttpDGTaskManager(getTask())
+    val manager = HttpDGTaskManager(getTask() as HttpDGroupTask)
     ThreadTaskManager2.putTaskManager(getTask().taskId, manager)
     manager
   }

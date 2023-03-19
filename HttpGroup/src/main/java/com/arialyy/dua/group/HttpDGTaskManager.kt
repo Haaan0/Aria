@@ -19,6 +19,14 @@ import android.os.Handler
 import android.os.Looper
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.inf.ITaskManager
+import com.arialyy.aria.http.download.HttpDTaskAdapter
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /**
  * @Author laoyuyu
@@ -28,6 +36,14 @@ import com.arialyy.aria.core.inf.ITaskManager
 internal class HttpDGTaskManager(val task: HttpDGroupTask) : ITaskManager, IBlockManager {
   private lateinit var looper: Looper
   private lateinit var handler: Handler
+  private val subTaskNum = task.dgOptionAdapter.subTaskNum
+  private val threadPool = ThreadPoolExecutor(
+    subTaskNum, subTaskNum,
+    0L, MILLISECONDS,
+    LinkedBlockingQueue(),
+  )
+  private val dispatcher = threadPool.asCoroutineDispatcher()
+  private val scope = MainScope()
 
   private val callback = Handler.Callback { msg ->
     when (msg.what) {
@@ -57,8 +73,18 @@ internal class HttpDGTaskManager(val task: HttpDGroupTask) : ITaskManager, IBloc
 
   override fun start() {
     task.incompleteTaskList.forEach {
-
+      scope.launch(dispatcher) {
+        val adapter = HttpDTaskAdapter(true)
+        adapter.init(it)
+        adapter.start()
+      }
     }
+  }
+
+  private fun quitLooper() {
+    looper.quit()
+    handler.removeCallbacksAndMessages(null)
+    scope.cancel()
   }
 
   override fun stop() {

@@ -26,4 +26,9 @@ internal class HttpDGOptionAdapter : IHttpTaskOptionAdapter {
   val subUrlList = mutableSetOf<String>()
   val subNameList = mutableListOf<String>()
 
+  /**
+   * Number of subtasks executed simultaneously
+   */
+  var subTaskNum = 2
+
 }

@@ -17,8 +17,6 @@ package com.arialyy.aria.core.task
 
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.inf.ITaskAdapter
-import com.arialyy.aria.core.inf.ITaskManager
-import com.arialyy.aria.core.listener.IEventListener
 import com.arialyy.aria.core.task.ITaskInterceptor.IChain
 
 /**
@@ -28,14 +26,12 @@ import com.arialyy.aria.core.task.ITaskInterceptor.IChain
  **/
 abstract class AbsTaskAdapter : ITaskAdapter {
   private lateinit var mTask: ITask
-  private lateinit var mEventListener: IEventListener
 
   private val mUserInterceptor = mutableListOf<ITaskInterceptor>()
   private val mCoreInterceptor = mutableListOf<ITaskInterceptor>()
 
-  override fun init(task: ITask, listener: IEventListener) {
+  override fun init(task: ITask) {
     mTask = task
-    mEventListener = listener
   }
 
   fun getTask() = mTask

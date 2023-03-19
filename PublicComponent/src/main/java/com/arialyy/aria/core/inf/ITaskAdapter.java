@@ -16,7 +16,6 @@
 
 package com.arialyy.aria.core.inf;
 
-import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.task.ITask;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ITaskAdapter {
 
-  void init(@NotNull ITask task, @NotNull IEventListener listener);
+  void init(@NotNull ITask task);
 
   /**
    * 任务是否正在执行

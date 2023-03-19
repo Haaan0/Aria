@@ -19,6 +19,7 @@ import com.arialyy.aria.core.common.TaskOption;
 import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.SingleDownloadTask;
+import com.arialyy.aria.http.HttpTaskOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +36,10 @@ public class HttpDGroupTask extends AbsTask {
 
   public HttpDGroupTask(ITaskOption taskOption) {
     super(taskOption);
+  }
+
+  public HttpDGOptionAdapter getDGOptionAdapter() {
+    return getTaskOption(HttpTaskOption.class).getOptionAdapter(HttpDGOptionAdapter.class);
   }
 
   void setIncompleteTaskList(List<SingleDownloadTask> list) {

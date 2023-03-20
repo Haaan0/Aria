@@ -32,21 +32,21 @@ object TaskCachePool {
    */
   private val entityMap = ConcurrentHashMap<Int, BaseEntity>()
 
-  /**
-   * task cache map; key: if task is [DownloadGroupTask], it's filePath else it's service url
-   */
   private val taskMap = ConcurrentHashMap<String, ITask>()
 
-  /**
-   * @param key if task is [DownloadGroupTask], it's filePath else it's service url
-   */
-  fun removeTask(key: String) {
-    taskMap.remove(key)
+  fun removeTask(task: ITask) {
+    when {
+      task is SingleDownloadTask -> {
+        taskMap.remove(task.url)
+      }
+      task::javaClass.name == "com.arialyy.dua.group.HttpDGroupTask" -> {
+        taskMap.remove(task.filePath)
+      }
+    }
   }
 
   /**
    * if task is completed, stopped, canceled, return null
-   * @param key if task is [DownloadGroupTask], it's filePath else it's service url
    */
   fun getTaskByKey(key: String) = taskMap[key]
 
@@ -55,11 +55,11 @@ object TaskCachePool {
   }
 
   fun putTask(task: ITask) {
-    when (task) {
-      is SingleDownloadTask -> {
+    when {
+      task is SingleDownloadTask -> {
         taskMap[task.url] = task
       }
-      is com.arialyy.dua.group.DownloadGroupTask -> {
+      task::javaClass.name == "com.arialyy.dua.group.HttpDGroupTask" -> {
         taskMap[task.filePath] = task
       }
     }

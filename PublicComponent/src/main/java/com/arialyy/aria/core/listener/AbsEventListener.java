@@ -141,11 +141,11 @@ public abstract class AbsEventListener implements IEventListener {
 
     if (state == IEntity.STATE_CANCEL) {
       handleCancel();
-      TaskCachePool.INSTANCE.removeTask(getTask().getTaskId());
+      TaskCachePool.INSTANCE.removeTask(getTask());
       return;
     }
     if (state == IEntity.STATE_COMPLETE) {
-      TaskCachePool.INSTANCE.removeTask(getTask().getTaskId());
+      TaskCachePool.INSTANCE.removeTask(getTask());
     }
 
     TaskCachePool.INSTANCE.updateState(mTask.getTaskId(), state, location);

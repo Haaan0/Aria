@@ -18,10 +18,16 @@ package com.arialyy.dua.group
 import android.os.Handler
 import android.os.Looper
 import com.arialyy.aria.core.inf.IBlockManager
+import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.core.inf.ITaskManager
 import com.arialyy.aria.core.task.ITask
+import com.arialyy.aria.core.task.TaskCachePool.removeTask
+import com.arialyy.aria.core.task.TaskCachePool.updateState
+import com.arialyy.aria.core.task.TaskState
+import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.download.HttpDOptionAdapter
+import com.arialyy.aria.util.BlockUtil
 import timber.log.Timber
 
 /**
@@ -36,6 +42,7 @@ internal class HttpSubBlockManager(private val task: ITask, private val groupHan
 
   private var isStop = false
   private var isCancel = false
+  private var progress: Long = 0L
 
   /**
    * Pass the message to the group task after the subtask is stopped
@@ -44,20 +51,53 @@ internal class HttpSubBlockManager(private val task: ITask, private val groupHan
     when (msg.what) {
       ITaskManager.STATE_STOP -> {
         isStop = true
+        saveData(IEntity.STATE_STOP)
+        quitLooper()
       }
       ITaskManager.STATE_CANCEL -> {
         isCancel = true
+        removeTask(task)
+        BlockUtil.removeTaskBlock(task)
+        quitLooper()
       }
       ITaskManager.STATE_FAIL -> {
       }
       ITaskManager.STATE_COMPLETE -> {
+        saveData(IEntity.STATE_COMPLETE)
+        val b = BlockUtil.mergeFile(task.taskState.taskRecord)
+
+        if (!b) {
+          Timber.e("merge block fail")
+          onFail(false, AriaException("merge block fail"))
+          return
+        }
+        task.taskState.speed = 0
+        saveData(IEntity.STATE_COMPLETE)
       }
       ITaskManager.STATE_RUNNING -> {
       }
       ITaskManager.STATE_UPDATE_PROGRESS -> {
+        val b = msg.data
+        if (b != null) {
+          val len = b.getLong(ITaskManager.DATA_ADD_LEN, 0)
+          progress += len
+          task.taskState.speed = len
+          task.taskState.curProgress = progress
+        }
       }
     }
     false
+  }
+
+  private fun saveData(state: Int) {
+    val ts: TaskState = task.taskState
+    ts.state = state
+    ts.curProgress = progress
+    if (state == IEntity.STATE_COMPLETE) {
+      ts.curProgress = ts.fileSize
+      removeTask(task)
+    }
+    updateState(task.taskId, state, progress)
   }
 
   override fun getHandler() = handler
@@ -95,5 +135,4 @@ internal class HttpSubBlockManager(private val task: ITask, private val groupHan
   override fun setBlockNum(blockNum: Int) {
     Timber.i("Subtasks do not support chunked downloads")
   }
-
 }

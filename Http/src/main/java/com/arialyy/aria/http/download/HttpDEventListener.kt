@@ -49,22 +49,9 @@ class HttpDEventListener(task: SingleDownloadTask) : AbsEventListener(task) {
     saveData(IEntity.STATE_COMPLETE, task.taskState.fileSize)
   }
 
-  /**
-   * 1.remove all block
-   * 2.remove record
-   */
-  override fun handleCancel() {
-    val file = FileUri.getPathByUri(task.taskState.taskRecord.filePath)?.let { File(it) }
-    file?.parentFile?.let {
-      FileUtils.deleteDir(it)
-    }
 
-    DuaContext.duaScope.launch(Dispatchers.IO) {
-      val entity = TaskCachePool.getEntity(taskId = task.taskId)
-      val db = DuaContext.getServiceManager().getDbService().getDuaDb()
-      db.getRecordDao().deleteTaskRecord(task.taskState.taskRecord)
-      db.getDEntityDao().delete(entity as DEntity)
-    }
+  override fun handleCancel() {
+    BlockUtil.removeTaskBlock(task)
   }
 
 }

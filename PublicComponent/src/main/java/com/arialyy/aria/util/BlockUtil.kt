@@ -1,8 +1,14 @@
 package com.arialyy.aria.util
 
 import android.net.Uri
+import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.task.ITask
+import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.orm.entity.BlockRecord
+import com.arialyy.aria.orm.entity.DEntity
 import com.arialyy.aria.orm.entity.TaskRecord
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -24,6 +30,25 @@ import java.io.FileOutputStream
  * limitations under the License.
  */
 object BlockUtil {
+
+
+  /**
+   * 1.remove all block
+   * 2.remove record
+   */
+  fun removeTaskBlock(task: ITask) {
+    val file = FileUri.getPathByUri(task.taskState.taskRecord.filePath)?.let { File(it) }
+    file?.parentFile?.let {
+      FileUtils.deleteDir(it)
+    }
+
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      val entity = TaskCachePool.getEntity(taskId = task.taskId)
+      val db = DuaContext.getServiceManager().getDbService().getDuaDb()
+      db.getRecordDao().deleteTaskRecord(task.taskState.taskRecord)
+      db.getDEntityDao().delete(entity as DEntity)
+    }
+  }
 
   fun getBlockPathFormUri(fileSaveUri: Uri, blockId: Int): String {
     val filePath = FileUri.getPathByUri(fileSaveUri) ?: "/"

@@ -31,6 +31,11 @@ interface ITaskManager {
     const val STATE_UPDATE_PROGRESS = 0x06
     const val STATE_PRE = 0x07
     const val STATE_START = 0x08
+    const val SUB_STATE_STOP = 0xb1
+    const val SUB_STATE_FAIL = 0xb2
+    const val SUB_STATE_CANCEL = 0xb3
+    const val SUB_STATE_COMPLETE = 0xb4
+    const val SUB_STATE_RUNNING = 0xb5
     const val DATA_RETRY = "DATA_RETRY"
     const val DATA_ERROR_INFO = "DATA_ERROR_INFO"
     const val DATA_THREAD_NAME = "DATA_THREAD_NAME"

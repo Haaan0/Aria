@@ -19,6 +19,8 @@ import android.os.Handler
 import android.os.Looper
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.inf.ITaskManager
+import com.arialyy.aria.core.listener.IEventListener
+import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.download.HttpDTaskAdapter
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -44,20 +46,20 @@ internal class HttpDGTaskManager(val task: HttpDGroupTask) : ITaskManager, IBloc
   )
   private val dispatcher = threadPool.asCoroutineDispatcher()
   private val scope = MainScope()
+  private val eventListener: IEventListener =
+    task.getTaskOption(HttpTaskOption::class.java).eventListener
 
   private val callback = Handler.Callback { msg ->
     when (msg.what) {
-      ITaskManager.STATE_STOP -> {
+      ITaskManager.SUB_STATE_STOP -> {
       }
-      ITaskManager.STATE_CANCEL -> {
+      ITaskManager.SUB_STATE_CANCEL -> {
       }
-      ITaskManager.STATE_FAIL -> {
+      ITaskManager.SUB_STATE_FAIL -> {
       }
-      ITaskManager.STATE_COMPLETE -> {
+      ITaskManager.SUB_STATE_COMPLETE -> {
       }
-      ITaskManager.STATE_RUNNING -> {
-      }
-      ITaskManager.STATE_UPDATE_PROGRESS -> {
+      ITaskManager.SUB_STATE_RUNNING -> {
       }
     }
     false

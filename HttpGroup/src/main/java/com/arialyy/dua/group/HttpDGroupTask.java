@@ -30,9 +30,9 @@ import java.util.Objects;
  */
 public class HttpDGroupTask extends AbsTask {
 
-  private List<SingleDownloadTask> incompleteTaskList = new ArrayList<>();
+  private final List<SingleDownloadTask> incompleteTaskList = new ArrayList<>();
 
-  private List<SingleDownloadTask> subTaskList = new ArrayList<>();
+  private final List<SingleDownloadTask> subTaskList = new ArrayList<>();
 
   public HttpDGroupTask(ITaskOption taskOption) {
     super(taskOption);

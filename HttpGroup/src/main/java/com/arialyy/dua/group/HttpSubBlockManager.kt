@@ -24,7 +24,6 @@ import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.TaskCachePool.removeTask
 import com.arialyy.aria.core.task.TaskCachePool.updateState
 import com.arialyy.aria.core.task.TaskState
-import com.arialyy.aria.exception.AriaException
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.download.HttpDOptionAdapter
 import com.arialyy.aria.util.BlockUtil
@@ -40,8 +39,7 @@ internal class HttpSubBlockManager(private val task: ITask, private val groupHan
   private lateinit var looper: Looper
   private lateinit var handler: Handler
 
-  private var isStop = false
-  private var isCancel = false
+  private var isBreak = false
   private var progress: Long = 0L
 
   /**
@@ -50,17 +48,22 @@ internal class HttpSubBlockManager(private val task: ITask, private val groupHan
   private val callback = Handler.Callback { msg ->
     when (msg.what) {
       ITaskManager.STATE_STOP -> {
-        isStop = true
+        isBreak = true
         saveData(IEntity.STATE_STOP)
+        sendStateToGroup(ITaskManager.SUB_STATE_STOP)
         quitLooper()
       }
       ITaskManager.STATE_CANCEL -> {
-        isCancel = true
+        isBreak = true
         removeTask(task)
         BlockUtil.removeTaskBlock(task)
+        sendStateToGroup(ITaskManager.SUB_STATE_CANCEL)
         quitLooper()
       }
       ITaskManager.STATE_FAIL -> {
+        isBreak = true
+        sendStateToGroup(ITaskManager.SUB_STATE_FAIL)
+        quitLooper()
       }
       ITaskManager.STATE_COMPLETE -> {
         saveData(IEntity.STATE_COMPLETE)
@@ -68,25 +71,34 @@ internal class HttpSubBlockManager(private val task: ITask, private val groupHan
 
         if (!b) {
           Timber.e("merge block fail")
-          onFail(false, AriaException("merge block fail"))
-          return
+          sendStateToGroup(ITaskManager.SUB_STATE_FAIL)
+        } else {
+          task.taskState.speed = 0
+          saveData(IEntity.STATE_COMPLETE)
         }
-        task.taskState.speed = 0
-        saveData(IEntity.STATE_COMPLETE)
       }
       ITaskManager.STATE_RUNNING -> {
+        updateProgress(msg.obj as Long)
       }
       ITaskManager.STATE_UPDATE_PROGRESS -> {
         val b = msg.data
         if (b != null) {
-          val len = b.getLong(ITaskManager.DATA_ADD_LEN, 0)
-          progress += len
-          task.taskState.speed = len
-          task.taskState.curProgress = progress
+          updateProgress(b.getLong(ITaskManager.DATA_ADD_LEN, 0))
         }
       }
     }
     false
+  }
+
+  private fun sendStateToGroup(state: Int) {
+    groupHandler.obtainMessage(state, task).sendToTarget()
+  }
+
+  private fun updateProgress(len: Long) {
+    progress += len
+    task.taskState.speed = len
+    task.taskState.curProgress = progress
+    groupHandler.obtainMessage(ITaskManager.SUB_STATE_RUNNING, len).sendToTarget()
   }
 
   private fun saveData(state: Int) {
@@ -115,12 +127,8 @@ internal class HttpSubBlockManager(private val task: ITask, private val groupHan
     // Synchronized sequential execution of all block
     task.getTaskOption(HttpTaskOption::class.java)
       .getOptionAdapter(HttpDOptionAdapter::class.java).threadList.forEach { tt ->
-        if (isStop) {
+        if (isBreak) {
           Timber.d("task stopped")
-          return
-        }
-        if (isCancel) {
-          Timber.d("task canceled")
           return
         }
         tt.run()

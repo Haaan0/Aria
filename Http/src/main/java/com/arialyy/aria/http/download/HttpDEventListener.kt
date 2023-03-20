@@ -15,21 +15,13 @@
  */
 package com.arialyy.aria.http.download
 
-import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.core.listener.AbsEventListener
 import com.arialyy.aria.core.listener.ISchedulers
 import com.arialyy.aria.core.task.SingleDownloadTask
-import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.exception.AriaException
-import com.arialyy.aria.orm.entity.DEntity
 import com.arialyy.aria.util.BlockUtil
-import com.arialyy.aria.util.FileUri
-import com.arialyy.aria.util.FileUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 
 class HttpDEventListener(task: SingleDownloadTask) : AbsEventListener(task) {
 
@@ -48,7 +40,6 @@ class HttpDEventListener(task: SingleDownloadTask) : AbsEventListener(task) {
     sendInState2Target(ISchedulers.COMPLETE)
     saveData(IEntity.STATE_COMPLETE, task.taskState.fileSize)
   }
-
 
   override fun handleCancel() {
     BlockUtil.removeTaskBlock(task)

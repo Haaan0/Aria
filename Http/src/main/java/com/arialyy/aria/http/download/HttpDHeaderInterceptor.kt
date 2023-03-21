@@ -20,7 +20,7 @@ import android.net.Uri
 import android.os.Looper
 import android.os.Process
 import android.text.TextUtils
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter
+import com.arialyy.aria.http.IHttpFileLenAdapter
 import com.arialyy.aria.core.task.ITask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskChain
@@ -56,8 +56,8 @@ internal class HttpDHeaderInterceptor : ITaskInterceptor {
     )
   }
 
-  private fun getOptionAdapter(): HttpDOptionAdapter {
-    return taskOption.getOptionAdapter(HttpDOptionAdapter::class.java)
+  private fun getOptionAdapter(): HttpDOptionDelegate {
+    return taskOption.getOptionDelegate(HttpDOptionDelegate::class.java)
   }
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {

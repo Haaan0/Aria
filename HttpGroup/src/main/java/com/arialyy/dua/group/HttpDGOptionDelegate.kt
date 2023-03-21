@@ -15,16 +15,20 @@
  */
 package com.arialyy.dua.group
 
-import android.content.Context
-import com.arialyy.aria.core.inf.IComponentInit
+import com.arialyy.aria.http.IHttpTaskOptionDelegate
 
 /**
  * @Author laoyuyu
  * @Description
- * @Date 21:51 2023/2/20
+ * @Date 8:14 PM 2023/3/6
  **/
-class HttpGroupComponent : IComponentInit {
-  override fun init(context: Context) {
+internal class HttpDGOptionDelegate : IHttpTaskOptionDelegate {
+  val subUrlList = mutableSetOf<String>()
+  val subNameList = mutableListOf<String>()
 
-  }
+  /**
+   * Number of subtasks executed simultaneously
+   */
+  var subTaskNum = 2
+
 }

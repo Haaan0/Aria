@@ -15,9 +15,9 @@
  */
 package com.arialyy.aria.http.download
 
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter
+import com.arialyy.aria.http.IHttpFileLenAdapter
 import com.arialyy.aria.core.task.IThreadTask
-import com.arialyy.aria.http.IHttpTaskOptionAdapter
+import com.arialyy.aria.http.IHttpTaskOptionDelegate
 import com.arialyy.aria.orm.entity.BlockRecord
 
 /**
@@ -25,7 +25,7 @@ import com.arialyy.aria.orm.entity.BlockRecord
  * @Description
  * @Date 2:03 PM 2023/3/6
  **/
-class HttpDOptionAdapter : IHttpTaskOptionAdapter {
+class HttpDOptionDelegate : IHttpTaskOptionDelegate {
   var fileSizeAdapter: IHttpFileLenAdapter? = null
   var isChunkTask = false
 

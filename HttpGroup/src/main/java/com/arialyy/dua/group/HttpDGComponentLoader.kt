@@ -18,20 +18,19 @@ package com.arialyy.dua.group
 import com.arialyy.annotations.TaskEnum
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IComponentLoader
-import com.arialyy.aria.core.inf.IDownloader
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 7:51 AM 2023/3/6
  **/
-class HttpDGComponentLoader : IComponentLoader {
+internal class HttpDGComponentLoader : IComponentLoader {
   private val downloader by lazy {
     HttpDGLoader(DuaContext.getLifeManager().getTargetByLoader(this)!!)
   }
 
-  override fun <T : IDownloader> download(): T {
-    return downloader as T
+  fun download(): HttpDGLoader {
+    return downloader
   }
 
   override fun getTaskEnum(): TaskEnum {

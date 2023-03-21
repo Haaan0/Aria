@@ -18,13 +18,14 @@ package com.arialyy.dua.group
 import android.net.Uri
 import com.arialyy.annotations.TaskEnum
 import com.arialyy.aria.core.inf.IDownloader
+import com.arialyy.aria.http.download.HttpDStopController
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 7:53 AM 2023/3/6
  **/
-class HttpDGLoader(val target: Any) : IDownloader {
+class HttpDGLoader(private val target: Any) : IDownloader {
   override fun getTaskEnum(): TaskEnum {
     return TaskEnum.DOWNLOAD_GROUP
   }
@@ -35,5 +36,9 @@ class HttpDGLoader(val target: Any) : IDownloader {
    */
   fun load(savePath: Uri): HttpDGStartController {
     return HttpDGStartController(target, savePath)
+  }
+
+  fun load(taskId: Int): HttpDStopController {
+    return HttpDStopController(taskId)
   }
 }

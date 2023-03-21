@@ -69,17 +69,17 @@ internal class HttpDGSubTaskInterceptor : ITaskInterceptor {
       tp.sourUrl = it.sourceUrl
       tp.savePathDir = taskOption.savePathDir
       tp.threadNum = 1
-      tp.eventListener = HttpSubListener()
       val subTask = SingleDownloadTask(tp)
       val subAdapter = HttpDTaskAdapter(true)
       subAdapter.setBlockManager(HttpSubBlockManager(subTask, chain.blockManager.handler))
       subTask.adapter = subAdapter
       if (it.isComplete && checkTaskIsComplete(it)) {
-        (chain.getTask() as HttpDGroupTask).addIncompleteTaskList(subTask)
         Timber.d("task already complete, sourUrl: ${it.sourceUrl}")
+        chain.blockManager.handler.obtainMessage(ITaskManager.SUB_STATE_COMPLETE, subTask)
+      } else {
+        (chain.getTask() as HttpDGTask).addIncompleteTaskList(subTask)
       }
-      (chain.getTask() as HttpDGroupTask).addSubTask(subTask)
+      (chain.getTask() as HttpDGTask).addSubTask(subTask)
     }
   }
-
 }

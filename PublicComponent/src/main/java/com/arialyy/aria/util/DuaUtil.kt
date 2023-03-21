@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.util
 
+import android.text.TextUtils
+import timber.log.Timber
 import java.security.MessageDigest
 
 /**
@@ -23,6 +25,27 @@ import java.security.MessageDigest
  * @Date 21:38 2023/3/11
  **/
 object DuaUtil {
+  /**
+   * 检测url是否合法
+   *
+   * @return `true` 合法，`false` 非法
+   */
+  fun checkUrl(url: String): Boolean {
+    if (TextUtils.isEmpty(url)) {
+      Timber.e("url不能为null")
+      return false
+    }
+    if (!url.startsWith("http") && !url.startsWith("ftp") && !url.startsWith("sftp")) {
+      Timber.e("url【$url】错误")
+      return false
+    }
+    val index = url.indexOf("://")
+    if (index == -1) {
+      Timber.e("url【$url】不合法")
+    }
+    return true
+  }
+
   fun getMD5Hash(str: String): String {
     val md = MessageDigest.getInstance("MD5")
     val messageDigest = md.digest(str.toByteArray())
@@ -33,5 +56,4 @@ object DuaUtil {
     }
     return hashText
   }
-
 }

@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.provider
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.startup.Initializer
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IComponentInit
@@ -24,6 +25,7 @@ import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.util.ServiceLoader
 
+@Keep
 class DuaStartupProvider : Initializer<Unit> {
 
   override fun create(context: Context) {

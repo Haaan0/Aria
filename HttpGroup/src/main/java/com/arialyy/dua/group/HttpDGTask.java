@@ -28,18 +28,18 @@ import java.util.Objects;
  * Created by AriaL on 2017/6/27.
  * 任务组任务
  */
-public class HttpDGroupTask extends AbsTask {
+public class HttpDGTask extends AbsTask {
 
   private final List<SingleDownloadTask> incompleteTaskList = new ArrayList<>();
 
   private final List<SingleDownloadTask> subTaskList = new ArrayList<>();
 
-  public HttpDGroupTask(ITaskOption taskOption) {
+  public HttpDGTask(ITaskOption taskOption) {
     super(taskOption);
   }
 
-  public HttpDGOptionAdapter getDGOptionAdapter() {
-    return getTaskOption(HttpTaskOption.class).getOptionAdapter(HttpDGOptionAdapter.class);
+  public HttpDGOptionDelegate getDGOptionAdapter() {
+    return getTaskOption(HttpTaskOption.class).getOptionDelegate(HttpDGOptionDelegate.class);
   }
 
   void setIncompleteTaskList(List<SingleDownloadTask> list) {

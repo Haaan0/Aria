@@ -33,16 +33,16 @@ import timber.log.Timber
  * @Description
  * @Date 21:58 2023/2/20
  **/
-internal class HttpDGroupAdapter : AbsTaskAdapter() {
+internal class HttpDGAdapter : AbsTaskAdapter() {
   private val taskManager by lazy {
-    val manager = HttpDGTaskManager(getTask() as HttpDGroupTask)
+    val manager = HttpDGTaskManager(getTask() as HttpDGTask)
     ThreadTaskManager2.putTaskManager(getTask().taskId, manager)
     manager
   }
 
   init {
     getTask().getTaskOption(HttpTaskOption::class.java).eventListener =
-      HttpDGEventListener(getTask() as HttpDGroupTask)
+      HttpDGEventListener(getTask() as HttpDGTask)
   }
 
   override fun getBlockManager(): IBlockManager {

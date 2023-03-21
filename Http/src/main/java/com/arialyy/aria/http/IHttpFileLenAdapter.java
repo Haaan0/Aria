@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.loader;
+package com.arialyy.aria.http;
+
+import com.arialyy.aria.core.inf.IEventHandler;
+import java.net.URLConnection;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 加载器部件
+ * Http文件长度适配器
  */
-public interface ILoaderComponent {
+public interface IHttpFileLenAdapter extends IEventHandler {
 
-  void accept(ILoaderVisitor visitor);
-
+  /**
+   * 同伙header中的数据获取文件长度
+   *
+   * @param headers header参数{@link URLConnection#getHeaderFields()}
+   * @return 文件长度
+   */
+  long handleFileLen(Map<String, List<String>> headers);
 }

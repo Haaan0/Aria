@@ -19,23 +19,28 @@ import android.os.Handler
 import android.os.Looper
 import com.arialyy.aria.core.inf.IBlockManager
 import com.arialyy.aria.core.inf.ITaskManager
+import com.arialyy.aria.core.inf.TaskSchedulerType
 import com.arialyy.aria.core.listener.IEventListener
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.http.download.HttpDTaskAdapter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 7:43 PM 2023/3/7
  **/
-internal class HttpDGTaskManager(val task: HttpDGroupTask) : ITaskManager, IBlockManager {
+internal class HttpDGTaskManager(private val task: HttpDGTask) : ITaskManager, IBlockManager {
   private lateinit var looper: Looper
   private lateinit var handler: Handler
   private val subTaskNum = task.dgOptionAdapter.subTaskNum
@@ -46,20 +51,50 @@ internal class HttpDGTaskManager(val task: HttpDGroupTask) : ITaskManager, IBloc
   )
   private val dispatcher = threadPool.asCoroutineDispatcher()
   private val scope = MainScope()
+  private var progress = 0L
+  private var lastUpdateTime = System.currentTimeMillis()
   private val eventListener: IEventListener =
     task.getTaskOption(HttpTaskOption::class.java).eventListener
+  private val canceledNum = AtomicInteger(0) // 已经取消的线程的数
+  private val stoppedNum = AtomicInteger(0) // 已经停止的线程数
+  private val failedNum = AtomicInteger(0) // 失败的线程数
+  private val completedNum = AtomicInteger(0) // 完成的线程数
 
   private val callback = Handler.Callback { msg ->
     when (msg.what) {
       ITaskManager.SUB_STATE_STOP -> {
+        stoppedNum.getAndDecrement()
+        if (isStopped()) {
+          Timber.d("isStopped")
+          eventListener.onStop(progress)
+          quitLooper()
+        }
       }
       ITaskManager.SUB_STATE_CANCEL -> {
+        canceledNum.getAndDecrement()
+        if (isCanceled()) {
+          Timber.d("isCanceled")
+          eventListener.onCancel()
+          quitLooper()
+        }
       }
       ITaskManager.SUB_STATE_FAIL -> {
+        failedNum.getAndDecrement()
       }
       ITaskManager.SUB_STATE_COMPLETE -> {
+        completedNum.getAndDecrement()
+        if (isCompleted()) {
+          Timber.d("isCompleted")
+          eventListener.onComplete()
+        }
       }
       ITaskManager.SUB_STATE_RUNNING -> {
+        val len = msg.obj as Long
+        progress += len
+        task.taskState.curProgress = progress
+        if (System.currentTimeMillis() - lastUpdateTime > 1000) {
+          eventListener.onProgress(progress)
+        }
       }
     }
     false
@@ -90,39 +125,49 @@ internal class HttpDGTaskManager(val task: HttpDGroupTask) : ITaskManager, IBloc
   }
 
   override fun stop() {
+    scope.launch(Dispatchers.IO) {
+      task.subTaskList.forEach {
+        it.stop(TaskSchedulerType.TYPE_DEFAULT)
+      }
+    }
   }
 
   override fun cancel() {
-
+    scope.launch(Dispatchers.IO) {
+      task.subTaskList.forEach {
+        it.cancel(TaskSchedulerType.TYPE_DEFAULT)
+      }
+      task.subTaskList.clear()
+    }
   }
 
   override fun isCompleted(): Boolean {
-    TODO("Not yet implemented")
+    return completedNum.get() == task.subTaskList.size
   }
 
   override fun getCurrentProgress(): Long {
-    TODO("Not yet implemented")
+    return task.currentProgress
   }
 
   override fun isStopped(): Boolean {
-    TODO("Not yet implemented")
+    return stoppedNum.get() + canceledNum.get() + failedNum.get() + completedNum.get() == task.subTaskList.size
   }
 
   override fun isCanceled(): Boolean {
-    TODO("Not yet implemented")
+    return canceledNum.get() == task.subTaskList.size
   }
 
   override fun isRunning(): Boolean {
-    TODO("Not yet implemented")
+    return scope.isActive
   }
 
   override fun setBlockNum(blockNum: Int) {
-    TODO("Not yet implemented")
+    Timber.e("Group tasks do not support setting threads")
   }
 
   override fun getHandler(): Handler = handler
 
   override fun hasFailedTask(): Boolean {
-    TODO("Not yet implemented")
+    return failedNum.get() != 0
   }
 }

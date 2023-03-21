@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.loader;
+package com.arialyy.dua.group
 
-import android.os.Handler;
-import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.task.IThreadTask;
-import java.util.List;
+import com.arialyy.aria.core.listener.ITaskStatusListener
 
 /**
- * 线程任务构造器
- */
-public interface IThreadTaskBuilder extends ILoaderComponent {
-
-  /**
-   * 构造线程任务
-   */
-  List<IThreadTask> buildThreadTask(TaskRecord record, Handler stateHandler);
-
-  /**
-   * 获取创建的线程任务数，需要先调用{@link #buildThreadTask(TaskRecord, Handler)}方法才能获取创建的线程任务数
-   */
-  int getCreatedThreadNum();
-}
+ * @Author laoyuyu
+ * @Description
+ * @Date 7:26 PM 2023/3/21
+ **/
+class HttpDGListener : ITaskStatusListener<HttpDGTask>

@@ -25,7 +25,7 @@ import com.arialyy.aria.core.task.TaskCachePool.removeTask
 import com.arialyy.aria.core.task.TaskCachePool.updateState
 import com.arialyy.aria.core.task.TaskState
 import com.arialyy.aria.http.HttpTaskOption
-import com.arialyy.aria.http.download.HttpDOptionAdapter
+import com.arialyy.aria.http.download.HttpDOptionDelegate
 import com.arialyy.aria.util.BlockUtil
 import timber.log.Timber
 
@@ -76,6 +76,7 @@ internal class HttpSubBlockManager(private val task: ITask, private val groupHan
           task.taskState.speed = 0
           saveData(IEntity.STATE_COMPLETE)
         }
+        quitLooper()
       }
       ITaskManager.STATE_RUNNING -> {
         updateProgress(msg.obj as Long)
@@ -126,7 +127,7 @@ internal class HttpSubBlockManager(private val task: ITask, private val groupHan
     handler = Handler(looper, callback)
     // Synchronized sequential execution of all block
     task.getTaskOption(HttpTaskOption::class.java)
-      .getOptionAdapter(HttpDOptionAdapter::class.java).threadList.forEach { tt ->
+      .getOptionDelegate(HttpDOptionDelegate::class.java).threadList.forEach { tt ->
         if (isBreak) {
           Timber.d("task stopped")
           return

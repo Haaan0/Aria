@@ -16,7 +16,11 @@
 package com.arialyy.dua.group
 
 import android.net.Uri
+import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.command.AddCmd
+import com.arialyy.aria.core.command.CancelCmd
 import com.arialyy.aria.core.command.StartCmd
+import com.arialyy.aria.core.command.StopCmd
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseStartController
@@ -30,12 +34,13 @@ import timber.log.Timber
  * @Description
  * @Date 7:47 PM 2023/3/6
  **/
-class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartController(target) {
+class HttpDGStartController(target: Any, private val savePath: Uri) :
+  HttpBaseStartController(target) {
 
-  private val optionAdapter = HttpDGOptionAdapter()
+  private val optionAdapter = HttpDGOptionDelegate()
 
   init {
-    httpTaskOption.taskOptionAdapter = optionAdapter
+    httpTaskOption.taskOptionDelegate = optionAdapter
     httpTaskOption.savePathDir = savePath
   }
 
@@ -49,6 +54,14 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
 
   override fun setHttpOption(httpOption: HttpOption): HttpDGStartController {
     return super.setHttpOption(httpOption) as HttpDGStartController
+  }
+
+  /**
+   * set download listener
+   */
+  fun setListener(listener: HttpDGListener): HttpDGStartController {
+    DuaContext.getLifeManager().addCustomListener(target, listener)
+    return this
   }
 
   /**
@@ -84,18 +97,31 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
     return this
   }
 
-  private fun getTask(createNewTask: Boolean = true): HttpDGroupTask {
+  private fun getTask(createNewTask: Boolean = true): HttpDGTask? {
     if (HttpUtil.checkHttpDParams(httpTaskOption)) {
       throw IllegalArgumentException("invalid params")
     }
     val temp = TaskCachePool.getTaskByKey(savePath.toString())
     if (temp != null) {
-      return temp as HttpDGroupTask
+      return temp as HttpDGTask
     }
-    val task = HttpDGroupTask(httpTaskOption)
-    task.adapter = HttpDGroupAdapter()
+    if (!createNewTask) {
+      return null
+    }
+    val task = HttpDGTask(httpTaskOption)
+    task.adapter = HttpDGAdapter()
     TaskCachePool.putTask(task)
     return task
+  }
+
+  fun add(): Int {
+    if (!FileUtils.uriEffective(savePath)) {
+      Timber.e("invalid savePath: $savePath")
+      return -1
+    }
+    val task = getTask()
+    val resp = AddCmd(task).executeCmd()
+    return if (resp.isInterrupt()) -1 else task?.taskId ?: -1
   }
 
   /**
@@ -110,6 +136,28 @@ class HttpDGStartController(target: Any, val savePath: Uri) : HttpBaseStartContr
 
     val task = getTask()
     val resp = StartCmd(task).executeCmd()
-    return if (resp.isInterrupt()) -1 else task.taskId
+    return if (resp.isInterrupt()) -1 else task?.taskId ?: -1
+  }
+
+  fun resume(): Int {
+    return start()
+  }
+
+  fun cancel() {
+    val task = getTask(true)
+    if (task == null) {
+      Timber.e("not found task, savePath: $savePath")
+      return
+    }
+    CancelCmd(task).executeCmd()
+  }
+
+  fun stop() {
+    val task = getTask(false)
+    if (task == null) {
+      Timber.e("task not running, savePath: $savePath")
+      return
+    }
+    StopCmd(task).executeCmd()
   }
 }

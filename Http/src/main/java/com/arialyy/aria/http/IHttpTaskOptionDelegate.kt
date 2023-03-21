@@ -13,22 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.command;
-
-import com.arialyy.aria.core.download.AbsGroupTaskWrapper;
+package com.arialyy.aria.http
 
 /**
- * Created by AriaL on 2017/6/29.
- * 停止任务组子任务的命令
- */
-final class DGSubStopCmd<T extends AbsGroupTaskWrapper> extends AbsGroupCmd<T> {
-  DGSubStopCmd(T entity) {
-    super(entity);
-  }
-
-  @Override public void executeCmd() {
-    if (checkTask()) {
-      tempTask.stopSubTask(childUrl);
-    }
-  }
-}
+ * @Author laoyuyu
+ * @Description
+ * @Date 8:03 PM 2023/3/6
+ **/
+interface IHttpTaskOptionDelegate

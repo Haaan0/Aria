@@ -33,12 +33,12 @@ import com.arialyy.aria.orm.entity.BlockRecord
  **/
 class HttpBlockThreadInterceptor : ITaskInterceptor {
   private lateinit var blockManager: IBlockManager
-  private lateinit var taskOption: HttpDOptionAdapter
+  private lateinit var taskOption: HttpDOptionDelegate
 
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     blockManager = chain.blockManager
     taskOption = chain.getTask().getTaskOption(HttpTaskOption::class.java)
-      .getOptionAdapter(HttpDOptionAdapter::class.java)
+      .getOptionDelegate(HttpDOptionDelegate::class.java)
     val unfinishedBlockList = taskOption.getUnfinishedBlockList()
     if (unfinishedBlockList.isEmpty()) {
       return TaskResp(TaskResp.CODE_INTERRUPT)
@@ -55,7 +55,7 @@ class HttpBlockThreadInterceptor : ITaskInterceptor {
       val threadConfig = ThreadConfig(it, option, DuaContext.getDConfig().maxSpeed)
       threadTaskList.add(
         ThreadTask2(
-          adapter = if (option.getOptionAdapter(HttpDOptionAdapter::class.java).isChunkTask) HttpDCTTaskAdapter(
+          adapter = if (option.getOptionDelegate(HttpDOptionDelegate::class.java).isChunkTask) HttpDCTTaskAdapter(
             threadConfig
           ) else HttpDBTaskAdapter(
             threadConfig
@@ -65,7 +65,7 @@ class HttpBlockThreadInterceptor : ITaskInterceptor {
         )
       )
     }
-    option.getOptionAdapter(HttpDOptionAdapter::class.java).threadList = threadTaskList
+    option.getOptionDelegate(HttpDOptionDelegate::class.java).threadList = threadTaskList
     blockManager.start()
   }
 }

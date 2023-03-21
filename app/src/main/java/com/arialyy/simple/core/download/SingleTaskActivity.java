@@ -35,7 +35,7 @@ import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.listener.ISchedulers;
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
+import com.arialyy.aria.http.IHttpFileLenAdapter;
 import com.arialyy.aria.core.task.SingleDownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;

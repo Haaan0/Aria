@@ -16,8 +16,8 @@
 package com.arialyy.aria.core.common;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
-import com.arialyy.aria.core.processor.IHttpFileNameAdapter;
+import com.arialyy.aria.http.IHttpFileLenAdapter;
+import com.arialyy.aria.http.IHttpFileNameAdapter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtils;
 import java.net.Proxy;

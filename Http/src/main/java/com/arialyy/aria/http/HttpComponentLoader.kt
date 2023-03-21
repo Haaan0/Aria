@@ -19,7 +19,6 @@ import com.arialyy.annotations.TaskEnum
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.inf.IBaseLoader
 import com.arialyy.aria.core.inf.IComponentLoader
-import com.arialyy.aria.core.inf.IDownloader
 import com.arialyy.aria.http.download.HttpDownloader
 import com.arialyy.aria.http.upload.HttpULoader
 import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
@@ -41,17 +40,17 @@ class HttpComponentLoader : IComponentLoader {
 
   private lateinit var loader: IBaseLoader
 
-  override fun <T : IDownloader> download(): T {
+  fun download(): HttpDownloader {
     loader = downloader
-    return downloader as T
+    return downloader
+  }
+
+  override fun getTaskEnum(): TaskEnum {
+    return TaskEnum.DOWNLOAD
   }
 
 //  override fun <T : IUploader> upload(): T {
 //    loader = uploader
 //    return uploader as T
 //  }
-
-  override fun getTaskEnum(): TaskEnum {
-    return loader.getTaskEnum()
-  }
 }

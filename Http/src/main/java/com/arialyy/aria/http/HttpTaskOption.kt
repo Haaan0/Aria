@@ -17,7 +17,6 @@ package com.arialyy.aria.http
 
 import com.arialyy.aria.core.common.TaskOption
 import com.arialyy.aria.core.task.ITaskInterceptor
-import com.arialyy.aria.orm.entity.BlockRecord
 
 /**
  * @Author laoyuyu
@@ -28,9 +27,9 @@ class HttpTaskOption : TaskOption() {
 
   var httpOption: HttpOption? = null
   var taskInterceptor = mutableListOf<ITaskInterceptor>()
-  lateinit var taskOptionAdapter: IHttpTaskOptionAdapter
+  lateinit var taskOptionDelegate: IHttpTaskOptionDelegate
 
-  fun <T : IHttpTaskOptionAdapter> getOptionAdapter(clazz: Class<T>): T {
-    return taskOptionAdapter as T
+  fun <T : IHttpTaskOptionDelegate> getOptionDelegate(clazz: Class<T>): T {
+    return taskOptionDelegate as T
   }
 }

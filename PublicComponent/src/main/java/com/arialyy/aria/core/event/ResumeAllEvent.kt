@@ -13,32 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.loader;
-
-import com.arialyy.aria.core.inf.ITaskManager;
+package com.arialyy.aria.core.event
 
 /**
- * 加载器访问者
- */
-public interface ILoaderVisitor {
-
-  /**
-   * 处理任务记录
-   */
-  void addComponent(IRecordHandler recordHandler);
-
-  /**
-   * 处理任务的文件信息
-   */
-  void addComponent(IInfoTask infoTask);
-
-  /**
-   * 线程状态
-   */
-  void addComponent(ITaskManager threadState);
-
-  /**
-   * 构造线程任务
-   */
-  void addComponent(IThreadTaskBuilder builder);
-}
+ * @Author laoyuyu
+ * @Description
+ * @Date 8:26 PM 2023/3/21
+ **/
+class ResumeAllEvent

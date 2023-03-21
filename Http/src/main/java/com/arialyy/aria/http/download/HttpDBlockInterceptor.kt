@@ -136,7 +136,7 @@ internal class HttpDBlockInterceptor : ITaskInterceptor {
         if (br.curProgress != blockF.length()) {
           br.curProgress = blockF.length()
           needUpdateBlockRecord.add(br)
-          taskOption.getOptionAdapter(HttpDOptionAdapter::class.java).putUnfinishedBlock(br)
+          taskOption.getOptionDelegate(HttpDOptionDelegate::class.java).putUnfinishedBlock(br)
         }
         // update task progress
         handler.obtainMessage(ITaskManager.STATE_UPDATE_PROGRESS, br.curProgress)

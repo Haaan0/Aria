@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
  **/
 class HttpDBlockManager(task: ITask) : DBlockManager(task) {
   private val optionAdapter =
-    task.getTaskOption(HttpTaskOption::class.java).getOptionAdapter(HttpDOptionAdapter::class.java)
+    task.getTaskOption(HttpTaskOption::class.java).getOptionDelegate(HttpDOptionDelegate::class.java)
 
   override fun start() {
     optionAdapter.threadList.forEach { tt ->

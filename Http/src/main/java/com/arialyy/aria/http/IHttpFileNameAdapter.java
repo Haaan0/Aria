@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.group;
+package com.arialyy.aria.http;
 
-import com.arialyy.aria.core.common.AbsNormalEntity;
-import com.arialyy.aria.core.task.AbsGroupTask;
+import com.arialyy.aria.core.inf.IEventHandler;
+
+import java.net.URLConnection;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Created by lyy on 2017/9/8.
- * 任务组参数传递
+ * Http文件名适配器
  */
-public final class GroupSendParams<GROUP_TASK extends AbsGroupTask, ENTITY extends AbsNormalEntity> {
+public interface IHttpFileNameAdapter extends IEventHandler {
 
-  public GROUP_TASK groupTask;
-  public ENTITY entity;
-
-  public GroupSendParams() {
-  }
-
-  public GroupSendParams(GROUP_TASK groupTask, ENTITY entity) {
-    this.groupTask = groupTask;
-    this.entity = entity;
-  }
+  /**
+   * 根据header中的数据获取文件名字
+   * @param headers header参数{@link URLConnection#getHeaderFields()}
+   * @param key 这里如果传entity可能会导致entity属性变更而其他地方没有改变，所以就传了个key 减少可操作范围
+   * @return 文件长度
+   */
+  String handleFileName(Map<String, List<String>> headers, String key);
 }

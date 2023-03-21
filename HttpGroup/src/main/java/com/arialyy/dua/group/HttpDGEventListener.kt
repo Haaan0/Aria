@@ -15,19 +15,33 @@
  */
 package com.arialyy.dua.group
 
+import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.core.listener.AbsEventListener
+import com.arialyy.aria.core.listener.ISchedulers
+import com.arialyy.aria.core.task.TaskCachePool
+import com.arialyy.aria.orm.entity.DEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * @Author laoyuyu
  * @Description
  * @Date 9:15 PM 2023/3/6
  **/
-internal class HttpDGEventListener(task: HttpDGroupTask) : AbsEventListener(task) {
+internal class HttpDGEventListener(task: HttpDGTask) : AbsEventListener(task) {
   override fun onComplete() {
-    TODO("Not yet implemented")
+    handleSpeed(0)
+    sendInState2Target(ISchedulers.COMPLETE)
+    saveData(IEntity.STATE_COMPLETE, task.taskState.fileSize)
   }
 
   override fun handleCancel() {
-    TODO("Not yet implemented")
+    DuaContext.duaScope.launch(Dispatchers.IO) {
+      val entity = TaskCachePool.getEntity(taskId = task.taskId)
+      val db = DuaContext.getServiceManager().getDbService().getDuaDb()
+      db.getRecordDao().deleteTaskRecord(task.taskState.taskRecord)
+      db.getDEntityDao().delete(entity as DEntity)
+    }
   }
 }

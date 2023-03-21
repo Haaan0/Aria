@@ -21,7 +21,7 @@ import com.arialyy.aria.core.command.AddCmd
 import com.arialyy.aria.core.command.CancelCmd
 import com.arialyy.aria.core.command.StartCmd
 import com.arialyy.aria.core.command.StopCmd
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter
+import com.arialyy.aria.http.IHttpFileLenAdapter
 import com.arialyy.aria.core.task.SingleDownloadTask
 import com.arialyy.aria.core.task.ITaskInterceptor
 import com.arialyy.aria.core.task.TaskCachePool
@@ -37,11 +37,11 @@ import java.net.HttpURLConnection
  * @Date 12:38 PM 2023/1/22
  **/
 class HttpDStartController(target: Any, val url: String) : HttpBaseStartController(target) {
-  private val taskOptionAdapter = HttpDOptionAdapter()
+  private val taskOptionAdapter = HttpDOptionDelegate()
 
   init {
     httpTaskOption.sourUrl = url
-    httpTaskOption.taskOptionAdapter = taskOptionAdapter
+    httpTaskOption.taskOptionDelegate = taskOptionAdapter
   }
 
   override fun setTaskInterceptor(taskInterceptor: ITaskInterceptor): HttpDStartController {

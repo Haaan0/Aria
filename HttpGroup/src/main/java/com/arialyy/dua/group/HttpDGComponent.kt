@@ -13,31 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.loader;
+package com.arialyy.dua.group
 
-public interface ILoader extends Runnable {
+import android.content.Context
+import com.arialyy.aria.core.event.Event
+import com.arialyy.aria.core.event.EventMsgUtil
+import com.arialyy.aria.core.event.ResumeAllEvent
+import com.arialyy.aria.core.inf.IComponentInit
 
-  //void start();
+/**
+ * @Author laoyuyu
+ * @Description
+ * @Date 21:51 2023/2/20
+ **/
+class HttpDGComponent : IComponentInit {
+  override fun init(context: Context) {
+    EventMsgUtil.getDefault().register(this)
+  }
 
-  /**
-   * 任务是否在执行
-   *
-   * @return true 任务执行中
-   */
-  boolean isRunning();
-
-  void cancel();
-
-  void stop();
-
-  /**
-   * 任务是否被中断（停止，取消）
-   *
-   * @return true 任务中断，false 任务没有中断
-   */
-  boolean isBreak();
-
-  String getKey();
-
-  long getCurrentProgress();
+  @Event
+  fun resumeAll(resumeAllEvent: ResumeAllEvent) {
+  }
 }

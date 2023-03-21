@@ -24,7 +24,7 @@ import com.arialyy.aria.core.task.TaskResp
 import com.arialyy.aria.http.HttpTaskOption
 import com.arialyy.aria.orm.entity.DEntity
 import com.arialyy.aria.orm.entity.DGEntity
-import com.arialyy.aria.util.CheckUtil
+import com.arialyy.aria.util.DuaUtil
 import com.arialyy.aria.util.FileUri
 import com.arialyy.aria.util.FileUtils
 import timber.log.Timber
@@ -40,7 +40,7 @@ import java.io.File
 internal class HttpDGCheckInterceptor : ITaskInterceptor {
 
   private lateinit var task: ITask
-  private lateinit var optionAdapter: HttpDGOptionAdapter
+  private lateinit var optionAdapter: HttpDGOptionDelegate
   private lateinit var taskOption: HttpTaskOption
   private val dgDao by lazy {
     DuaContext.getServiceManager().getDbService().getDuaDb().getDGEntityDao()
@@ -49,7 +49,7 @@ internal class HttpDGCheckInterceptor : ITaskInterceptor {
   override suspend fun interceptor(chain: TaskChain): TaskResp {
     task = chain.getTask()
     taskOption = task.getTaskOption(HttpTaskOption::class.java)
-    optionAdapter = taskOption.getOptionAdapter(HttpDGOptionAdapter::class.java)
+    optionAdapter = taskOption.getOptionDelegate(HttpDGOptionDelegate::class.java)
 
     if (checkParams(taskOption.savePathDir)) {
       return TaskResp(TaskResp.CODE_INTERRUPT)
@@ -140,7 +140,7 @@ internal class HttpDGCheckInterceptor : ITaskInterceptor {
     }
 
     optionAdapter.subUrlList.forEach {
-      if (!CheckUtil.checkUrl(it)) {
+      if (!DuaUtil.checkUrl(it)) {
         Timber.e("invalid url: $it")
         return false
       }

@@ -183,7 +183,7 @@ public abstract class AbsTask implements ITask {
     mAdapter.stop();
   }
 
-  @Override public void cancel(int type) {
+  @Override public void delete(int type) {
     if (mAdapter == null) {
       Timber.e("util is  null");
       return;

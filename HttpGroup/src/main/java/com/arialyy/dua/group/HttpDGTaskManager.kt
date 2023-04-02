@@ -132,10 +132,10 @@ internal class HttpDGTaskManager(private val task: HttpDGTask) : ITaskManager, I
     }
   }
 
-  override fun cancel() {
+  override fun delete() {
     scope.launch(Dispatchers.IO) {
       task.subTaskList.forEach {
-        it.cancel(TaskSchedulerType.TYPE_DEFAULT)
+        it.delete(TaskSchedulerType.TYPE_DEFAULT)
       }
       task.subTaskList.clear()
     }

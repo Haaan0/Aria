@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.event;
+package com.arialyy.aria.core.command
 
-public class ErrorEvent {
-  public long taskId;
-  public String errorMsg;
-
-  public ErrorEvent(long taskId, String errorMsg) {
-    this.taskId = taskId;
-    this.errorMsg = errorMsg;
-  }
+/**
+ * @Author laoyuyu
+ * @Description
+ * @Date 21:51 2023/4/2
+ **/
+interface ICmdHandler {
+  fun initHandler()
 }

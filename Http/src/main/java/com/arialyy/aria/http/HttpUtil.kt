@@ -16,6 +16,9 @@
 package com.arialyy.aria.http
 
 import android.text.TextUtils
+import com.arialyy.aria.core.task.SingleDownloadTask
+import com.arialyy.aria.core.task.TaskCachePool
+import com.arialyy.aria.http.download.HttpDTaskAdapter
 import com.arialyy.aria.util.FileUtils
 import com.arialyy.aria.util.Regular
 import timber.log.Timber
@@ -32,6 +35,33 @@ import java.util.zip.InflaterInputStream
  * @Date 12:40 PM 2023/1/22
  **/
 object HttpUtil {
+
+  /**
+   * get or create single task
+   * @param createNewTask if not found task in [TaskCachePool], create new task
+   */
+  fun getSingDTask(
+    httpTaskOption: HttpTaskOption,
+    createNewTask: Boolean = true
+  ): SingleDownloadTask? {
+    if (checkHttpDParams(httpTaskOption)) {
+      throw IllegalArgumentException("invalid params")
+    }
+    if (httpTaskOption.sourUrl.isNullOrEmpty()) {
+      return null
+    }
+    val tempTask = TaskCachePool.getTaskByKey(httpTaskOption.sourUrl!!)
+    if (tempTask != null) {
+      return tempTask as SingleDownloadTask
+    }
+    if (!createNewTask) {
+      return null
+    }
+    val task = SingleDownloadTask(httpTaskOption)
+    task.adapter = HttpDTaskAdapter()
+    TaskCachePool.putTask(task)
+    return task
+  }
 
   /**
    * 拦截window.location.replace数据
@@ -95,7 +125,7 @@ object HttpUtil {
       Timber.e("invalid uri, ${option.savePathDir}")
       return false
     }
-    if (!FileUtils.uriIsDir(option.savePathDir!!)){
+    if (!FileUtils.uriIsDir(option.savePathDir!!)) {
       Timber.e("invalid uri, that path not a dir")
       return false
     }

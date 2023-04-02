@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.common.controller;
 
-import com.arialyy.aria.core.command.CancelCmd;
+import com.arialyy.aria.core.command.DeleteCmd;
 import com.arialyy.aria.core.command.CmdHelper;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.command.StartCmd;
@@ -106,11 +106,11 @@ public final class NormalController extends FeatureController implements INormal
   public void cancel(boolean removeFile) {
     setAction(ACTION_CANCEL);
     if (checkConfig()) {
-      CancelCmd cancelCmd =
-          (CancelCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
+      DeleteCmd deleteCmd =
+          (DeleteCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
               checkTaskType());
-      cancelCmd.removeFile = removeFile;
-      EventMsgUtil.getDefault().post(cancelCmd);
+      deleteCmd.removeFile = removeFile;
+      EventMsgUtil.getDefault().post(deleteCmd);
     }
   }
 

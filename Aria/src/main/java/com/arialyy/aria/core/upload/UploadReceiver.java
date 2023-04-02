@@ -19,7 +19,7 @@ import android.text.TextUtils;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.command.CancelAllCmd;
+import com.arialyy.aria.core.command.DeleteAllCmd;
 import com.arialyy.aria.core.command.CmdHelper;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
@@ -251,8 +251,8 @@ public class UploadReceiver extends AbsReceiver {
    */
   public void removeAllTask(boolean removeFile) {
     final AriaManager am = AriaManager.getInstance();
-    CancelAllCmd cancelCmd =
-        (CancelAllCmd) CmdHelper.createNormalCmd(new UTaskWrapper(null),
+    DeleteAllCmd cancelCmd =
+        (DeleteAllCmd) CmdHelper.createNormalCmd(new UTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ITask.UPLOAD);
     cancelCmd.removeFile = removeFile;
 

@@ -15,9 +15,8 @@
  */
 package com.arialyy.aria.core.command
 
-import com.arialyy.aria.core.DuaContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.arialyy.aria.core.event.EventMsgUtil
+import com.arialyy.aria.core.event.ResumeAllEvent
 
 /**
  * Created by AriaL on 2017/6/13.
@@ -30,9 +29,7 @@ import kotlinx.coroutines.launch
 class ResumeAllCmd() : ICmd {
 
   override fun executeCmd(): CmdResp {
-    DuaContext.duaScope.launch(Dispatchers.IO) {
-
-    }
+    EventMsgUtil.getDefault().post(ResumeAllEvent())
     return CmdResp(CmdResp.CODE_COMPLETE)
   }
 }

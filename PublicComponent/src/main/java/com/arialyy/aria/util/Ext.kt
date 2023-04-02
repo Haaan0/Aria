@@ -19,6 +19,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import com.arialyy.aria.core.DuaContext
+import com.arialyy.aria.core.inf.IEntity
+import com.arialyy.aria.orm.entity.DEntity
 import timber.log.Timber
 import java.io.File
 import java.math.BigInteger
@@ -29,7 +31,7 @@ fun File.uri(): Uri {
   return Uri.parse(path)
 }
 
-fun String.uri():Uri{
+fun String.uri(): Uri {
   return Uri.parse(this)
 }
 
@@ -81,4 +83,8 @@ inline fun <R> Uri.use(block: Uri.() -> R): R {
     }
   }
   return block()
+}
+
+fun DEntity.isNotComplete(): Boolean {
+  return state != IEntity.STATE_COMPLETE && state != IEntity.STATE_CANCEL
 }

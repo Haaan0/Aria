@@ -48,7 +48,7 @@ object ThreadTaskManager2 {
       return
     }
     if (isRemoveTask) {
-      taskManager.cancel()
+      taskManager.delete()
     } else {
       taskManager.stop()
     }
@@ -63,7 +63,7 @@ object ThreadTaskManager2 {
       return
     }
     taskManagerMap.forEach {
-      it.value.cancel()
+      it.value.delete()
     }
     taskManagerMap.clear()
   }

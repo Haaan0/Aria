@@ -91,11 +91,11 @@ public interface ITask {
   void stop(int type);
 
   /**
-   * 停止任务
+   * 删除任务
    *
    * @param type {@link TaskSchedulerType}
    */
-  void cancel(int type);
+  void delete(int type);
 
   /**
    * 任务是否停止了

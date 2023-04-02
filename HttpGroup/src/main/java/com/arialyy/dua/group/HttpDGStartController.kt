@@ -18,7 +18,7 @@ package com.arialyy.dua.group
 import android.net.Uri
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.command.AddCmd
-import com.arialyy.aria.core.command.CancelCmd
+import com.arialyy.aria.core.command.DeleteCmd
 import com.arialyy.aria.core.command.StartCmd
 import com.arialyy.aria.core.command.StopCmd
 import com.arialyy.aria.core.task.ITaskInterceptor
@@ -149,7 +149,7 @@ class HttpDGStartController(target: Any, private val savePath: Uri) :
       Timber.e("not found task, savePath: $savePath")
       return
     }
-    CancelCmd(task).executeCmd()
+    DeleteCmd(task).executeCmd()
   }
 
   fun stop() {

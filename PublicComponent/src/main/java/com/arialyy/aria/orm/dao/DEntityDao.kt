@@ -21,6 +21,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.aria.orm.entity.DEntity
 
 /**
@@ -38,6 +39,10 @@ interface DEntityDao {
   @Query("SELECT * FROM DEntity WHERE :savePath=savePath")
   suspend fun queryDEntityBySavePath(savePath: String): DEntity?
 
+  @Transaction
+  @Query("SELECT * FROM DEntity WHERE state!=${IEntity.STATE_COMPLETE}")
+  suspend fun queryAllNotCompleteEntityList(): List<DEntity>?
+
   @Query("SELECT * FROM DEntity WHERE :dId=dId")
   suspend fun queryDEntityById(did: String): DEntity?
 
@@ -52,4 +57,9 @@ interface DEntityDao {
 
   @Delete
   suspend fun delete(dEntity: DEntity)
+
+  @Transaction
+  @Query("DELETE FROM DEntity")
+  suspend fun deleteAll()
+
 }

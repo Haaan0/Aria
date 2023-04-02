@@ -18,7 +18,7 @@ package com.arialyy.aria.core.download;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.command.CancelAllCmd;
+import com.arialyy.aria.core.command.DeleteAllCmd;
 import com.arialyy.aria.core.command.CmdHelper;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
@@ -506,8 +506,8 @@ public class DownloadReceiver extends AbsReceiver {
    */
   public void removeAllTask(boolean removeFile) {
     final AriaManager ariaManager = AriaManager.getInstance();
-    CancelAllCmd cancelCmd =
-        (CancelAllCmd) CmdHelper.createNormalCmd(new DTaskWrapper(null),
+    DeleteAllCmd cancelCmd =
+        (DeleteAllCmd) CmdHelper.createNormalCmd(new DTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ITask.SINGLE_DOWNLOAD);
     cancelCmd.removeFile = removeFile;
     EventMsgUtil.getDefault().post(cancelCmd);

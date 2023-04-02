@@ -32,6 +32,19 @@ class HttpDGLoader(private val target: Any) : IDownloader {
 
   /**
    * start, create a task
+   *
+   *```
+   * + mnt
+   * + sdcard
+   *    + download
+   *        + group_test
+   *            - task1.apk
+   *            - task2.apk
+   *            - task3.apk
+   *            ....
+   *
+   *```
+   *
    * @param savePath download url
    */
   fun load(savePath: Uri): HttpDGStartController {

@@ -99,18 +99,18 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
     return b ? task.getTaskId() : -1;
   }
 
-  @Override public void removeTask(TASK task) {
+  @Override public void deleteTask(TASK task) {
     if (task == null) {
       Timber.e("task is null");
       return;
     }
     if (getCachePool().taskExist(task.getTaskId())) {
       Timber.i("cache pool has task, which will be removed from the cache pool");
-      getCachePool().removeTask(task.getTaskId());
+      getCachePool().deleteTask(task.getTaskId());
     }
     if (getExePool().taskExist(task.getTaskId())) {
       stopTask(task);
-      getExePool().removeTask(task.getTaskId());
+      getExePool().deleteTask(task.getTaskId());
     }
   }
 
@@ -135,6 +135,28 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
     }
     ThreadTaskManager2.INSTANCE.stopAllThreadTask();
     getCachePool().clear();
+    getExePool().clear();
+  }
+
+  @Override public void deleteAllTask() {
+    for (TASK task : getExePool().getAllTask()) {
+      if (task != null) {
+        int state = task.getTaskState().getState();
+        if (task.isRunning()
+            || (state != IEntity.STATE_COMPLETE && state != IEntity.STATE_CANCEL)) {
+          task.delete(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
+        }
+      }
+    }
+
+    for (TASK task : getCachePool().getAllTask()) {
+      if (task != null) {
+        task.delete(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
+      }
+    }
+    ThreadTaskManager2.INSTANCE.stopAllThreadTask();
+    getCachePool().clear();
+    getExePool().clear();
   }
 
   /**
@@ -151,13 +173,13 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
     boolean canStop = false;
     switch (state) {
       case IEntity.STATE_WAIT:
-        getCachePool().removeTask(task.getTaskId());
+        getCachePool().deleteTask(task.getTaskId());
         canStop = true;
         break;
       case IEntity.STATE_POST_PRE:
       case IEntity.STATE_PRE:
       case IEntity.STATE_RUNNING:
-        getExePool().removeTask(task.getTaskId());
+        getExePool().deleteTask(task.getTaskId());
         canStop = true;
         break;
       case IEntity.STATE_STOP:
@@ -165,8 +187,8 @@ public abstract class AbsTaskQueue<TASK extends ITask> implements ITaskQueue<TAS
       case IEntity.STATE_FAIL:
         Timber.w("stop task fail，it already topped, taskId: %d", task.getTaskId());
         if (taskIsRunning(task.getTaskId())) {
-          getCachePool().removeTask(task.getTaskId());
-          getExePool().removeTask(task.getTaskId());
+          getCachePool().deleteTask(task.getTaskId());
+          getExePool().deleteTask(task.getTaskId());
           if (ThreadTaskManager2.INSTANCE.taskIsRunning(task.getTaskId())) {
             ThreadTaskManager2.INSTANCE.stopThreadTask(task.getTaskId(), false);
           }

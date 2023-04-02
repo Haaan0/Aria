@@ -1,9 +1,6 @@
 package com.arialyy.aria.http
 
 import android.content.Context
-import com.arialyy.aria.core.event.Event
-import com.arialyy.aria.core.event.EventMsgUtil
-import com.arialyy.aria.core.event.ResumeAllEvent
 import com.arialyy.aria.core.inf.IComponentInit
 
 /**
@@ -13,12 +10,7 @@ import com.arialyy.aria.core.inf.IComponentInit
  **/
 class HttpComponent : IComponentInit {
   override fun init(context: Context) {
-    EventMsgUtil.getDefault().register(this)
-  }
-
-  @Event
-  fun resumeAll(resumeAllEvent: ResumeAllEvent) {
-
+    HttpCmdHandler.initHandler()
   }
 
 }

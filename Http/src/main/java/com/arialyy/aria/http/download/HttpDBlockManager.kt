@@ -43,7 +43,7 @@ class HttpDBlockManager(task: ITask) : DBlockManager(task) {
     }
   }
 
-  override fun cancel() {
+  override fun delete() {
     optionAdapter.threadList.forEach {
       it.cancel()
     }

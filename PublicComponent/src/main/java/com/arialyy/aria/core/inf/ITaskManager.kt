@@ -47,7 +47,7 @@ interface ITaskManager {
 
   fun stop()
 
-  fun cancel()
+  fun delete()
 
   /**
    * 任务是否已经完成

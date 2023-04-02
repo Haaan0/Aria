@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.core.event;
 
-import com.arialyy.aria.util.ALog;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -28,17 +27,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import timber.log.Timber;
 
 /**
  * 消息发送工具
  */
 public class EventMsgUtil {
-  private static final String TAG = "EventUtil";
   private static EventMsgUtil defaultInstance;
-  private Map<Object, List<EventMethodInfo>> mEventMethods =
+  private final Map<Object, List<EventMethodInfo>> mEventMethods =
       new ConcurrentHashMap<>();
-  private ArrayBlockingQueue<Object> mEventQueue = new ArrayBlockingQueue<>(10);
-  private ExecutorService mPool = Executors.newFixedThreadPool(5);
+  private final ArrayBlockingQueue<Object> mEventQueue = new ArrayBlockingQueue<>(10);
+  private final ExecutorService mPool = Executors.newFixedThreadPool(5);
 
   private EventMsgUtil() {
     ExecutorService pool = Executors.newSingleThreadExecutor();
@@ -102,15 +101,14 @@ public class EventMsgUtil {
         continue;
       }
       Class<?>[] clazz = method.getParameterTypes();
-      if (clazz.length == 0 || clazz.length > 1) {
-        ALog.e(TAG,
-            String.format("%s.%s参数数量为0或参数数量大于1", obj.getClass().getName(), method.getName()));
+      if (clazz.length != 1) {
+        Timber.e("%s.%s参数数量为0或参数数量大于1", obj.getClass().getName(), method.getName());
         continue;
       }
       int modifier = method.getModifiers();
       if (Modifier.isStatic(modifier) || Modifier.isAbstract(modifier) || Modifier.isFinal(
           modifier)) {
-        ALog.e(TAG, "注册的方法不能使用final、static、abstract修饰");
+        Timber.e("注册的方法不能使用final、static、abstract修饰");
         continue;
       }
 

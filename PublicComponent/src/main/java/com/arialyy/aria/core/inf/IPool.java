@@ -59,7 +59,7 @@ public interface IPool<T extends ITask> {
   /**
    * @return true:移除成功
    */
-  boolean removeTask(int taskId);
+  boolean deleteTask(int taskId);
 
   /**
    * 池子大小

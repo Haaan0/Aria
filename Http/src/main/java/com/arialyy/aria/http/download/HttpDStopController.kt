@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.http.download
 
-import com.arialyy.aria.core.command.CancelCmd
+import com.arialyy.aria.core.command.DeleteCmd
 import com.arialyy.aria.core.command.StopCmd
 import com.arialyy.aria.core.task.TaskCachePool
 import timber.log.Timber
@@ -27,13 +27,13 @@ import timber.log.Timber
  **/
 class HttpDStopController(val taskId: Int) {
 
-  fun cancel() {
+  fun delete() {
     val task = TaskCachePool.getTaskById(taskId)
     if (task == null) {
       Timber.e("task not found, taskId: $taskId")
       return
     }
-    CancelCmd(task).executeCmd()
+    DeleteCmd(task).executeCmd()
   }
 
   fun stop() {

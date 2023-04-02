@@ -59,7 +59,12 @@ public interface ITaskQueue<TASK extends ITask> extends IService {
   /**
    * remove task
    */
-  void removeTask(TASK task);
+  void deleteTask(TASK task);
+
+  /**
+   * Delete all active tasks
+   */
+  void deleteAllTask();
 
   /**
    * 重试

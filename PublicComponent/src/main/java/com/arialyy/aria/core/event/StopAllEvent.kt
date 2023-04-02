@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.event;
+package com.arialyy.aria.core.event
+
+import androidx.annotation.Keep
 
 /**
- * 最大上传任务数事件
- */
-public class UMaxNumEvent {
-
-  public int maxNum;
-
-  public UMaxNumEvent(int maxNum) {
-    this.maxNum = maxNum;
-  }
-}
+ * @Author laoyuyu
+ * @Description
+ * @Date 21:57 2023/4/2
+ **/
+@Keep
+class StopAllEvent

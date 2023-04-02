@@ -59,7 +59,7 @@ internal class HttpDGAdapter : AbsTaskAdapter() {
         Timber.w("task already canceled, taskId: ${getTask().taskId}")
         return
       }
-      it.cancel()
+      it.delete()
     }
   }
 

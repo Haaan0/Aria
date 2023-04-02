@@ -13,32 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.arialyy.aria.core.command;
 
+import com.arialyy.aria.core.event.EventMsgUtil;
+import com.arialyy.aria.core.event.DeleteAllEvent;
+
 /**
- * 命令处理器
+ * Created by AriaL on 2017/6/27.
+ * 删除所有任务，并且删除所有回掉
  */
-public class CommandManager {
+final public class DeleteAllCmd implements ICmd {
 
-  private static CommandManager instance;
+  private boolean onlyDeleteRecord;
 
-  private CommandManager() {
+  /**
+   * @param onlyDeleteRecord true: Delete records only;
+   * false: Delete file and records
+   */
+  public DeleteAllCmd(boolean onlyDeleteRecord) {
+    this.onlyDeleteRecord = onlyDeleteRecord;
   }
 
-  public static void init() {
-    if (instance == null) {
-      synchronized (CommandManager.class) {
-        if (instance == null) {
-          instance = new CommandManager();
-        }
-      }
-    }
-  }
-
-  public void exeCmd(ICmd cmd) {
-    //if (CommonUtil.isFastDoubleClick()) {
-    //  return;
-    //}
-    cmd.executeCmd();
+  @Override public CmdResp executeCmd() {
+    EventMsgUtil.getDefault().post(new DeleteAllEvent(onlyDeleteRecord));
+    return new CmdResp(CmdResp.CODE_COMPLETE);
   }
 }

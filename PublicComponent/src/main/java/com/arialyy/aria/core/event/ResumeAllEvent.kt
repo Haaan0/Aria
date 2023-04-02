@@ -15,9 +15,12 @@
  */
 package com.arialyy.aria.core.event
 
+import androidx.annotation.Keep
+
 /**
  * @Author laoyuyu
  * @Description
  * @Date 8:26 PM 2023/3/21
  **/
+@Keep
 class ResumeAllEvent

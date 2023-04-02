@@ -27,19 +27,13 @@ import timber.log.Timber
  * Created by lyy on 2016/9/20.
  * 取消命令
  */
-class CancelCmd(task: ITask) : AbsCmd(task) {
+class DeleteCmd(task: ITask) : AbsCmd(task) {
 
   override fun executeCmd(): CmdResp {
     val resp = interceptor()
     if (resp.isInterrupt()) {
       Timber.w("interruption occurred, cancel cmd")
       return resp
-    }
-
-    if (!taskQueue.taskIsRunning(mTask?.taskId ?: -1)) {
-      // remove already file
-
-      return CmdResp(CmdResp.CODE_COMPLETE)
     }
     DuaContext.duaScope.launch(Dispatchers.IO) {
       ThreadTaskManager2.stopThreadTask(mTask!!.taskId, true)

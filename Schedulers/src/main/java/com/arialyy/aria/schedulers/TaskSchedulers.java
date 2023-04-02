@@ -312,7 +312,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         }
         break;
       case CANCEL:
-        queue.removeTask(task);
+        queue.deleteTask(task);
 
         if (!queue.isFull()) {
           Timber.d("remove task success, if there is a task, start the next task, taskId: %s",
@@ -323,7 +323,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         }
         break;
       case COMPLETE:
-        queue.removeTask(task);
+        queue.deleteTask(task);
         Timber.d("task complete, taskId: %s", task.getTaskId());
         queue.startNextTask();
         break;
@@ -502,7 +502,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    */
   private void handleFailTask(final ITaskQueue<ITask> queue, final TASK task) {
     if (!task.getTaskState().getNeedRetry() || task.isStopped() || task.isCanceled()) {
-      queue.removeTask(task);
+      queue.deleteTask(task);
       queue.startNextTask();
       normalTaskCallback(FAIL, task);
       return;
@@ -511,7 +511,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
     boolean isNotNetRetry = mAriaConfig.getAConfig().isNotNetRetry();
 
     if ((!NetUtils.isConnected(mAriaConfig.getAPP()) && !isNotNetRetry)) {
-      queue.removeTask(task);
+      queue.deleteTask(task);
       queue.startNextTask();
       normalTaskCallback(FAIL, task);
       return;

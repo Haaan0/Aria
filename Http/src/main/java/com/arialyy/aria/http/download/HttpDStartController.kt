@@ -18,16 +18,14 @@ package com.arialyy.aria.http.download
 import android.net.Uri
 import com.arialyy.aria.core.DuaContext
 import com.arialyy.aria.core.command.AddCmd
-import com.arialyy.aria.core.command.CancelCmd
+import com.arialyy.aria.core.command.DeleteCmd
 import com.arialyy.aria.core.command.StartCmd
 import com.arialyy.aria.core.command.StopCmd
-import com.arialyy.aria.http.IHttpFileLenAdapter
-import com.arialyy.aria.core.task.SingleDownloadTask
 import com.arialyy.aria.core.task.ITaskInterceptor
-import com.arialyy.aria.core.task.TaskCachePool
 import com.arialyy.aria.http.HttpBaseStartController
 import com.arialyy.aria.http.HttpOption
 import com.arialyy.aria.http.HttpUtil
+import com.arialyy.aria.http.IHttpFileLenAdapter
 import timber.log.Timber
 import java.net.HttpURLConnection
 
@@ -92,28 +90,11 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
     return this
   }
 
-  private fun getTask(createNewTask: Boolean = true): SingleDownloadTask? {
-    if (HttpUtil.checkHttpDParams(httpTaskOption)) {
-      throw IllegalArgumentException("invalid params")
-    }
-    val tempTask = TaskCachePool.getTaskByKey(url)
-    if (tempTask != null) {
-      return tempTask as SingleDownloadTask
-    }
-    if (!createNewTask) {
-      return null
-    }
-    val task = SingleDownloadTask(httpTaskOption)
-    task.adapter = HttpDTaskAdapter()
-    TaskCachePool.putTask(task)
-    return task
-  }
-
   fun add(): Int {
     if (!HttpUtil.checkHttpDParams(httpTaskOption)) {
       return -1
     }
-    val task = getTask()
+    val task = HttpUtil.getSingDTask(httpTaskOption)
     val resp = AddCmd(task).executeCmd()
     return if (resp.isInterrupt()) -1 else task?.taskId ?: -1
   }
@@ -122,7 +103,7 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
     if (!HttpUtil.checkHttpDParams(httpTaskOption)) {
       return -1
     }
-    val task = getTask()
+    val task = HttpUtil.getSingDTask(httpTaskOption)
     val resp = StartCmd(task).executeCmd()
     return if (resp.isInterrupt()) -1 else task?.taskId ?: -1
   }
@@ -131,17 +112,17 @@ class HttpDStartController(target: Any, val url: String) : HttpBaseStartControll
     return start()
   }
 
-  fun cancel() {
-    val task = getTask(true)
+  fun delete() {
+    val task = HttpUtil.getSingDTask(httpTaskOption, true)
     if (task == null) {
       Timber.e("not found task, url: $url")
       return
     }
-    CancelCmd(task).executeCmd()
+    DeleteCmd(task).executeCmd()
   }
 
   fun stop() {
-    val task = getTask(false)
+    val task = HttpUtil.getSingDTask(httpTaskOption, false)
     if (task == null) {
       Timber.e("task not running, url: $url")
       return

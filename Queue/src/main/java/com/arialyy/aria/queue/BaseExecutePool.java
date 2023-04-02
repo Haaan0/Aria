@@ -146,7 +146,7 @@ public class BaseExecutePool<TASK extends ITask> implements IPool<TASK> {
     return getTask(taskId) != null;
   }
 
-  @Override public boolean removeTask(int taskId) {
+  @Override public boolean deleteTask(int taskId) {
     if (taskId < 0) {
       Timber.e("invalid taskId");
       return false;
